@@ -41,7 +41,7 @@ export function AppSidebar() {
       )}
     >
       {/* Logo */}
-      <div className="flex h-16 items-center gap-3 border-b border-border px-4">
+      <Link href="/connect" className="flex h-16 items-center gap-3 border-b border-border px-4 transition-opacity hover:opacity-80">
         <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary">
           <GitFork className="h-5 w-5 text-primary-foreground" />
         </div>
@@ -50,7 +50,7 @@ export function AppSidebar() {
             Tippa
           </span>
         )}
-      </div>
+      </Link>
 
       {/* Wallet Status */}
       {!collapsed && (
