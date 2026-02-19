@@ -42,36 +42,47 @@ function StatCard({ label, value, change, changeType, icon, accent }: StatCardPr
   )
 }
 
-export function StatCards() {
+interface StatCardsProps {
+  totalReceived: number
+  totalForwarded: number
+  activeCascades: number
+  depCount: number
+}
+
+export function StatCards({ totalReceived, totalForwarded, activeCascades, depCount }: StatCardsProps) {
+  const multiplier = totalForwarded > 0 && totalReceived > 0
+    ? (totalReceived / totalForwarded).toFixed(2)
+    : "0.00"
+
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
       <StatCard
         label="Total Received"
-        value="$12,845.60"
-        change="+18.2%"
-        changeType="positive"
+        value={`$${totalReceived.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
+        change={totalReceived > 0 ? "Live" : "No data yet"}
+        changeType={totalReceived > 0 ? "positive" : "neutral"}
         icon={<ArrowDownLeft className="h-5 w-5 text-primary" />}
       />
       <StatCard
         label="Total Forwarded"
-        value="$3,412.90"
-        change="+12.5%"
-        changeType="positive"
+        value={`$${totalForwarded.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
+        change={totalForwarded > 0 ? "Live" : "No data yet"}
+        changeType={totalForwarded > 0 ? "positive" : "neutral"}
         icon={<ArrowUpRight className="h-5 w-5 text-[hsl(var(--chart-2))]" />}
         accent="bg-[hsl(var(--chart-2))]/10"
       />
       <StatCard
         label="Impact Multiplier"
-        value="3.76x"
-        change="+0.4x"
-        changeType="positive"
+        value={`${multiplier}x`}
+        change={Number(multiplier) > 1 ? "Active" : "N/A"}
+        changeType={Number(multiplier) > 1 ? "positive" : "neutral"}
         icon={<Zap className="h-5 w-5 text-[hsl(var(--warning))]" />}
         accent="bg-[hsl(var(--warning))]/10"
       />
       <StatCard
         label="Active Cascades"
-        value="5"
-        change="3 recipients"
+        value={String(activeCascades)}
+        change={`${depCount} recipient${depCount !== 1 ? "s" : ""}`}
         changeType="neutral"
         icon={<TrendingUp className="h-5 w-5 text-primary" />}
       />

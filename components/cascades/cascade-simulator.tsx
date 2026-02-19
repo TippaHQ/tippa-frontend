@@ -12,18 +12,25 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import type { CascadeDependency } from "@/lib/types"
 
-export function CascadeSimulator() {
+interface CascadeSimulatorProps {
+  dependencies: CascadeDependency[]
+}
+
+export function CascadeSimulator({ dependencies }: CascadeSimulatorProps) {
   const [amount, setAmount] = useState("100")
   const [asset, setAsset] = useState("USDC")
   const [simulated, setSimulated] = useState(false)
 
   const numAmount = parseFloat(amount) || 0
   const platformFee = numAmount * 0.005
-  const depA = numAmount * 0.02
-  const depB = numAmount * 0.02
-  const depC = numAmount * 0.02
-  const youReceive = numAmount - platformFee - depA - depB - depC
+  const depAmounts = dependencies.map((d) => ({
+    name: d.label,
+    amount: numAmount * (Number(d.percentage) / 100),
+  }))
+  const totalDeps = depAmounts.reduce((s, d) => s + d.amount, 0)
+  const youReceive = numAmount - platformFee - totalDeps
 
   return (
     <div className="rounded-xl border border-border bg-card p-5">
@@ -72,7 +79,7 @@ export function CascadeSimulator() {
           <p className="text-xs font-medium text-muted-foreground">Distribution Preview</p>
 
           <div className="flex items-center justify-between">
-            <span className="text-sm text-foreground">You (alice)</span>
+            <span className="text-sm text-foreground">You</span>
             <div className="flex items-center gap-1.5">
               <span className="font-mono text-sm font-semibold text-foreground">
                 {youReceive.toFixed(2)}
@@ -81,17 +88,13 @@ export function CascadeSimulator() {
             </div>
           </div>
 
-          <div className="h-px bg-border" />
+          {depAmounts.length > 0 && <div className="h-px bg-border" />}
 
-          {[
-            { name: "react-core", amount: depA },
-            { name: "tailwind-css", amount: depB },
-            { name: "next-framework", amount: depC },
-          ].map((d) => (
+          {depAmounts.map((d) => (
             <div key={d.name} className="flex items-center justify-between">
               <div className="flex items-center gap-1.5">
                 <ArrowRight className="h-3 w-3 text-primary" />
-                <span className="text-sm text-muted-foreground">{d.name}</span>
+                <span className="text-sm text-muted-foreground">{d.name || "Unnamed"}</span>
               </div>
               <div className="flex items-center gap-1.5">
                 <span className="font-mono text-sm text-primary">{d.amount.toFixed(2)}</span>

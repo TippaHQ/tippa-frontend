@@ -13,9 +13,13 @@ import {
   HelpCircle,
   ChevronLeft,
   ChevronRight,
+  LogOut,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { createClient } from "@/lib/supabase/client"
+import { useRouter } from "next/navigation"
+import type { Profile } from "@/lib/types"
 
 const mainNav = [
   { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
@@ -31,7 +35,38 @@ const secondaryNav = [
 
 export function AppSidebar() {
   const pathname = usePathname()
+  const router = useRouter()
   const [collapsed, setCollapsed] = useState(false)
+  const [profile, setProfile] = useState<Profile | null>(null)
+
+  useEffect(() => {
+    const supabase = createClient()
+    const fetchProfile = async () => {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser()
+      if (user) {
+        const { data } = await supabase
+          .from("profiles")
+          .select("*")
+          .eq("id", user.id)
+          .single()
+        setProfile(data)
+      }
+    }
+    fetchProfile()
+  }, [])
+
+  const handleLogout = async () => {
+    const supabase = createClient()
+    await supabase.auth.signOut()
+    router.push("/connect")
+    router.refresh()
+  }
+
+  const walletShort = profile?.wallet_address
+    ? profile.wallet_address.slice(0, 4) + "..." + profile.wallet_address.slice(-4)
+    : "No wallet"
 
   return (
     <aside
@@ -41,7 +76,10 @@ export function AppSidebar() {
       )}
     >
       {/* Logo */}
-      <Link href="/connect" className="flex h-16 items-center gap-3 border-b border-border px-4 transition-opacity hover:opacity-80">
+      <Link
+        href="/connect"
+        className="flex h-16 items-center gap-3 border-b border-border px-4 transition-opacity hover:opacity-80"
+      >
         <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary">
           <GitFork className="h-5 w-5 text-primary-foreground" />
         </div>
@@ -56,16 +94,19 @@ export function AppSidebar() {
       {!collapsed && (
         <div className="mx-3 mt-4 rounded-lg border border-border bg-secondary/50 p-3">
           <div className="flex items-center gap-2">
-            <div className="h-2 w-2 rounded-full bg-primary" />
-            <span className="text-xs font-medium text-muted-foreground">Connected</span>
+            <div className={cn("h-2 w-2 rounded-full", profile ? "bg-primary" : "bg-muted-foreground")} />
+            <span className="text-xs font-medium text-muted-foreground">
+              {profile ? "Connected" : "Not connected"}
+            </span>
           </div>
           <p className="mt-1.5 truncate font-mono text-xs text-foreground">
-            GBXK...7HQF
+            {walletShort}
           </p>
-          <div className="mt-2 flex items-center justify-between">
-            <span className="text-xs text-muted-foreground">XLM Balance</span>
-            <span className="text-xs font-medium text-foreground">1,245.80</span>
-          </div>
+          {profile?.display_name && (
+            <p className="mt-1 truncate text-xs text-muted-foreground">
+              {profile.display_name}
+            </p>
+          )}
         </div>
       )}
       {collapsed && (
@@ -134,21 +175,32 @@ export function AppSidebar() {
           )
         })}
 
-        {/* Spacer */}
         <div className="flex-1" />
 
         {/* Tippa Link */}
-        {!collapsed && (
+        {!collapsed && profile?.username && (
           <div className="mb-2 rounded-lg border border-dashed border-primary/30 bg-primary/5 p-3">
             <div className="flex items-center gap-2">
               <ExternalLink className="h-4 w-4 text-primary" />
               <span className="text-xs font-medium text-foreground">Your Tippa Link</span>
             </div>
             <p className="mt-1 truncate font-mono text-xs text-primary">
-              tippa.io/alice
+              tippa.io/{profile.username}
             </p>
           </div>
         )}
+
+        {/* Logout */}
+        <button
+          onClick={handleLogout}
+          className={cn(
+            "flex items-center gap-2 rounded-lg py-2.5 text-sm text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground",
+            collapsed ? "justify-center px-0" : "px-3"
+          )}
+        >
+          <LogOut className="h-4 w-4" />
+          {!collapsed && <span>Sign out</span>}
+        </button>
 
         {/* Collapse Toggle */}
         <button
