@@ -1,14 +1,19 @@
 "use client"
 
 import { Eye, Users, ArrowDownLeft } from "lucide-react"
+import type { ProfileAnalytics } from "@/lib/types"
 
-const stats = [
-  { label: "Profile Views", value: "1,284", icon: Eye, period: "Last 30 days" },
-  { label: "Unique Supporters", value: "47", icon: Users, period: "All time" },
-  { label: "Payments Received", value: "132", icon: ArrowDownLeft, period: "All time" },
-]
+interface ProfileStatsProps {
+  analytics: ProfileAnalytics | null
+}
 
-export function ProfileStats() {
+export function ProfileStats({ analytics }: ProfileStatsProps) {
+  const stats = [
+    { label: "Profile Views", value: analytics?.profile_views?.toLocaleString() ?? "0", icon: Eye, period: "Last 30 days" },
+    { label: "Unique Supporters", value: analytics?.unique_supporters?.toLocaleString() ?? "0", icon: Users, period: "All time" },
+    { label: "Payments Received", value: analytics?.total_payments_received?.toLocaleString() ?? "0", icon: ArrowDownLeft, period: "All time" },
+  ]
+
   return (
     <div className="rounded-xl border border-border bg-card p-5">
       <h3 className="text-sm font-semibold text-foreground">Profile Analytics</h3>

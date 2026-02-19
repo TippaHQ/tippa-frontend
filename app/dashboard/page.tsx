@@ -2,11 +2,25 @@ import { StatCards } from "@/components/dashboard/stat-cards"
 import { FlowChart } from "@/components/dashboard/flow-chart"
 import { RecentTransactions } from "@/components/dashboard/recent-transactions"
 import { CascadePreview } from "@/components/dashboard/cascade-preview"
+import {
+  getDashboardStats,
+  getMonthlyFlowStats,
+  getTransactions,
+  getCascadeDependencies,
+  getProfile,
+} from "@/lib/actions"
 
-export default function DashboardPage() {
+export default async function DashboardPage() {
+  const [stats, monthlyStats, txResult, deps, profile] = await Promise.all([
+    getDashboardStats(),
+    getMonthlyFlowStats(),
+    getTransactions({ limit: 5 }),
+    getCascadeDependencies(),
+    getProfile(),
+  ])
+
   return (
     <div className="mx-auto max-w-7xl space-y-6">
-      {/* Header */}
       <div>
         <h1 className="text-2xl font-semibold tracking-tight text-foreground">Dashboard</h1>
         <p className="mt-1 text-sm text-muted-foreground">
@@ -14,19 +28,24 @@ export default function DashboardPage() {
         </p>
       </div>
 
-      {/* Stat Cards */}
-      <StatCards />
+      <StatCards
+        totalReceived={stats.totalReceived}
+        totalForwarded={stats.totalForwarded}
+        activeCascades={stats.activeCascades}
+        depCount={stats.depCount}
+      />
 
-      {/* Charts Row */}
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
         <div className="xl:col-span-2">
-          <FlowChart />
+          <FlowChart data={monthlyStats} />
         </div>
-        <CascadePreview />
+        <CascadePreview
+          dependencies={deps}
+          username={profile?.username ?? profile?.display_name ?? "you"}
+        />
       </div>
 
-      {/* Recent Transactions */}
-      <RecentTransactions />
+      <RecentTransactions transactions={txResult.data} />
     </div>
   )
 }

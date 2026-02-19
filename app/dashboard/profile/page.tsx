@@ -2,8 +2,15 @@ import { ProfileCard } from "@/components/profile/profile-card"
 import { ProfileLink } from "@/components/profile/profile-link"
 import { ProfileStats } from "@/components/profile/profile-stats"
 import { ProfileDependencies } from "@/components/profile/profile-dependencies"
+import { getProfile, getProfileAnalytics, getCascadeDependencies } from "@/lib/actions"
 
-export default function ProfilePage() {
+export default async function ProfilePage() {
+  const [profile, analytics, deps] = await Promise.all([
+    getProfile(),
+    getProfileAnalytics(),
+    getCascadeDependencies(),
+  ])
+
   return (
     <div className="mx-auto max-w-7xl space-y-6">
       <div>
@@ -15,12 +22,12 @@ export default function ProfilePage() {
 
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
         <div className="space-y-6 xl:col-span-2">
-          <ProfileCard />
-          <ProfileLink />
+          <ProfileCard profile={profile} />
+          <ProfileLink username={profile?.username ?? null} />
         </div>
         <div className="space-y-6">
-          <ProfileStats />
-          <ProfileDependencies />
+          <ProfileStats analytics={analytics} />
+          <ProfileDependencies dependencies={deps} />
         </div>
       </div>
     </div>
