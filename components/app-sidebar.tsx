@@ -1,7 +1,7 @@
-"use client"
+"use client";
 
-import Link from "next/link"
-import { usePathname } from "next/navigation"
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import {
   LayoutDashboard,
   GitFork,
@@ -14,65 +14,77 @@ import {
   ChevronLeft,
   ChevronRight,
   LogOut,
-} from "lucide-react"
-import { cn } from "@/lib/utils"
-import { useState, useEffect } from "react"
-import { createClient } from "@/lib/supabase/client"
-import { useRouter } from "next/navigation"
-import type { Profile } from "@/lib/types"
+} from "lucide-react";
+import { cn } from "@/lib/utils";
+import { useState, useEffect } from "react";
+import { createClient } from "@/lib/supabase/client";
+import { useRouter } from "next/navigation";
+import type { Profile } from "@/lib/types";
+import { useWallet } from "@/providers/wallet-provider";
 
 const mainNav = [
   { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
   { label: "Cascades", href: "/dashboard/cascades", icon: GitFork },
-  { label: "Transactions", href: "/dashboard/transactions", icon: ArrowLeftRight },
+  {
+    label: "Transactions",
+    href: "/dashboard/transactions",
+    icon: ArrowLeftRight,
+  },
   { label: "Profile", href: "/dashboard/profile", icon: User },
-]
+];
 
 const secondaryNav = [
   { label: "Settings", href: "/dashboard/settings", icon: Settings },
   { label: "Help", href: "/dashboard/help", icon: HelpCircle },
-]
+];
 
 export function AppSidebar() {
-  const pathname = usePathname()
-  const router = useRouter()
-  const [collapsed, setCollapsed] = useState(false)
-  const [profile, setProfile] = useState<Profile | null>(null)
+  const pathname = usePathname();
+  const router = useRouter();
+  const [collapsed, setCollapsed] = useState(false);
+  const [profile, setProfile] = useState<Profile | null>(null);
+  const {
+    walletAddress,
+    walletName,
+    isConnected,
+    connectWallet,
+    disconnectWallet,
+  } = useWallet();
 
   useEffect(() => {
-    const supabase = createClient()
+    const supabase = createClient();
     const fetchProfile = async () => {
       const {
         data: { user },
-      } = await supabase.auth.getUser()
+      } = await supabase.auth.getUser();
       if (user) {
         const { data } = await supabase
           .from("profiles")
           .select("*")
           .eq("id", user.id)
-          .single()
-        setProfile(data)
+          .single();
+        setProfile(data);
       }
-    }
-    fetchProfile()
-  }, [])
+    };
+    fetchProfile();
+  }, []);
 
   const handleLogout = async () => {
-    const supabase = createClient()
-    await supabase.auth.signOut()
-    router.push("/connect")
-    router.refresh()
-  }
+    const supabase = createClient();
+    await supabase.auth.signOut();
+    router.push("/connect");
+    router.refresh();
+  };
 
-  const walletShort = profile?.wallet_address
-    ? profile.wallet_address.slice(0, 4) + "..." + profile.wallet_address.slice(-4)
-    : "No wallet"
+  const walletShort = walletAddress
+    ? walletAddress.slice(0, 4) + "..." + walletAddress.slice(-4)
+    : null;
 
   return (
     <aside
       className={cn(
         "flex h-screen flex-col border-r border-border bg-sidebar transition-all duration-300",
-        collapsed ? "w-[72px]" : "w-64"
+        collapsed ? "w-[72px]" : "w-64",
       )}
     >
       {/* Logo */}
@@ -90,18 +102,52 @@ export function AppSidebar() {
         )}
       </Link>
 
-      {/* Wallet Status */}
+      {/* Wallet Status Card */}
       {!collapsed && (
         <div className="mx-3 mt-4 rounded-lg border border-border bg-secondary/50 p-3">
-          <div className="flex items-center gap-2">
-            <div className={cn("h-2 w-2 rounded-full", profile ? "bg-primary" : "bg-muted-foreground")} />
-            <span className="text-xs font-medium text-muted-foreground">
-              {profile ? "Connected" : "Not connected"}
-            </span>
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2">
+              <div
+                className={cn(
+                  "h-2 w-2 rounded-full transition-colors",
+                  isConnected ? "bg-primary" : "bg-muted-foreground",
+                )}
+              />
+              <span className="text-xs font-medium text-muted-foreground">
+                {isConnected ? "Connected" : "Not connected"}
+              </span>
+            </div>
+            {isConnected && (
+              <button
+                onClick={disconnectWallet}
+                className="text-[10px] font-medium text-muted-foreground underline-offset-2 hover:text-destructive hover:underline transition-colors"
+              >
+                Disconnect
+              </button>
+            )}
           </div>
-          <p className="mt-1.5 truncate font-mono text-xs text-foreground">
-            {walletShort}
-          </p>
+
+          {isConnected && walletShort ? (
+            <>
+              <p className="mt-1.5 truncate font-mono text-xs text-foreground">
+                {walletShort}
+              </p>
+              {walletName && (
+                <p className="mt-1 truncate text-xs text-muted-foreground">
+                  {walletName}
+                </p>
+              )}
+            </>
+          ) : (
+            <button
+              onClick={connectWallet}
+              className="mt-2 flex w-full items-center justify-center gap-1.5 rounded-md bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground transition-opacity hover:opacity-90"
+            >
+              <Wallet className="h-3.5 w-3.5" />
+              Connect Wallet
+            </button>
+          )}
+
           {profile?.display_name && (
             <p className="mt-1 truncate text-xs text-muted-foreground">
               {profile.display_name}
@@ -120,13 +166,13 @@ export function AppSidebar() {
         <span
           className={cn(
             "mb-2 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground",
-            collapsed && "sr-only"
+            collapsed && "sr-only",
           )}
         >
           Menu
         </span>
         {mainNav.map((item) => {
-          const isActive = pathname === item.href
+          const isActive = pathname === item.href;
           return (
             <Link
               key={item.href}
@@ -136,13 +182,18 @@ export function AppSidebar() {
                 isActive
                   ? "bg-primary/10 text-primary"
                   : "text-muted-foreground hover:bg-secondary hover:text-foreground",
-                collapsed && "justify-center px-0"
+                collapsed && "justify-center px-0",
               )}
             >
-              <item.icon className={cn("h-[18px] w-[18px] shrink-0", isActive && "text-primary")} />
+              <item.icon
+                className={cn(
+                  "h-[18px] w-[18px] shrink-0",
+                  isActive && "text-primary",
+                )}
+              />
               {!collapsed && <span>{item.label}</span>}
             </Link>
-          )
+          );
         })}
 
         <div className="my-4 h-px bg-border" />
@@ -150,13 +201,13 @@ export function AppSidebar() {
         <span
           className={cn(
             "mb-2 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground",
-            collapsed && "sr-only"
+            collapsed && "sr-only",
           )}
         >
           Support
         </span>
         {secondaryNav.map((item) => {
-          const isActive = pathname === item.href
+          const isActive = pathname === item.href;
           return (
             <Link
               key={item.href}
@@ -166,13 +217,13 @@ export function AppSidebar() {
                 isActive
                   ? "bg-primary/10 text-primary"
                   : "text-muted-foreground hover:bg-secondary hover:text-foreground",
-                collapsed && "justify-center px-0"
+                collapsed && "justify-center px-0",
               )}
             >
               <item.icon className="h-[18px] w-[18px] shrink-0" />
               {!collapsed && <span>{item.label}</span>}
             </Link>
-          )
+          );
         })}
 
         <div className="flex-1" />
@@ -182,7 +233,9 @@ export function AppSidebar() {
           <div className="mb-2 rounded-lg border border-dashed border-primary/30 bg-primary/5 p-3">
             <div className="flex items-center gap-2">
               <ExternalLink className="h-4 w-4 text-primary" />
-              <span className="text-xs font-medium text-foreground">Your Tippa Link</span>
+              <span className="text-xs font-medium text-foreground">
+                Your Tippa Link
+              </span>
             </div>
             <p className="mt-1 truncate font-mono text-xs text-primary">
               tippa.io/{profile.username}
@@ -195,7 +248,7 @@ export function AppSidebar() {
           onClick={handleLogout}
           className={cn(
             "flex items-center gap-2 rounded-lg py-2.5 text-sm text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground",
-            collapsed ? "justify-center px-0" : "px-3"
+            collapsed ? "justify-center px-0" : "px-3",
           )}
         >
           <LogOut className="h-4 w-4" />
@@ -219,5 +272,5 @@ export function AppSidebar() {
         </button>
       </nav>
     </aside>
-  )
+  );
 }
