@@ -17,16 +17,11 @@ export function ProfileStats({ analytics }: ProfileStatsProps) {
   return (
     <div className="rounded-xl border border-border bg-card p-5">
       <h3 className="text-sm font-semibold text-foreground">Profile Analytics</h3>
-      <p className="mt-0.5 text-xs text-muted-foreground">
-        How people interact with your Tippa page
-      </p>
+      <p className="mt-0.5 text-xs text-muted-foreground">How people interact with your Tippa page</p>
 
       <div className="mt-4 space-y-3">
         {stats.map((stat) => (
-          <div
-            key={stat.label}
-            className="flex items-center gap-3 rounded-lg border border-border bg-secondary/20 p-3"
-          >
+          <div key={stat.label} className="flex items-center gap-3 rounded-lg border border-border bg-secondary/20 p-3">
             <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary/10">
               <stat.icon className="h-4 w-4 text-primary" />
             </div>

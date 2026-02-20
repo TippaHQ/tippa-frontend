@@ -38,9 +38,7 @@ export default function LoginPage() {
           <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary">
             <GitFork className="h-6 w-6 text-primary-foreground" />
           </div>
-          <h1 className="text-2xl font-semibold tracking-tight text-foreground">
-            Welcome back
-          </h1>
+          <h1 className="text-2xl font-semibold tracking-tight text-foreground">Welcome back</h1>
           <p className="text-sm text-muted-foreground">Sign in to your Tippa account</p>
         </div>
 
@@ -68,17 +66,9 @@ export default function LoginPage() {
             />
           </div>
 
-          {error && (
-            <div className="rounded-lg bg-destructive/10 px-3 py-2 text-xs text-destructive">
-              {error}
-            </div>
-          )}
+          {error && <div className="rounded-lg bg-destructive/10 px-3 py-2 text-xs text-destructive">{error}</div>}
 
-          <Button
-            type="submit"
-            disabled={loading}
-            className="w-full gap-2 bg-primary text-primary-foreground hover:bg-primary/90"
-          >
+          <Button type="submit" disabled={loading} className="w-full gap-2 bg-primary text-primary-foreground hover:bg-primary/90">
             {loading && <Loader2 className="h-4 w-4 animate-spin" />}
             Sign In
           </Button>
@@ -86,10 +76,7 @@ export default function LoginPage() {
 
         <p className="text-center text-sm text-muted-foreground">
           {"Don't have an account? "}
-          <Link
-            href="/auth/sign-up"
-            className="font-medium text-primary hover:text-primary/80"
-          >
+          <Link href="/auth/sign-up" className="font-medium text-primary hover:text-primary/80">
             Sign up
           </Link>
         </p>

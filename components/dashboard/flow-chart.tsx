@@ -1,14 +1,6 @@
 "use client"
 
-import {
-  AreaChart,
-  Area,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-} from "recharts"
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts"
 import type { MonthlyFlowStat } from "@/lib/types"
 
 const MONTH_NAMES = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
@@ -33,14 +25,9 @@ function CustomTooltip({
         <p className="mb-2 text-xs font-medium text-muted-foreground">{label}</p>
         {payload.map((p) => (
           <div key={p.dataKey} className="flex items-center gap-2">
-            <div
-              className="h-2 w-2 rounded-full"
-              style={{ backgroundColor: p.color }}
-            />
+            <div className="h-2 w-2 rounded-full" style={{ backgroundColor: p.color }} />
             <span className="text-xs capitalize text-muted-foreground">{p.dataKey}:</span>
-            <span className="text-xs font-medium text-foreground">
-              ${Number(p.value).toLocaleString()}
-            </span>
+            <span className="text-xs font-medium text-foreground">${Number(p.value).toLocaleString()}</span>
           </div>
         ))}
       </div>
@@ -68,9 +55,7 @@ export function FlowChart({ data }: FlowChartProps) {
         <div>
           <h3 className="text-sm font-semibold text-foreground">Payment Flow</h3>
           <p className="mt-0.5 text-xs text-muted-foreground">
-            {isEmpty
-              ? "No flow data yet -- stats will appear as transactions come in"
-              : "Received vs forwarded over time"}
+            {isEmpty ? "No flow data yet -- stats will appear as transactions come in" : "Received vs forwarded over time"}
           </p>
         </div>
         <div className="flex items-center gap-4">
@@ -86,9 +71,7 @@ export function FlowChart({ data }: FlowChartProps) {
       </div>
       <div className="h-[280px]">
         {isEmpty ? (
-          <div className="flex h-full items-center justify-center text-sm text-muted-foreground">
-            No payment flow data to display yet.
-          </div>
+          <div className="flex h-full items-center justify-center text-sm text-muted-foreground">No payment flow data to display yet.</div>
         ) : (
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart data={chartData}>
@@ -102,38 +85,12 @@ export function FlowChart({ data }: FlowChartProps) {
                   <stop offset="100%" stopColor="hsl(200, 70%, 50%)" stopOpacity={0} />
                 </linearGradient>
               </defs>
-              <CartesianGrid
-                strokeDasharray="3 3"
-                stroke="hsl(230, 12%, 18%)"
-                vertical={false}
-              />
-              <XAxis
-                dataKey="date"
-                tick={{ fill: "hsl(215, 15%, 55%)", fontSize: 12 }}
-                axisLine={false}
-                tickLine={false}
-              />
-              <YAxis
-                tick={{ fill: "hsl(215, 15%, 55%)", fontSize: 12 }}
-                axisLine={false}
-                tickLine={false}
-                tickFormatter={(v) => `$${v / 1000}k`}
-              />
+              <CartesianGrid strokeDasharray="3 3" stroke="hsl(230, 12%, 18%)" vertical={false} />
+              <XAxis dataKey="date" tick={{ fill: "hsl(215, 15%, 55%)", fontSize: 12 }} axisLine={false} tickLine={false} />
+              <YAxis tick={{ fill: "hsl(215, 15%, 55%)", fontSize: 12 }} axisLine={false} tickLine={false} tickFormatter={(v) => `$${v / 1000}k`} />
               <Tooltip content={<CustomTooltip />} />
-              <Area
-                type="monotone"
-                dataKey="received"
-                stroke="hsl(168, 80%, 50%)"
-                strokeWidth={2}
-                fill="url(#receivedGrad)"
-              />
-              <Area
-                type="monotone"
-                dataKey="forwarded"
-                stroke="hsl(200, 70%, 50%)"
-                strokeWidth={2}
-                fill="url(#forwardedGrad)"
-              />
+              <Area type="monotone" dataKey="received" stroke="hsl(168, 80%, 50%)" strokeWidth={2} fill="url(#receivedGrad)" />
+              <Area type="monotone" dataKey="forwarded" stroke="hsl(200, 70%, 50%)" strokeWidth={2} fill="url(#forwardedGrad)" />
             </AreaChart>
           </ResponsiveContainer>
         )}

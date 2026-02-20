@@ -1,25 +1,10 @@
 "use client"
 
 import { useState } from "react"
-import {
-  ArrowDownLeft,
-  ArrowUpRight,
-  ExternalLink,
-  Search,
-  Filter,
-  Download,
-  ChevronLeft,
-  ChevronRight,
-} from "lucide-react"
+import { ArrowDownLeft, ArrowUpRight, ExternalLink, Search, Filter, Download, ChevronLeft, ChevronRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { cn } from "@/lib/utils"
 import { formatDistanceToNow } from "date-fns"
 import type { Transaction, TransactionType } from "@/lib/types"
@@ -29,10 +14,7 @@ interface TransactionsClientProps {
   initialCount: number
 }
 
-export function TransactionsClient({
-  initialTransactions,
-  initialCount,
-}: TransactionsClientProps) {
+export function TransactionsClient({ initialTransactions, initialCount }: TransactionsClientProps) {
   const [filter, setFilter] = useState<"all" | TransactionType>("all")
   const [searchQuery, setSearchQuery] = useState("")
 
@@ -56,18 +38,10 @@ export function TransactionsClient({
     <div className="mx-auto max-w-7xl space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-foreground">
-            Transactions
-          </h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Full history of all payments and cascade activity
-          </p>
+          <h1 className="text-2xl font-semibold tracking-tight text-foreground">Transactions</h1>
+          <p className="mt-1 text-sm text-muted-foreground">Full history of all payments and cascade activity</p>
         </div>
-        <Button
-          variant="outline"
-          size="sm"
-          className="gap-2 border-border text-foreground hover:bg-secondary"
-        >
+        <Button variant="outline" size="sm" className="gap-2 border-border text-foreground hover:bg-secondary">
           <Download className="h-4 w-4" />
           Export CSV
         </Button>
@@ -91,9 +65,7 @@ export function TransactionsClient({
                 onClick={() => setFilter(f)}
                 className={cn(
                   "rounded-md px-3 py-1.5 text-xs font-medium capitalize transition-colors",
-                  filter === f
-                    ? "bg-primary text-primary-foreground"
-                    : "text-muted-foreground hover:text-foreground"
+                  filter === f ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground",
                 )}
               >
                 {f}
@@ -152,7 +124,7 @@ export function TransactionsClient({
                           <div
                             className={cn(
                               "flex h-8 w-8 items-center justify-center rounded-lg",
-                              isReceived ? "bg-primary/10" : "bg-[hsl(var(--chart-2))]/10"
+                              isReceived ? "bg-primary/10" : "bg-[hsl(var(--chart-2))]/10",
                             )}
                           >
                             {isReceived ? (
@@ -163,9 +135,7 @@ export function TransactionsClient({
                           </div>
                         </td>
                         <td className="px-5 py-3.5">
-                          <p className="text-sm font-medium text-foreground">
-                            {isReceived ? tx.from_name : tx.to_name}
-                          </p>
+                          <p className="text-sm font-medium text-foreground">{isReceived ? tx.from_name : tx.to_name}</p>
                           <p className="font-mono text-xs text-muted-foreground">
                             {isReceived
                               ? tx.from_address.slice(0, 4) + "..." + tx.from_address.slice(-4)
@@ -173,21 +143,14 @@ export function TransactionsClient({
                           </p>
                         </td>
                         <td className="px-5 py-3.5">
-                          <span
-                            className={cn(
-                              "font-mono text-sm font-semibold",
-                              isReceived ? "text-[hsl(var(--success))]" : "text-foreground"
-                            )}
-                          >
+                          <span className={cn("font-mono text-sm font-semibold", isReceived ? "text-[hsl(var(--success))]" : "text-foreground")}>
                             {isReceived ? "+" : "-"}
                             {Math.abs(Number(tx.amount)).toFixed(2)}
                           </span>
                           <span className="ml-1.5 text-xs text-muted-foreground">{tx.asset}</span>
                         </td>
                         <td className="px-5 py-3.5">
-                          <span className="text-xs text-muted-foreground">
-                            {tx.cascade_info ?? "Direct"}
-                          </span>
+                          <span className="text-xs text-muted-foreground">{tx.cascade_info ?? "Direct"}</span>
                         </td>
                         <td className="px-5 py-3.5">
                           <span
@@ -195,7 +158,7 @@ export function TransactionsClient({
                               "inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium",
                               tx.status === "completed" && "bg-[hsl(var(--success))]/10 text-[hsl(var(--success))]",
                               tx.status === "pending" && "bg-[hsl(var(--warning))]/10 text-[hsl(var(--warning))]",
-                              tx.status === "failed" && "bg-destructive/10 text-destructive"
+                              tx.status === "failed" && "bg-destructive/10 text-destructive",
                             )}
                           >
                             <span
@@ -203,7 +166,7 @@ export function TransactionsClient({
                                 "h-1.5 w-1.5 rounded-full",
                                 tx.status === "completed" && "bg-[hsl(var(--success))]",
                                 tx.status === "pending" && "bg-[hsl(var(--warning))]",
-                                tx.status === "failed" && "bg-destructive"
+                                tx.status === "failed" && "bg-destructive",
                               )}
                             />
                             {tx.status}
@@ -243,24 +206,12 @@ export function TransactionsClient({
                 <span className="font-medium text-foreground">{initialCount}</span> transactions
               </p>
               <div className="flex items-center gap-1">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-8 w-8 text-muted-foreground hover:text-foreground"
-                  disabled
-                >
+                <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-foreground" disabled>
                   <ChevronLeft className="h-4 w-4" />
                   <span className="sr-only">Previous page</span>
                 </Button>
-                <span className="flex h-8 w-8 items-center justify-center rounded-md bg-primary text-xs font-medium text-primary-foreground">
-                  1
-                </span>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-8 w-8 text-muted-foreground hover:text-foreground"
-                  disabled={initialCount <= 20}
-                >
+                <span className="flex h-8 w-8 items-center justify-center rounded-md bg-primary text-xs font-medium text-primary-foreground">1</span>
+                <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-foreground" disabled={initialCount <= 20}>
                   <ChevronRight className="h-4 w-4" />
                   <span className="sr-only">Next page</span>
                 </Button>

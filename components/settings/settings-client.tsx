@@ -5,13 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Switch } from "@/components/ui/switch"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { updateProfile, updateNotificationPreferences } from "@/lib/actions"
 import { useRouter } from "next/navigation"
 import type { Profile, NotificationPreferences } from "@/lib/types"
@@ -35,10 +29,7 @@ export function SettingsClient({ profile, notifPrefs }: SettingsClientProps) {
   }
 
   const handleNetworkChange = async (value: string) => {
-    const horizon =
-      value === "mainnet"
-        ? "https://horizon.stellar.org"
-        : "https://horizon-testnet.stellar.org"
+    const horizon = value === "mainnet" ? "https://horizon.stellar.org" : "https://horizon-testnet.stellar.org"
     await updateProfile({ stellar_network: value, horizon_url: horizon })
     router.refresh()
   }
@@ -51,9 +42,7 @@ export function SettingsClient({ profile, notifPrefs }: SettingsClientProps) {
     <div className="mx-auto max-w-3xl space-y-6">
       <div>
         <h1 className="text-2xl font-semibold tracking-tight text-foreground">Settings</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Manage your account preferences and security
-        </p>
+        <p className="mt-1 text-sm text-muted-foreground">Manage your account preferences and security</p>
       </div>
 
       {/* Wallet */}
@@ -69,14 +58,8 @@ export function SettingsClient({ profile, notifPrefs }: SettingsClientProps) {
         </div>
         <div className="flex items-center gap-3 rounded-lg border border-border bg-secondary/20 p-3">
           <div className="h-2.5 w-2.5 rounded-full bg-primary" />
-          <span className="flex-1 truncate font-mono text-sm text-foreground">
-            {profile?.wallet_address || "No wallet connected"}
-          </span>
-          <Button
-            variant="outline"
-            size="sm"
-            className="border-border text-xs text-foreground hover:bg-secondary"
-          >
+          <span className="flex-1 truncate font-mono text-sm text-foreground">{profile?.wallet_address || "No wallet connected"}</span>
+          <Button variant="outline" size="sm" className="border-border text-xs text-foreground hover:bg-secondary">
             Disconnect
           </Button>
         </div>
@@ -89,17 +72,12 @@ export function SettingsClient({ profile, notifPrefs }: SettingsClientProps) {
                 onBlur={(e) => handleFederatedSave(e.target.value)}
                 className="h-9 border-border bg-secondary/50 pr-24 text-sm text-foreground focus-visible:ring-primary"
               />
-              <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">
-                *tippa.io
-              </span>
+              <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">*tippa.io</span>
             </div>
           </div>
           <div>
             <Label className="mb-1.5 text-xs text-muted-foreground">Default Asset</Label>
-            <Select
-              defaultValue={profile?.default_asset ?? "USDC"}
-              onValueChange={handleAssetChange}
-            >
+            <Select defaultValue={profile?.default_asset ?? "USDC"} onValueChange={handleAssetChange}>
               <SelectTrigger className="h-9 border-border bg-secondary/50 text-sm text-foreground">
                 <SelectValue />
               </SelectTrigger>
@@ -126,15 +104,32 @@ export function SettingsClient({ profile, notifPrefs }: SettingsClientProps) {
         </div>
         <div className="space-y-3">
           {[
-            { field: "payment_received", label: "Payment Received", desc: "When someone sends a payment to your Tippa link", value: notifPrefs?.payment_received },
-            { field: "cascade_completed", label: "Cascade Completed", desc: "When a payment is successfully split to all dependencies", value: notifPrefs?.cascade_completed },
-            { field: "failed_transactions", label: "Failed Transactions", desc: "When a cascade fails or hits the minimum threshold", value: notifPrefs?.failed_transactions },
-            { field: "profile_views_digest", label: "Profile Views", desc: "Weekly digest of profile view analytics", value: notifPrefs?.profile_views_digest },
+            {
+              field: "payment_received",
+              label: "Payment Received",
+              desc: "When someone sends a payment to your Tippa link",
+              value: notifPrefs?.payment_received,
+            },
+            {
+              field: "cascade_completed",
+              label: "Cascade Completed",
+              desc: "When a payment is successfully split to all dependencies",
+              value: notifPrefs?.cascade_completed,
+            },
+            {
+              field: "failed_transactions",
+              label: "Failed Transactions",
+              desc: "When a cascade fails or hits the minimum threshold",
+              value: notifPrefs?.failed_transactions,
+            },
+            {
+              field: "profile_views_digest",
+              label: "Profile Views",
+              desc: "Weekly digest of profile view analytics",
+              value: notifPrefs?.profile_views_digest,
+            },
           ].map((n) => (
-            <div
-              key={n.field}
-              className="flex items-center justify-between rounded-lg border border-border bg-secondary/20 p-3"
-            >
+            <div key={n.field} className="flex items-center justify-between rounded-lg border border-border bg-secondary/20 p-3">
               <div>
                 <p className="text-sm font-medium text-foreground">{n.label}</p>
                 <p className="text-xs text-muted-foreground">{n.desc}</p>
@@ -163,10 +158,7 @@ export function SettingsClient({ profile, notifPrefs }: SettingsClientProps) {
         <div className="space-y-3">
           <div>
             <Label className="mb-1.5 text-xs text-muted-foreground">Network</Label>
-            <Select
-              defaultValue={profile?.stellar_network ?? "mainnet"}
-              onValueChange={handleNetworkChange}
-            >
+            <Select defaultValue={profile?.stellar_network ?? "mainnet"} onValueChange={handleNetworkChange}>
               <SelectTrigger className="h-9 border-border bg-secondary/50 text-sm text-foreground">
                 <SelectValue />
               </SelectTrigger>
@@ -201,15 +193,9 @@ export function SettingsClient({ profile, notifPrefs }: SettingsClientProps) {
         <div className="flex items-center justify-between rounded-lg border border-destructive/20 bg-background/50 p-3">
           <div>
             <p className="text-sm font-medium text-foreground">Delete Account</p>
-            <p className="text-xs text-muted-foreground">
-              Remove your Tippa profile and all cascade configurations
-            </p>
+            <p className="text-xs text-muted-foreground">Remove your Tippa profile and all cascade configurations</p>
           </div>
-          <Button
-            variant="outline"
-            size="sm"
-            className="border-destructive/30 text-destructive hover:bg-destructive/10 hover:text-destructive"
-          >
+          <Button variant="outline" size="sm" className="border-destructive/30 text-destructive hover:bg-destructive/10 hover:text-destructive">
             Delete
           </Button>
         </div>

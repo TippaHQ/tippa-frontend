@@ -1,14 +1,14 @@
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2"
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
 
 if (!supabaseUrl || !supabaseServiceKey) {
-  console.error("Missing NEXT_PUBLIC_SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY");
-  process.exit(1);
+  console.error("Missing NEXT_PUBLIC_SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY")
+  process.exit(1)
 }
 
-const supabase = createClient(supabaseUrl, supabaseServiceKey);
+const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
 const migrations = [
   // 1. Helper function
@@ -208,19 +208,19 @@ const migrations = [
    end; $$;`,
 
   `drop trigger if exists on_auth_user_created on auth.users;`,
-  `create trigger on_auth_user_created after insert on auth.users for each row execute function public.handle_new_user();`
-];
+  `create trigger on_auth_user_created after insert on auth.users for each row execute function public.handle_new_user();`,
+]
 
 async function runMigrations() {
-  console.log("Starting Tippa database migrations...");
-  let success = 0;
-  let failed = 0;
+  console.log("Starting Tippa database migrations...")
+  let success = 0
+  let failed = 0
 
   for (let i = 0; i < migrations.length; i++) {
-    const sql = migrations[i];
-    const preview = sql.substring(0, 60).replace(/\n/g, " ").trim();
+    const sql = migrations[i]
+    const preview = sql.substring(0, 60).replace(/\n/g, " ").trim()
     try {
-      const { error } = await supabase.rpc("exec_sql", { query: sql }).maybeSingle();
+      const { error } = await supabase.rpc("exec_sql", { query: sql }).maybeSingle()
       if (error) {
         // Try direct approach via REST
         const res = await fetch(`${supabaseUrl}/rest/v1/rpc/exec_sql`, {
@@ -231,7 +231,7 @@ async function runMigrations() {
             Authorization: `Bearer ${supabaseServiceKey}`,
           },
           body: JSON.stringify({ query: sql }),
-        });
+        })
         if (!res.ok) {
           // Fallback: use the sql endpoint directly
           const sqlRes = await fetch(`${supabaseUrl}/pg`, {
@@ -242,18 +242,18 @@ async function runMigrations() {
               Authorization: `Bearer ${supabaseServiceKey}`,
             },
             body: JSON.stringify({ query: sql }),
-          });
+          })
         }
       }
-      success++;
-      console.log(`[${i + 1}/${migrations.length}] OK: ${preview}...`);
+      success++
+      console.log(`[${i + 1}/${migrations.length}] OK: ${preview}...`)
     } catch (err) {
-      failed++;
-      console.error(`[${i + 1}/${migrations.length}] FAIL: ${preview}... - ${err.message}`);
+      failed++
+      console.error(`[${i + 1}/${migrations.length}] FAIL: ${preview}... - ${err.message}`)
     }
   }
 
-  console.log(`\nMigrations complete: ${success} succeeded, ${failed} failed`);
+  console.log(`\nMigrations complete: ${success} succeeded, ${failed} failed`)
 }
 
-runMigrations();
+runMigrations()

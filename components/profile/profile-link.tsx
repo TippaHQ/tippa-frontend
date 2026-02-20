@@ -23,9 +23,7 @@ export function ProfileLink({ username }: ProfileLinkProps) {
       <div className="flex items-center justify-between">
         <div>
           <h3 className="text-sm font-semibold text-foreground">Discovery Link</h3>
-          <p className="mt-0.5 text-xs text-muted-foreground">
-            Share this link to receive payments through your cascade
-          </p>
+          <p className="mt-0.5 text-xs text-muted-foreground">Share this link to receive payments through your cascade</p>
         </div>
       </div>
 
@@ -33,15 +31,8 @@ export function ProfileLink({ username }: ProfileLinkProps) {
         <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-primary/10">
           <ExternalLink className="h-4 w-4 text-primary" />
         </div>
-        <span className="flex-1 truncate font-mono text-sm font-medium text-primary">
-          {link}
-        </span>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={handleCopy}
-          className="h-8 gap-1.5 text-xs text-primary hover:bg-primary/10 hover:text-primary"
-        >
+        <span className="flex-1 truncate font-mono text-sm font-medium text-primary">{link}</span>
+        <Button variant="ghost" size="sm" onClick={handleCopy} className="h-8 gap-1.5 text-xs text-primary hover:bg-primary/10 hover:text-primary">
           {copied ? (
             <>
               <Check className="h-3.5 w-3.5" />

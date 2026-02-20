@@ -16,20 +16,13 @@ function StatCard({ label, value, change, changeType, icon, accent }: StatCardPr
   return (
     <div className="group rounded-xl border border-border bg-card p-5 transition-colors hover:border-primary/30">
       <div className="flex items-start justify-between">
-        <div
-          className={cn(
-            "flex h-10 w-10 items-center justify-center rounded-lg",
-            accent || "bg-primary/10"
-          )}
-        >
-          {icon}
-        </div>
+        <div className={cn("flex h-10 w-10 items-center justify-center rounded-lg", accent || "bg-primary/10")}>{icon}</div>
         <span
           className={cn(
             "flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium",
             changeType === "positive" && "bg-[hsl(var(--success))]/10 text-[hsl(var(--success))]",
             changeType === "negative" && "bg-destructive/10 text-destructive",
-            changeType === "neutral" && "bg-secondary text-muted-foreground"
+            changeType === "neutral" && "bg-secondary text-muted-foreground",
           )}
         >
           {changeType === "positive" && <TrendingUp className="h-3 w-3" />}
@@ -50,9 +43,7 @@ interface StatCardsProps {
 }
 
 export function StatCards({ totalReceived, totalForwarded, activeCascades, depCount }: StatCardsProps) {
-  const multiplier = totalForwarded > 0 && totalReceived > 0
-    ? (totalReceived / totalForwarded).toFixed(2)
-    : "0.00"
+  const multiplier = totalForwarded > 0 && totalReceived > 0 ? (totalReceived / totalForwarded).toFixed(2) : "0.00"
 
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">

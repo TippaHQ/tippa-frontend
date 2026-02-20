@@ -1,8 +1,6 @@
 import type { Metadata, Viewport } from "next"
 import { Geist, Geist_Mono } from "next/font/google"
-
 import "./globals.css"
-import { WalletProvider } from "@/providers/wallet-provider"
 
 const geistSans = Geist({
   subsets: ["latin"],
@@ -31,9 +29,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable} font-sans antialiased`}>
-        <WalletProvider>{children}</WalletProvider>
-      </body>
+      <body className={`${geistSans.variable} ${geistMono.variable} font-sans antialiased`}>{children}</body>
     </html>
   )
 }

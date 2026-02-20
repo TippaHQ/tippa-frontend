@@ -19,9 +19,7 @@ export async function GET() {
     const results: Record<string, { exists: boolean; count: number }> = {}
 
     for (const table of tables) {
-      const { count, error } = await supabase
-        .from(table)
-        .select("*", { count: "exact", head: true })
+      const { count, error } = await supabase.from(table).select("*", { count: "exact", head: true })
 
       results[table] = {
         exists: !error,
@@ -43,7 +41,7 @@ export async function GET() {
         database: "disconnected",
         message: error instanceof Error ? error.message : "Unknown error",
       },
-      { status: 500 }
+      { status: 500 },
     )
   }
 }

@@ -71,18 +71,12 @@ export function ProfileCard({ profile }: ProfileCardProps) {
       <div className="relative px-5 pb-5">
         <div className="relative -mt-10 mb-5 flex items-end gap-4">
           <Avatar className="h-20 w-20 border-4 border-card">
-            <AvatarFallback className="bg-primary/20 text-xl font-semibold text-primary">
-              {initials}
-            </AvatarFallback>
+            <AvatarFallback className="bg-primary/20 text-xl font-semibold text-primary">{initials}</AvatarFallback>
           </Avatar>
           <div className="mb-1">
-            <h3 className="text-lg font-semibold text-foreground">
-              {displayName || "Your Name"}
-            </h3>
+            <h3 className="text-lg font-semibold text-foreground">{displayName || "Your Name"}</h3>
             <p className="font-mono text-xs text-muted-foreground">
-              {profile?.wallet_address
-                ? profile.wallet_address.slice(0, 4) + "..." + profile.wallet_address.slice(-4)
-                : "No wallet connected"}
+              {profile?.wallet_address ? profile.wallet_address.slice(0, 4) + "..." + profile.wallet_address.slice(-4) : "No wallet connected"}
             </p>
           </div>
         </div>
@@ -100,9 +94,7 @@ export function ProfileCard({ profile }: ProfileCardProps) {
             <div>
               <Label className="mb-1.5 text-xs text-muted-foreground">Username</Label>
               <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">
-                  tippa.io/
-                </span>
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">tippa.io/</span>
                 <Input
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
@@ -168,11 +160,7 @@ export function ProfileCard({ profile }: ProfileCardProps) {
           )}
 
           <div className="flex justify-end">
-            <Button
-              onClick={handleSave}
-              disabled={isPending}
-              className="gap-2 bg-primary text-primary-foreground hover:bg-primary/90"
-            >
+            <Button onClick={handleSave} disabled={isPending} className="gap-2 bg-primary text-primary-foreground hover:bg-primary/90">
               {isPending && <Loader2 className="h-4 w-4 animate-spin" />}
               Save Profile
             </Button>

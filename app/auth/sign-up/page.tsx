@@ -26,9 +26,7 @@ export default function SignUpPage() {
       email,
       password,
       options: {
-        emailRedirectTo:
-          process.env.NEXT_PUBLIC_DEV_SUPABASE_REDIRECT_URL ||
-          `${window.location.origin}/dashboard`,
+        emailRedirectTo: process.env.NEXT_PUBLIC_DEV_SUPABASE_REDIRECT_URL || `${window.location.origin}/dashboard`,
         data: {
           display_name: displayName,
           username: username.toLowerCase().replace(/[^a-z0-9_-]/g, ""),
@@ -51,12 +49,9 @@ export default function SignUpPage() {
           <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[hsl(var(--success))]/10">
             <CheckCircle2 className="h-6 w-6 text-[hsl(var(--success))]" />
           </div>
-          <h1 className="text-2xl font-semibold tracking-tight text-foreground">
-            Check your email
-          </h1>
+          <h1 className="text-2xl font-semibold tracking-tight text-foreground">Check your email</h1>
           <p className="text-sm text-muted-foreground">
-            We sent a confirmation link to <strong className="text-foreground">{email}</strong>.
-            Click it to activate your Tippa account.
+            We sent a confirmation link to <strong className="text-foreground">{email}</strong>. Click it to activate your Tippa account.
           </p>
           <Link href="/auth/login">
             <Button variant="outline" className="border-border text-foreground hover:bg-secondary">
@@ -75,9 +70,7 @@ export default function SignUpPage() {
           <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary">
             <GitFork className="h-6 w-6 text-primary-foreground" />
           </div>
-          <h1 className="text-2xl font-semibold tracking-tight text-foreground">
-            Create an account
-          </h1>
+          <h1 className="text-2xl font-semibold tracking-tight text-foreground">Create an account</h1>
           <p className="text-sm text-muted-foreground">Get started with Tippa</p>
         </div>
 
@@ -128,17 +121,9 @@ export default function SignUpPage() {
             />
           </div>
 
-          {error && (
-            <div className="rounded-lg bg-destructive/10 px-3 py-2 text-xs text-destructive">
-              {error}
-            </div>
-          )}
+          {error && <div className="rounded-lg bg-destructive/10 px-3 py-2 text-xs text-destructive">{error}</div>}
 
-          <Button
-            type="submit"
-            disabled={loading}
-            className="w-full gap-2 bg-primary text-primary-foreground hover:bg-primary/90"
-          >
+          <Button type="submit" disabled={loading} className="w-full gap-2 bg-primary text-primary-foreground hover:bg-primary/90">
             {loading && <Loader2 className="h-4 w-4 animate-spin" />}
             Create Account
           </Button>
@@ -146,10 +131,7 @@ export default function SignUpPage() {
 
         <p className="text-center text-sm text-muted-foreground">
           Already have an account?{" "}
-          <Link
-            href="/auth/login"
-            className="font-medium text-primary hover:text-primary/80"
-          >
+          <Link href="/auth/login" className="font-medium text-primary hover:text-primary/80">
             Sign in
           </Link>
         </p>

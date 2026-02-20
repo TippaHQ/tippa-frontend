@@ -30,9 +30,7 @@ export function CascadeRules({ rules }: CascadeRulesProps) {
   return (
     <div className="rounded-xl border border-border bg-card p-5">
       <h3 className="text-sm font-semibold text-foreground">Cascade Rules</h3>
-      <p className="mt-0.5 text-xs text-muted-foreground">
-        Fine-tune how payments are processed
-      </p>
+      <p className="mt-0.5 text-xs text-muted-foreground">Fine-tune how payments are processed</p>
 
       <div className="mt-4 space-y-4">
         <div className="flex items-start gap-3 rounded-lg border border-border bg-secondary/20 p-3">
@@ -63,9 +61,7 @@ export function CascadeRules({ rules }: CascadeRulesProps) {
                 className="data-[state=checked]:bg-primary"
               />
             </div>
-            <p className="mt-1 text-xs text-muted-foreground">
-              Skip forwarding when the cascaded amount is too small to be meaningful.
-            </p>
+            <p className="mt-1 text-xs text-muted-foreground">Skip forwarding when the cascaded amount is too small to be meaningful.</p>
             <div className="mt-2">
               <Label className="mb-1 text-xs text-muted-foreground">Min amount</Label>
               <Input
@@ -88,9 +84,7 @@ export function CascadeRules({ rules }: CascadeRulesProps) {
                 className="data-[state=checked]:bg-primary"
               />
             </div>
-            <p className="mt-1 text-xs text-muted-foreground">
-              Automatically cascade incoming payments without manual approval.
-            </p>
+            <p className="mt-1 text-xs text-muted-foreground">Automatically cascade incoming payments without manual approval.</p>
           </div>
         </div>
       </div>

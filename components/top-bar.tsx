@@ -35,9 +35,7 @@ export function TopBar() {
         {/* User */}
         <button className="flex items-center gap-2 rounded-lg px-2 py-1.5 transition-colors hover:bg-secondary">
           <Avatar className="h-8 w-8">
-            <AvatarFallback className="bg-primary/20 text-xs font-semibold text-primary">
-              AL
-            </AvatarFallback>
+            <AvatarFallback className="bg-primary/20 text-xs font-semibold text-primary">AL</AvatarFallback>
           </Avatar>
           <div className="hidden text-left md:block">
             <p className="text-sm font-medium text-foreground">Alice</p>

@@ -1,18 +1,5 @@
-import {
-  BookOpen,
-  MessageCircle,
-  ExternalLink,
-  GitFork,
-  Shield,
-  Zap,
-  HelpCircle,
-} from "lucide-react"
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion"
+import { BookOpen, MessageCircle, ExternalLink, GitFork, Shield, Zap, HelpCircle } from "lucide-react"
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 
 const faqs = [
   {
@@ -66,20 +53,14 @@ export default function HelpPage() {
   return (
     <div className="mx-auto max-w-4xl space-y-6">
       <div>
-        <h1 className="text-2xl font-semibold tracking-tight text-foreground">
-          Help & Resources
-        </h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Everything you need to get started with Tippa
-        </p>
+        <h1 className="text-2xl font-semibold tracking-tight text-foreground">Help & Resources</h1>
+        <p className="mt-1 text-sm text-muted-foreground">Everything you need to get started with Tippa</p>
       </div>
 
       {/* Quick Start */}
       <div className="rounded-xl border border-primary/20 bg-primary/5 p-5">
         <h3 className="text-sm font-semibold text-foreground">Quick Start Guide</h3>
-        <p className="mt-1 text-xs text-muted-foreground">
-          Get up and running in 3 simple steps
-        </p>
+        <p className="mt-1 text-xs text-muted-foreground">Get up and running in 3 simple steps</p>
         <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-3">
           {[
             {
@@ -101,10 +82,7 @@ export default function HelpPage() {
               desc: "Share your tippa.io link and watch the ecosystem grow",
             },
           ].map((s) => (
-            <div
-              key={s.step}
-              className="flex items-start gap-3 rounded-lg border border-border bg-card p-3"
-            >
+            <div key={s.step} className="flex items-start gap-3 rounded-lg border border-border bg-card p-3">
               <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-primary/10 font-mono text-xs font-bold text-primary">
                 {s.step}
               </span>
@@ -123,23 +101,13 @@ export default function HelpPage() {
           <div className="rounded-xl border border-border bg-card p-5">
             <div className="mb-4 flex items-center gap-2">
               <HelpCircle className="h-4 w-4 text-primary" />
-              <h3 className="text-sm font-semibold text-foreground">
-                Frequently Asked Questions
-              </h3>
+              <h3 className="text-sm font-semibold text-foreground">Frequently Asked Questions</h3>
             </div>
             <Accordion type="single" collapsible className="space-y-2">
               {faqs.map((faq, idx) => (
-                <AccordionItem
-                  key={idx}
-                  value={`faq-${idx}`}
-                  className="rounded-lg border border-border bg-secondary/20 px-4"
-                >
-                  <AccordionTrigger className="py-3 text-sm font-medium text-foreground hover:no-underline">
-                    {faq.q}
-                  </AccordionTrigger>
-                  <AccordionContent className="pb-3 text-sm leading-relaxed text-muted-foreground">
-                    {faq.a}
-                  </AccordionContent>
+                <AccordionItem key={idx} value={`faq-${idx}`} className="rounded-lg border border-border bg-secondary/20 px-4">
+                  <AccordionTrigger className="py-3 text-sm font-medium text-foreground hover:no-underline">{faq.q}</AccordionTrigger>
+                  <AccordionContent className="pb-3 text-sm leading-relaxed text-muted-foreground">{faq.a}</AccordionContent>
                 </AccordionItem>
               ))}
             </Accordion>
@@ -170,9 +138,7 @@ export default function HelpPage() {
           {/* Contact */}
           <div className="rounded-xl border border-border bg-card p-4">
             <h4 className="text-sm font-semibold text-foreground">Need more help?</h4>
-            <p className="mt-1 text-xs text-muted-foreground">
-              Reach out to our team for personalized support.
-            </p>
+            <p className="mt-1 text-xs text-muted-foreground">Reach out to our team for personalized support.</p>
             <a
               href="mailto:support@tippa.io"
               className="mt-3 inline-flex items-center gap-1.5 text-xs font-medium text-primary transition-colors hover:text-primary/80"

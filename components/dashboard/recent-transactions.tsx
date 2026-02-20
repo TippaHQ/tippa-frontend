@@ -18,14 +18,9 @@ export function RecentTransactions({ transactions }: RecentTransactionsProps) {
       <div className="flex items-center justify-between border-b border-border p-5">
         <div>
           <h3 className="text-sm font-semibold text-foreground">Recent Transactions</h3>
-          <p className="mt-0.5 text-xs text-muted-foreground">
-            {isEmpty ? "No transactions yet" : "Latest payment activity on your account"}
-          </p>
+          <p className="mt-0.5 text-xs text-muted-foreground">{isEmpty ? "No transactions yet" : "Latest payment activity on your account"}</p>
         </div>
-        <Link
-          href="/dashboard/transactions"
-          className="text-xs font-medium text-primary transition-colors hover:text-primary/80"
-        >
+        <Link href="/dashboard/transactions" className="text-xs font-medium text-primary transition-colors hover:text-primary/80">
           View all
         </Link>
       </div>
@@ -39,44 +34,28 @@ export function RecentTransactions({ transactions }: RecentTransactionsProps) {
             const isReceived = tx.type === "received"
             const timeAgo = formatDistanceToNow(new Date(tx.created_at), { addSuffix: true })
             return (
-              <div
-                key={tx.id}
-                className="flex items-center gap-4 px-5 py-3.5 transition-colors hover:bg-secondary/30"
-              >
+              <div key={tx.id} className="flex items-center gap-4 px-5 py-3.5 transition-colors hover:bg-secondary/30">
                 <div
                   className={cn(
                     "flex h-9 w-9 shrink-0 items-center justify-center rounded-lg",
-                    isReceived ? "bg-primary/10" : "bg-[hsl(var(--chart-2))]/10"
+                    isReceived ? "bg-primary/10" : "bg-[hsl(var(--chart-2))]/10",
                   )}
                 >
-                  {isReceived ? (
-                    <ArrowDownLeft className="h-4 w-4 text-primary" />
-                  ) : (
-                    <ArrowUpRight className="h-4 w-4 text-[hsl(var(--chart-2))]" />
-                  )}
+                  {isReceived ? <ArrowDownLeft className="h-4 w-4 text-primary" /> : <ArrowUpRight className="h-4 w-4 text-[hsl(var(--chart-2))]" />}
                 </div>
                 <div className="flex-1 overflow-hidden">
                   <div className="flex items-center gap-2">
-                    <span className="text-sm font-medium text-foreground">
-                      {isReceived ? tx.from_name : tx.to_name}
-                    </span>
+                    <span className="text-sm font-medium text-foreground">{isReceived ? tx.from_name : tx.to_name}</span>
                     <span className="font-mono text-xs text-muted-foreground">
                       {isReceived
                         ? tx.from_address.slice(0, 4) + "..." + tx.from_address.slice(-4)
                         : tx.to_address.slice(0, 4) + "..." + tx.to_address.slice(-4)}
                     </span>
                   </div>
-                  <p className="mt-0.5 text-xs text-muted-foreground">
-                    {tx.cascade_info ?? "Direct payment"}
-                  </p>
+                  <p className="mt-0.5 text-xs text-muted-foreground">{tx.cascade_info ?? "Direct payment"}</p>
                 </div>
                 <div className="text-right">
-                  <p
-                    className={cn(
-                      "text-sm font-semibold",
-                      isReceived ? "text-[hsl(var(--success))]" : "text-foreground"
-                    )}
-                  >
+                  <p className={cn("text-sm font-semibold", isReceived ? "text-[hsl(var(--success))]" : "text-foreground")}>
                     {isReceived ? "+" : "-"}
                     {Math.abs(Number(tx.amount)).toFixed(2)} {tx.asset}
                   </p>

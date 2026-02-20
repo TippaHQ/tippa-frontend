@@ -5,13 +5,7 @@ import { Play, ArrowRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import type { CascadeDependency } from "@/lib/types"
 
 interface CascadeSimulatorProps {
@@ -35,9 +29,7 @@ export function CascadeSimulator({ dependencies }: CascadeSimulatorProps) {
   return (
     <div className="rounded-xl border border-border bg-card p-5">
       <h3 className="text-sm font-semibold text-foreground">Payment Simulator</h3>
-      <p className="mt-0.5 text-xs text-muted-foreground">
-        Preview how a payment will be distributed
-      </p>
+      <p className="mt-0.5 text-xs text-muted-foreground">Preview how a payment will be distributed</p>
 
       <div className="mt-4 space-y-3">
         <div>
@@ -65,10 +57,7 @@ export function CascadeSimulator({ dependencies }: CascadeSimulatorProps) {
           </div>
         </div>
 
-        <Button
-          onClick={() => setSimulated(true)}
-          className="w-full gap-2 bg-primary text-primary-foreground hover:bg-primary/90"
-        >
+        <Button onClick={() => setSimulated(true)} className="w-full gap-2 bg-primary text-primary-foreground hover:bg-primary/90">
           <Play className="h-4 w-4" />
           Simulate
         </Button>
@@ -81,9 +70,7 @@ export function CascadeSimulator({ dependencies }: CascadeSimulatorProps) {
           <div className="flex items-center justify-between">
             <span className="text-sm text-foreground">You</span>
             <div className="flex items-center gap-1.5">
-              <span className="font-mono text-sm font-semibold text-foreground">
-                {youReceive.toFixed(2)}
-              </span>
+              <span className="font-mono text-sm font-semibold text-foreground">{youReceive.toFixed(2)}</span>
               <span className="text-xs text-muted-foreground">{asset}</span>
             </div>
           </div>
