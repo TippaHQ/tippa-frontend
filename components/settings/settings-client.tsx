@@ -59,9 +59,6 @@ export function SettingsClient({ profile, notifPrefs }: SettingsClientProps) {
         <div className="flex items-center gap-3 rounded-lg border border-border bg-secondary/20 p-3">
           <div className="h-2.5 w-2.5 rounded-full bg-primary" />
           <span className="flex-1 truncate font-mono text-sm text-foreground">{profile?.wallet_address || "No wallet connected"}</span>
-          <Button variant="outline" size="sm" className="border-border text-xs text-foreground hover:bg-secondary">
-            Disconnect
-          </Button>
         </div>
         <div className="mt-3 grid grid-cols-2 gap-3">
           <div>
@@ -72,7 +69,7 @@ export function SettingsClient({ profile, notifPrefs }: SettingsClientProps) {
                 onBlur={(e) => handleFederatedSave(e.target.value)}
                 className="h-9 border-border bg-secondary/50 pr-24 text-sm text-foreground focus-visible:ring-primary"
               />
-              <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">*tippa.io</span>
+              <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">*trytippa.com</span>
             </div>
           </div>
           <div>

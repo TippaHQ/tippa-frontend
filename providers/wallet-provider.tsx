@@ -1,6 +1,7 @@
 "use client"
 
 import { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from "react"
+import { WalletNetwork } from "@creit.tech/stellar-wallets-kit"
 import { getKit } from "@/lib/stellar-kit"
 
 type WalletContextType = {
@@ -9,6 +10,7 @@ type WalletContextType = {
   isConnected: boolean
   connectWallet: () => Promise<void>
   disconnectWallet: () => void
+  signTransaction: (xdr: string) => Promise<string>
 }
 
 const WalletContext = createContext<WalletContextType | undefined>(undefined)
@@ -55,6 +57,14 @@ export function WalletProvider({ children }: { children: ReactNode }) {
     localStorage.removeItem(STORAGE_NAME_KEY)
   }, [])
 
+  const signTransaction = useCallback(async (xdr: string): Promise<string> => {
+    const kit = getKit()
+    const { signedTxXdr } = await kit.signTransaction(xdr, {
+      networkPassphrase: WalletNetwork.TESTNET,
+    })
+    return signedTxXdr
+  }, [])
+
   return (
     <WalletContext.Provider
       value={{
@@ -63,6 +73,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
         isConnected,
         connectWallet,
         disconnectWallet,
+        signTransaction,
       }}
     >
       {children}

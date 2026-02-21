@@ -1,10 +1,17 @@
 "use client"
 
+import { usePathname } from "next/navigation"
 import { AppSidebar } from "@/components/app-sidebar"
 import { TopBar } from "@/components/top-bar"
 import { WalletProvider } from "@/providers/wallet-provider"
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname()
+
+  if (pathname.startsWith("/dashboard/onboarding")) {
+    return <>{children}</>
+  }
+
   return (
     <div className="flex h-screen overflow-hidden">
       <WalletProvider>

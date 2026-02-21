@@ -12,7 +12,6 @@ export default function SignUpPage() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [displayName, setDisplayName] = useState("")
-  const [username, setUsername] = useState("")
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
   const [success, setSuccess] = useState(false)
@@ -29,7 +28,6 @@ export default function SignUpPage() {
         emailRedirectTo: process.env.NEXT_PUBLIC_DEV_SUPABASE_REDIRECT_URL || `${window.location.origin}/dashboard`,
         data: {
           display_name: displayName,
-          username: username.toLowerCase().replace(/[^a-z0-9_-]/g, ""),
         },
       },
     })
@@ -75,27 +73,15 @@ export default function SignUpPage() {
         </div>
 
         <form onSubmit={handleSignUp} className="space-y-4">
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <Label className="mb-1.5 text-xs text-muted-foreground">Display Name</Label>
-              <Input
-                value={displayName}
-                onChange={(e) => setDisplayName(e.target.value)}
-                placeholder="Alice"
-                required
-                className="h-10 border-border bg-secondary/50 text-foreground placeholder:text-muted-foreground/60 focus-visible:ring-primary"
-              />
-            </div>
-            <div>
-              <Label className="mb-1.5 text-xs text-muted-foreground">Username</Label>
-              <Input
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                placeholder="alice"
-                required
-                className="h-10 border-border bg-secondary/50 text-foreground placeholder:text-muted-foreground/60 focus-visible:ring-primary"
-              />
-            </div>
+          <div>
+            <Label className="mb-1.5 text-xs text-muted-foreground">Display Name</Label>
+            <Input
+              value={displayName}
+              onChange={(e) => setDisplayName(e.target.value)}
+              placeholder="Your name"
+              required
+              className="h-10 border-border bg-secondary/50 text-foreground placeholder:text-muted-foreground/60 focus-visible:ring-primary"
+            />
           </div>
           <div>
             <Label className="mb-1.5 text-xs text-muted-foreground">Email</Label>

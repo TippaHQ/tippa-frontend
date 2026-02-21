@@ -21,7 +21,6 @@ export function ProfileCard({ profile }: ProfileCardProps) {
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null)
 
   const [displayName, setDisplayName] = useState(profile?.display_name ?? "")
-  const [username, setUsername] = useState(profile?.username ?? "")
   const [bio, setBio] = useState(profile?.bio ?? "")
   const [github, setGithub] = useState(profile?.github ?? "")
   const [twitter, setTwitter] = useState(profile?.twitter ?? "")
@@ -41,7 +40,6 @@ export function ProfileCard({ profile }: ProfileCardProps) {
     startTransition(async () => {
       const result = await updateProfile({
         display_name: displayName,
-        username: username.toLowerCase().replace(/[^a-z0-9_-]/g, ""),
         bio,
         github,
         twitter,
@@ -94,11 +92,11 @@ export function ProfileCard({ profile }: ProfileCardProps) {
             <div>
               <Label className="mb-1.5 text-xs text-muted-foreground">Username</Label>
               <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">tippa.io/</span>
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">trytippa.com/</span>
                 <Input
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  className="h-9 border-border bg-secondary/50 pl-16 text-sm text-foreground focus-visible:ring-primary"
+                  value={profile?.username ?? ""}
+                  readOnly
+                  className="h-9 cursor-default border-border bg-secondary/30 pl-16 text-sm text-muted-foreground focus-visible:ring-0"
                 />
               </div>
             </div>

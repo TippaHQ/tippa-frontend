@@ -7,7 +7,6 @@ import {
   GitFork,
   ArrowLeftRight,
   User,
-  Wallet,
   ExternalLink,
   Settings,
   HelpCircle,
@@ -20,7 +19,6 @@ import { useState, useEffect } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { useRouter } from "next/navigation"
 import type { Profile } from "@/lib/types"
-import { useWallet } from "@/providers/wallet-provider"
 
 const mainNav = [
   { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
@@ -43,8 +41,6 @@ export function AppSidebar() {
   const router = useRouter()
   const [collapsed, setCollapsed] = useState(false)
   const [profile, setProfile] = useState<Profile | null>(null)
-  const { walletAddress, walletName, isConnected, connectWallet, disconnectWallet } = useWallet()
-
   useEffect(() => {
     const supabase = createClient()
     const fetchProfile = async () => {
@@ -66,7 +62,7 @@ export function AppSidebar() {
     router.refresh()
   }
 
-  const walletShort = walletAddress ? walletAddress.slice(0, 4) + "..." + walletAddress.slice(-4) : null
+
 
   return (
     <aside className={cn("flex h-screen flex-col border-r border-border bg-sidebar transition-all duration-300", collapsed ? "w-[72px]" : "w-64")}>
@@ -78,47 +74,6 @@ export function AppSidebar() {
         {!collapsed && <span className="text-lg font-semibold tracking-tight text-foreground">Tippa</span>}
       </Link>
 
-      {/* Wallet Status Card */}
-      {!collapsed && (
-        <div className="mx-3 mt-4 rounded-lg border border-border bg-secondary/50 p-3">
-          <div className="flex items-center justify-between gap-2">
-            <div className="flex items-center gap-2">
-              <div className={cn("h-2 w-2 rounded-full transition-colors", isConnected ? "bg-primary" : "bg-muted-foreground")} />
-              <span className="text-xs font-medium text-muted-foreground">{isConnected ? "Connected" : "Not connected"}</span>
-            </div>
-            {isConnected && (
-              <button
-                onClick={disconnectWallet}
-                className="text-[10px] font-medium text-muted-foreground underline-offset-2 hover:text-destructive hover:underline transition-colors"
-              >
-                Disconnect
-              </button>
-            )}
-          </div>
-
-          {isConnected && walletShort ? (
-            <>
-              <p className="mt-1.5 truncate font-mono text-xs text-foreground">{walletShort}</p>
-              {walletName && <p className="mt-1 truncate text-xs text-muted-foreground">{walletName}</p>}
-            </>
-          ) : (
-            <button
-              onClick={connectWallet}
-              className="mt-2 flex w-full items-center justify-center gap-1.5 rounded-md bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground transition-opacity hover:opacity-90"
-            >
-              <Wallet className="h-3.5 w-3.5" />
-              Connect Wallet
-            </button>
-          )}
-
-          {profile?.display_name && <p className="mt-1 truncate text-xs text-muted-foreground">{profile.display_name}</p>}
-        </div>
-      )}
-      {collapsed && (
-        <div className="mx-auto mt-4 flex h-9 w-9 items-center justify-center">
-          <Wallet className="h-5 w-5 text-primary" />
-        </div>
-      )}
 
       {/* Main Navigation */}
       <nav className="mt-6 flex flex-1 flex-col gap-1 px-3">
@@ -171,7 +126,7 @@ export function AppSidebar() {
               <ExternalLink className="h-4 w-4 text-primary" />
               <span className="text-xs font-medium text-foreground">Your Tippa Link</span>
             </div>
-            <p className="mt-1 truncate font-mono text-xs text-primary">tippa.io/{profile.username}</p>
+            <p className="mt-1 truncate font-mono text-xs text-primary">trytippa.com/{profile.username}</p>
           </div>
         )}
 

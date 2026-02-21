@@ -41,7 +41,7 @@ const steps = [
   {
     step: "03",
     title: "Share Your Link",
-    description: "Get your tippa.io/username URL",
+    description: "Get your trytippa.com/username URL",
   },
 ]
 
@@ -173,7 +173,7 @@ export default function ConnectPage() {
             <div className="space-y-2 text-sm leading-relaxed text-muted-foreground">
               <p>
                 Bob sends <span className="font-mono font-semibold text-foreground">100 USDC</span> to{" "}
-                <span className="font-mono text-primary">tippa.io/alice</span>
+                <span className="font-mono text-primary">trytippa.com/alice</span>
               </p>
               <div className="flex flex-col gap-1 pl-4 text-xs">
                 <span>

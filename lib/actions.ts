@@ -28,6 +28,12 @@ export async function getProfile(): Promise<Profile | null> {
   return data
 }
 
+export async function getProfileByUsername(username: string): Promise<Profile | null> {
+  const supabase = await createClient()
+  const { data } = await supabase.from("profiles").select("*").eq("username", username).single()
+  return data
+}
+
 export async function updateProfile(
   fields: Partial<
     Pick<
@@ -68,6 +74,16 @@ export async function getCascadeDependencies(): Promise<CascadeDependency[]> {
   if (!user) return []
   const supabase = await createClient()
   const { data } = await supabase.from("cascade_dependencies").select("*").eq("user_id", user.id).order("sort_order", { ascending: true })
+  return data ?? []
+}
+
+export async function getPublicCascadeDependencies(userId: string): Promise<CascadeDependency[]> {
+  const supabase = await createClient()
+  const { data } = await supabase
+    .from("cascade_dependencies")
+    .select("*")
+    .eq("user_id", userId)
+    .order("sort_order", { ascending: true })
   return data ?? []
 }
 

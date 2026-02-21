@@ -39,6 +39,16 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url)
   }
 
+  // Redirect to onboarding if user has no username
+  if (user && request.nextUrl.pathname.startsWith("/dashboard") && !request.nextUrl.pathname.startsWith("/dashboard/onboarding")) {
+    const { data: profile } = await supabase.from("profiles").select("username").eq("id", user.id).single()
+    if (!profile?.username) {
+      const url = request.nextUrl.clone()
+      url.pathname = "/dashboard/onboarding"
+      return NextResponse.redirect(url)
+    }
+  }
+
   // IMPORTANT: You *must* return the supabaseResponse object as it is.
   // If you're creating a new response object with NextResponse.next() make sure to:
   // 1. Pass the request in it, like so:

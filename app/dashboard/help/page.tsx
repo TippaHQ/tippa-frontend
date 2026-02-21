@@ -79,7 +79,7 @@ export default function HelpPage() {
               icon: Zap,
               step: "3",
               title: "Share & Earn",
-              desc: "Share your tippa.io link and watch the ecosystem grow",
+              desc: "Share your trytippa.com link and watch the ecosystem grow",
             },
           ].map((s) => (
             <div key={s.step} className="flex items-start gap-3 rounded-lg border border-border bg-card p-3">
@@ -140,11 +140,11 @@ export default function HelpPage() {
             <h4 className="text-sm font-semibold text-foreground">Need more help?</h4>
             <p className="mt-1 text-xs text-muted-foreground">Reach out to our team for personalized support.</p>
             <a
-              href="mailto:support@tippa.io"
+              href="mailto:support@trytippa.com"
               className="mt-3 inline-flex items-center gap-1.5 text-xs font-medium text-primary transition-colors hover:text-primary/80"
             >
               <MessageCircle className="h-3.5 w-3.5" />
-              support@tippa.io
+              support@trytippa.com
             </a>
           </div>
         </div>
