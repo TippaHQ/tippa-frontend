@@ -1,7 +1,7 @@
 "use client"
 
 import { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from "react"
-import { kit } from "@/lib/stellar-kit"
+import { getKit } from "@/lib/stellar-kit"
 
 type WalletContextType = {
   walletAddress: string | null
@@ -33,6 +33,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const connectWallet = useCallback(async () => {
+    const kit = getKit()
     await kit.openModal({
       onWalletSelected: async (option) => {
         kit.setWallet(option.id)
