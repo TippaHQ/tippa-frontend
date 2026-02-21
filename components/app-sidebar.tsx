@@ -58,7 +58,7 @@ export function AppSidebar() {
   const handleLogout = async () => {
     const supabase = createClient()
     await supabase.auth.signOut()
-    router.push("/connect")
+    router.push("/")
     router.refresh()
   }
 
@@ -67,7 +67,7 @@ export function AppSidebar() {
   return (
     <aside className={cn("flex h-screen flex-col border-r border-border bg-sidebar transition-all duration-300", collapsed ? "w-[72px]" : "w-64")}>
       {/* Logo */}
-      <Link href="/connect" className="flex h-16 items-center gap-3 border-b border-border px-4 transition-opacity hover:opacity-80">
+      <Link href="/" className="flex h-16 items-center gap-3 border-b border-border px-4 transition-opacity hover:opacity-80">
         <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary">
           <GitFork className="h-5 w-5 text-primary-foreground" />
         </div>
