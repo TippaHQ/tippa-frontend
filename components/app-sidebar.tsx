@@ -126,7 +126,7 @@ export function AppSidebar() {
               <ExternalLink className="h-4 w-4 text-primary" />
               <span className="text-xs font-medium text-foreground">Your Tippa Link</span>
             </div>
-            <p className="mt-1 truncate font-mono text-xs text-primary">trytippa.com/{profile.username}</p>
+            <p className="mt-1 truncate font-mono text-xs text-primary">trytippa.com/d/{profile.username}</p>
           </div>
         )}
 

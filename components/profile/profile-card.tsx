@@ -91,14 +91,16 @@ export function ProfileCard({ profile }: ProfileCardProps) {
             </div>
             <div>
               <Label className="mb-1.5 text-xs text-muted-foreground">Username</Label>
-              <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">trytippa.com/</span>
-                <Input
-                  value={profile?.username ?? ""}
-                  readOnly
-                  className="h-9 cursor-default border-border bg-secondary/30 pl-16 text-sm text-muted-foreground focus-visible:ring-0"
-                />
-              </div>
+              <Input
+                value={profile?.username ?? ""}
+                readOnly
+                className="h-9 cursor-default border-border bg-secondary/30 text-sm text-muted-foreground focus-visible:ring-0"
+              />
+              {profile?.username && (
+                <p className="mt-1.5 font-mono text-xs text-muted-foreground">
+                  trytippa.com/d/<span className="text-foreground">{profile.username}</span>
+                </p>
+              )}
             </div>
           </div>
 

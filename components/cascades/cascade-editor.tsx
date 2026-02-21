@@ -42,7 +42,7 @@ export function CascadeEditor({ initialDeps }: CascadeEditorProps) {
   const remaining = 100 - totalPct - platformFee
 
   const addDependency = () => {
-    if (deps.length >= 5) return
+    if (deps.length >= 10) return
     setDeps([...deps, { id: crypto.randomUUID(), name: "", address: "", percentage: 1 }])
   }
 
@@ -78,16 +78,16 @@ export function CascadeEditor({ initialDeps }: CascadeEditorProps) {
     <div className="rounded-xl border border-border bg-card">
       <div className="flex items-center justify-between border-b border-border p-5">
         <div>
-          <h3 className="text-sm font-semibold text-foreground">Dependencies</h3>
-          <p className="mt-0.5 text-xs text-muted-foreground">Add up to 5 Stellar addresses to receive a share of incoming payments</p>
+          <h3 className="text-sm font-semibold text-foreground">Recipients</h3>
+          <p className="mt-0.5 text-xs text-muted-foreground">Add up to 10 Stellar addresses to receive a share of incoming payments</p>
         </div>
         <span
           className={cn(
             "rounded-full px-2.5 py-1 text-xs font-medium",
-            deps.length >= 5 ? "bg-destructive/10 text-destructive" : "bg-secondary text-muted-foreground",
+            deps.length >= 10 ? "bg-destructive/10 text-destructive" : "bg-secondary text-muted-foreground",
           )}
         >
-          {deps.length}/5 slots
+          {deps.length}/10 slots
         </span>
       </div>
 
@@ -148,14 +148,14 @@ export function CascadeEditor({ initialDeps }: CascadeEditorProps) {
         ))}
       </div>
 
-      {deps.length < 5 && (
+      {deps.length < 10 && (
         <div className="border-t border-border px-5 py-3">
           <button
             onClick={addDependency}
             className="flex w-full items-center justify-center gap-2 rounded-lg border border-dashed border-border py-2.5 text-sm text-muted-foreground transition-colors hover:border-primary/50 hover:text-primary"
           >
             <Plus className="h-4 w-4" />
-            Add Dependency
+            Add Recipient
           </button>
         </div>
       )}

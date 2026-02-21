@@ -1,6 +1,6 @@
 "use client"
 
-import { Shield, Bell, Globe, Trash2 } from "lucide-react"
+import { Shield, Bell, Trash2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -25,12 +25,6 @@ export function SettingsClient({ profile, notifPrefs }: SettingsClientProps) {
 
   const handleAssetChange = async (value: string) => {
     await updateProfile({ default_asset: value })
-    router.refresh()
-  }
-
-  const handleNetworkChange = async (value: string) => {
-    const horizon = value === "mainnet" ? "https://horizon.stellar.org" : "https://horizon-testnet.stellar.org"
-    await updateProfile({ stellar_network: value, horizon_url: horizon })
     router.refresh()
   }
 
@@ -110,7 +104,7 @@ export function SettingsClient({ profile, notifPrefs }: SettingsClientProps) {
             {
               field: "cascade_completed",
               label: "Cascade Completed",
-              desc: "When a payment is successfully split to all dependencies",
+              desc: "When a payment is successfully split to all recipients",
               value: notifPrefs?.cascade_completed,
             },
             {
@@ -138,41 +132,6 @@ export function SettingsClient({ profile, notifPrefs }: SettingsClientProps) {
               />
             </div>
           ))}
-        </div>
-      </div>
-
-      {/* Network */}
-      <div className="rounded-xl border border-border bg-card p-5">
-        <div className="mb-4 flex items-center gap-3">
-          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10">
-            <Globe className="h-4 w-4 text-primary" />
-          </div>
-          <div>
-            <h3 className="text-sm font-semibold text-foreground">Network</h3>
-            <p className="text-xs text-muted-foreground">Stellar network settings</p>
-          </div>
-        </div>
-        <div className="space-y-3">
-          <div>
-            <Label className="mb-1.5 text-xs text-muted-foreground">Network</Label>
-            <Select defaultValue={profile?.stellar_network ?? "mainnet"} onValueChange={handleNetworkChange}>
-              <SelectTrigger className="h-9 border-border bg-secondary/50 text-sm text-foreground">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent className="border-border bg-popover">
-                <SelectItem value="mainnet">Stellar Mainnet</SelectItem>
-                <SelectItem value="testnet">Stellar Testnet</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          <div>
-            <Label className="mb-1.5 text-xs text-muted-foreground">Horizon URL</Label>
-            <Input
-              value={profile?.horizon_url ?? "https://horizon.stellar.org"}
-              className="h-9 border-border bg-secondary/50 font-mono text-sm text-foreground focus-visible:ring-primary"
-              readOnly
-            />
-          </div>
         </div>
       </div>
 

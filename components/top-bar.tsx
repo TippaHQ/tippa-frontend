@@ -6,12 +6,10 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { createClient } from "@/lib/supabase/client"
-import { useWallet } from "@/providers/wallet-provider"
 import type { Profile } from "@/lib/types"
 
 export function TopBar() {
   const [profile, setProfile] = useState<Profile | null>(null)
-  const { walletAddress, isConnected } = useWallet()
 
   useEffect(() => {
     const supabase = createClient()
@@ -35,7 +33,7 @@ export function TopBar() {
     .toUpperCase()
     .slice(0, 2)
 
-  const walletShort = walletAddress ? walletAddress.slice(0, 4) + "..." + walletAddress.slice(-4) : null
+  const walletShort = profile?.wallet_address ? profile.wallet_address.slice(0, 4) + "..." + profile.wallet_address.slice(-4) : null
 
   return (
     <header className="flex h-16 shrink-0 items-center justify-between border-b border-border bg-background px-6">
@@ -51,7 +49,7 @@ export function TopBar() {
       {/* Right side */}
       <div className="flex items-center gap-3">
         {/* Wallet indicator */}
-        {isConnected && walletShort ? (
+        {walletShort ? (
           <div className="flex items-center gap-2 rounded-full border border-border bg-secondary/50 px-3 py-1.5">
             <Wallet className="h-3.5 w-3.5 text-primary" />
             <span className="font-mono text-xs font-medium text-foreground">{walletShort}</span>
@@ -62,12 +60,6 @@ export function TopBar() {
             <span className="text-xs font-medium text-muted-foreground">No wallet</span>
           </div>
         )}
-
-        {/* Network indicator */}
-        <div className="flex items-center gap-2 rounded-full border border-border bg-secondary/50 px-3 py-1.5">
-          <div className="h-2 w-2 rounded-full bg-primary" />
-          <span className="text-xs font-medium text-foreground">Stellar Mainnet</span>
-        </div>
 
         {/* Notifications */}
         <Button variant="ghost" size="icon" className="relative h-9 w-9 text-muted-foreground hover:text-foreground">

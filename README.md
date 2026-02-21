@@ -36,7 +36,7 @@ Bob sends 100 USDC to trytippa.com/d/alice
 | Step | What happens |
 |------|-------------|
 | **Register** | Claim a username on-chain via Soroban smart contract |
-| **Configure** | Set up to 5 cascade recipients with percentage-based splits |
+| **Configure** | Set up to 10 cascade recipients with percentage-based splits |
 | **Share** | Share your `trytippa.com/d/username` link with anyone |
 | **Receive** | Senders connect any Stellar wallet — no Tippa account needed |
 | **Cascade** | The contract splits the payment atomically across all recipients |

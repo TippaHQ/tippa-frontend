@@ -31,7 +31,7 @@ export function CascadePreview({ dependencies, username }: CascadePreviewProps) 
       {isEmpty ? (
         <div className="flex flex-col items-center justify-center gap-3 py-8 text-center">
           <GitFork className="h-8 w-8 text-muted-foreground/40" />
-          <p className="text-sm text-muted-foreground">Add dependencies to start cascading payments.</p>
+          <p className="text-sm text-muted-foreground">Add recipients to start cascading payments.</p>
           <Link href="/dashboard/cascades" className="text-xs font-medium text-primary hover:text-primary/80">
             Configure now
           </Link>

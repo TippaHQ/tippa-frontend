@@ -10,7 +10,7 @@ interface ProfileLinkProps {
 
 export function ProfileLink({ username }: ProfileLinkProps) {
   const [copied, setCopied] = useState(false)
-  const link = `trytippa.com/${username ?? "me"}`
+  const link = `trytippa.com/d/${username ?? "me"}`
 
   const handleCopy = () => {
     navigator.clipboard.writeText(`https://${link}`)
@@ -68,7 +68,7 @@ export function ProfileLink({ username }: ProfileLinkProps) {
         <p className="mb-1.5 text-xs text-muted-foreground">Embed Badge</p>
         <div className="rounded-lg border border-border bg-secondary/30 p-3">
           <code className="break-all font-mono text-xs text-muted-foreground">
-            {`<a href="https://trytippa.com/${username ?? "me"}"><img src="https://trytippa.com/badge/${username ?? "me"}.svg" alt="Tip ${username ?? "me"} on Tippa" /></a>`}
+            {`<a href="https://trytippa.com/d/${username ?? "me"}"><img src="https://trytippa.com/badge/${username ?? "me"}.svg" alt="Tip ${username ?? "me"} on Tippa" /></a>`}
           </code>
         </div>
       </div>

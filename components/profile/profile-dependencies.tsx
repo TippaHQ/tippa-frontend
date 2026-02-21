@@ -10,12 +10,12 @@ interface ProfileDependenciesProps {
 export function ProfileDependencies({ dependencies }: ProfileDependenciesProps) {
   return (
     <div className="rounded-xl border border-border bg-card p-5">
-      <h3 className="text-sm font-semibold text-foreground">Public Dependencies</h3>
+      <h3 className="text-sm font-semibold text-foreground">Cascade Recipients</h3>
       <p className="mt-0.5 text-xs text-muted-foreground">Visible to anyone viewing your Tippa profile</p>
 
       <div className="mt-4 space-y-2">
         {dependencies.length === 0 ? (
-          <div className="py-6 text-center text-sm text-muted-foreground">No dependencies configured yet.</div>
+          <div className="py-6 text-center text-sm text-muted-foreground">No recipients configured yet.</div>
         ) : (
           dependencies.map((dep) => (
             <div

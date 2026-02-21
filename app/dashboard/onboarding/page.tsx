@@ -63,7 +63,6 @@ export default function OnboardingPage() {
     setError("")
     try {
       await connectWallet()
-      setStep("register")
     } catch {
       setError("Failed to connect wallet. Please try again.")
     }
@@ -187,12 +186,11 @@ export default function OnboardingPage() {
               <div>
                 <Label className="mb-1.5 text-xs text-muted-foreground">Username</Label>
                 <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">trytippa.com/</span>
                   <Input
                     value={username}
                     onChange={(e) => setUsername(e.target.value.toLowerCase())}
                     placeholder="alice"
-                    className="h-10 border-border bg-secondary/50 pl-16 text-foreground placeholder:text-muted-foreground/60 focus-visible:ring-primary"
+                    className="h-10 border-border bg-secondary/50 text-foreground placeholder:text-muted-foreground/60 focus-visible:ring-primary"
                     autoFocus
                   />
                   {checkingUsername && (
@@ -202,6 +200,11 @@ export default function OnboardingPage() {
                     <CheckCircle2 className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[hsl(var(--success))]" />
                   )}
                 </div>
+                {username && !usernameError && (
+                  <p className="mt-1.5 font-mono text-xs text-muted-foreground">
+                    trytippa.com/d/<span className="text-foreground">{username}</span>
+                  </p>
+                )}
                 {usernameError && <p className="mt-1.5 text-xs text-destructive">{usernameError}</p>}
                 {!usernameError && usernameAvailable === true && (
                   <p className="mt-1.5 text-xs text-[hsl(var(--success))]">Username is available!</p>

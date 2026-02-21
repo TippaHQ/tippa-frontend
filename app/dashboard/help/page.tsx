@@ -4,11 +4,11 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 const faqs = [
   {
     q: "What is a cascade?",
-    a: "A cascade is an automatic payment split. When someone pays you through your Tippa link, a percentage of that payment is forwarded to your configured dependencies -- all in a single atomic Stellar transaction.",
+    a: "A cascade is an automatic payment split. When someone pays you through your Tippa link, a percentage of that payment is forwarded to your configured recipients -- all in a single atomic Stellar transaction.",
   },
   {
     q: "Is Tippa custodial?",
-    a: "No. Tippa is fully non-custodial. Your private keys never touch our servers. All transaction signing happens client-side through your Freighter wallet extension.",
+    a: "No. Tippa is fully non-custodial. Your private keys never touch our servers. All transaction signing happens client-side through your Stellar wallet.",
   },
   {
     q: "What is the platform fee?",
@@ -19,8 +19,8 @@ const faqs = [
     a: "You can set a minimum hop threshold in your cascade rules. If a forwarded amount falls below this threshold, it stays with you instead of failing the transaction.",
   },
   {
-    q: "Can I have more than 5 dependencies?",
-    a: "Currently the MVP supports up to 5 dependencies per cascade. We plan to increase this limit and support multi-level cascading (A to B to C to D) in a future release.",
+    q: "Can I have more than 5 recipients?",
+    a: "Currently Tippa supports up to 10 recipients per cascade. We plan to support multi-level cascading (A to B to C to D) in a future release.",
   },
   {
     q: "Which assets are supported?",
@@ -32,7 +32,7 @@ const resources = [
   {
     icon: BookOpen,
     title: "Documentation",
-    description: "Detailed guides on setting up cascades, managing dependencies, and more.",
+    description: "Detailed guides on setting up cascades, managing recipients, and more.",
     link: "#",
   },
   {
@@ -67,13 +67,13 @@ export default function HelpPage() {
               icon: Shield,
               step: "1",
               title: "Connect Wallet",
-              desc: "Use Freighter to sign in securely",
+              desc: "Use your Stellar wallet to sign in securely",
             },
             {
               icon: GitFork,
               step: "2",
               title: "Configure Cascade",
-              desc: "Add your dependencies and set split percentages",
+              desc: "Add your recipients and set split percentages",
             },
             {
               icon: Zap,

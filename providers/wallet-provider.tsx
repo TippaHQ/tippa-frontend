@@ -1,6 +1,6 @@
 "use client"
 
-import { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from "react"
+import { createContext, useContext, useState, useCallback, type ReactNode } from "react"
 import { WalletNetwork } from "@creit.tech/stellar-wallets-kit"
 import { getKit } from "@/lib/stellar-kit"
 
@@ -15,24 +15,11 @@ type WalletContextType = {
 
 const WalletContext = createContext<WalletContextType | undefined>(undefined)
 
-const STORAGE_ADDRESS_KEY = "stellar_wallet_address"
-const STORAGE_NAME_KEY = "stellar_wallet_name"
-
 export function WalletProvider({ children }: { children: ReactNode }) {
   const [walletAddress, setWalletAddress] = useState<string | null>(null)
   const [walletName, setWalletName] = useState<string | null>(null)
 
   const isConnected = Boolean(walletAddress)
-
-  // Restore persisted session on mount
-  useEffect(() => {
-    const savedAddress = localStorage.getItem(STORAGE_ADDRESS_KEY)
-    const savedName = localStorage.getItem(STORAGE_NAME_KEY)
-    if (savedAddress && savedName) {
-      setWalletAddress(savedAddress)
-      setWalletName(savedName)
-    }
-  }, [])
 
   const connectWallet = useCallback(async () => {
     const kit = getKit()
@@ -43,9 +30,6 @@ export function WalletProvider({ children }: { children: ReactNode }) {
 
         setWalletAddress(address)
         setWalletName(option.name)
-
-        localStorage.setItem(STORAGE_ADDRESS_KEY, address)
-        localStorage.setItem(STORAGE_NAME_KEY, option.name)
       },
     })
   }, [])
@@ -53,8 +37,6 @@ export function WalletProvider({ children }: { children: ReactNode }) {
   const disconnectWallet = useCallback(() => {
     setWalletAddress(null)
     setWalletName(null)
-    localStorage.removeItem(STORAGE_ADDRESS_KEY)
-    localStorage.removeItem(STORAGE_NAME_KEY)
   }, [])
 
   const signTransaction = useCallback(async (xdr: string): Promise<string> => {

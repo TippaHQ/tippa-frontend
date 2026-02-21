@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { GitFork, Loader2, CheckCircle2, ExternalLink, Wallet, ArrowDown, User } from "lucide-react"
+import { GitFork, Loader2, CheckCircle2, ExternalLink, Wallet, ArrowDown, User, Github, Twitter, Globe } from "lucide-react"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -38,6 +38,7 @@ export function DonateForm({ profile, dependencies }: DonateFormProps) {
     .slice(0, 2)
 
   const totalDependencyPercentage = dependencies.reduce((sum, d) => sum + d.percentage, 0)
+  const hasSocials = profile.github || profile.twitter || profile.website
 
   async function handleDonate() {
     setError(null)
@@ -56,7 +57,6 @@ export function DonateForm({ profile, dependencies }: DonateFormProps) {
     setStep("submitting")
 
     try {
-      // Build unsigned tx
       const buildRes = await fetch("/api/donate/build", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -65,7 +65,6 @@ export function DonateForm({ profile, dependencies }: DonateFormProps) {
           username: profile.username,
           assetId,
           amount,
-          donorOverride: donorName || undefined,
         }),
       })
 
@@ -74,10 +73,8 @@ export function DonateForm({ profile, dependencies }: DonateFormProps) {
         throw new Error(buildData.error || "Failed to build transaction.")
       }
 
-      // Sign with wallet
       const signedXdr = await signTransaction(buildData.xdr)
 
-      // Submit signed tx
       const submitRes = await fetch("/api/donate/submit", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -106,195 +103,305 @@ export function DonateForm({ profile, dependencies }: DonateFormProps) {
   }
 
   return (
-    <div className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-background px-4 py-12">
+    <div className="relative min-h-screen overflow-hidden bg-background">
       {/* Atmospheric background */}
       <div className="pointer-events-none absolute inset-0">
-        <div className="absolute left-1/2 top-0 h-[600px] w-[800px] -translate-x-1/2 -translate-y-1/3 rounded-full bg-primary/[0.04] blur-[120px]" />
-        <div className="absolute bottom-0 right-0 h-[400px] w-[500px] translate-x-1/4 translate-y-1/4 rounded-full bg-[hsl(200_70%_50%/0.03)] blur-[100px]" />
+        <div className="absolute left-1/2 top-0 h-[700px] w-[900px] -translate-x-1/2 -translate-y-1/4 rounded-full bg-primary/[0.05] blur-[150px]" />
+        <div className="absolute bottom-0 left-0 h-[400px] w-[600px] -translate-x-1/4 translate-y-1/4 rounded-full bg-[hsl(200_70%_50%/0.03)] blur-[120px]" />
       </div>
 
-      {/* Branding */}
-      <div className="relative mb-8 flex items-center gap-2.5">
-        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
-          <GitFork className="h-4 w-4 text-primary-foreground" />
+      {/* Top bar */}
+      <header className="relative flex items-center justify-between px-6 py-4">
+        <div className="flex items-center gap-2.5">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
+            <GitFork className="h-4 w-4 text-primary-foreground" />
+          </div>
+          <span className="text-sm font-semibold tracking-tight text-foreground">Tippa</span>
         </div>
-        <span className="text-sm font-semibold tracking-tight text-foreground">Tippa</span>
-      </div>
+        <a
+          href="/"
+          className="text-xs text-muted-foreground transition-colors hover:text-foreground"
+        >
+          Create your own
+        </a>
+      </header>
 
-      {/* Main card */}
-      <div className="relative w-full max-w-md">
-        <div className="rounded-2xl border border-border bg-card/80 shadow-2xl shadow-black/20 backdrop-blur-sm">
-          {/* Recipient header */}
-          <div className="border-b border-border px-6 py-5">
-            <div className="flex items-center gap-3.5">
-              <Avatar className="h-12 w-12 border-2 border-primary/20">
-                <AvatarFallback className="bg-primary/10 text-sm font-semibold text-primary">
-                  {initials}
-                </AvatarFallback>
-              </Avatar>
-              <div className="min-w-0 flex-1">
-                <h1 className="truncate text-lg font-semibold text-foreground">{displayName}</h1>
+      {/* Main content */}
+      <main className="relative mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:py-16">
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-5 lg:gap-12">
+
+          {/* Left: Profile showcase */}
+          <div className="lg:col-span-3">
+            {/* Profile hero */}
+            <div className="rounded-2xl border border-border bg-card/80 backdrop-blur-sm">
+              {/* Banner gradient */}
+              <div className="h-24 rounded-t-2xl bg-gradient-to-br from-primary/20 via-[hsl(200_70%_50%/0.15)] to-primary/5" />
+
+              <div className="relative px-6 pb-6">
+                {/* Avatar */}
+                <div className="-mt-10 mb-4">
+                  <Avatar className="h-20 w-20 border-4 border-card shadow-lg">
+                    <AvatarFallback className="bg-primary/10 text-xl font-bold text-primary">
+                      {initials}
+                    </AvatarFallback>
+                  </Avatar>
+                </div>
+
+                {/* Name + username */}
+                <h1 className="text-2xl font-bold tracking-tight text-foreground">{displayName}</h1>
+                {profile.username && (
+                  <p className="mt-0.5 font-mono text-sm text-primary">@{profile.username}</p>
+                )}
+
+                {/* Bio */}
                 {profile.bio && (
-                  <p className="mt-0.5 truncate text-xs text-muted-foreground">{profile.bio}</p>
+                  <p className="mt-4 whitespace-pre-line text-sm leading-relaxed text-muted-foreground">{profile.bio}</p>
+                )}
+
+                {/* Social links */}
+                {hasSocials && (
+                  <div className="mt-5 flex flex-wrap items-center gap-2">
+                    {profile.github && (
+                      <a
+                        href={`https://github.com/${profile.github}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1.5 rounded-full border border-border bg-secondary/40 px-3 py-1.5 text-xs text-muted-foreground transition-colors hover:border-primary/30 hover:text-foreground"
+                      >
+                        <Github className="h-3 w-3" />
+                        {profile.github}
+                      </a>
+                    )}
+                    {profile.twitter && (
+                      <a
+                        href={`https://x.com/${profile.twitter}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1.5 rounded-full border border-border bg-secondary/40 px-3 py-1.5 text-xs text-muted-foreground transition-colors hover:border-primary/30 hover:text-foreground"
+                      >
+                        <Twitter className="h-3 w-3" />
+                        {profile.twitter}
+                      </a>
+                    )}
+                    {profile.website && (
+                      <a
+                        href={profile.website.startsWith("http") ? profile.website : `https://${profile.website}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1.5 rounded-full border border-border bg-secondary/40 px-3 py-1.5 text-xs text-muted-foreground transition-colors hover:border-primary/30 hover:text-foreground"
+                      >
+                        <Globe className="h-3 w-3" />
+                        {profile.website.replace(/^https?:\/\//, "")}
+                      </a>
+                    )}
+                  </div>
+                )}
+
+                {/* Wallet address */}
+                {profile.wallet_address && (
+                  <div className="mt-5 flex items-center gap-2">
+                    <Wallet className="h-3.5 w-3.5 text-muted-foreground/50" />
+                    <span className="font-mono text-xs text-muted-foreground/60">
+                      {profile.wallet_address.slice(0, 6)}...{profile.wallet_address.slice(-6)}
+                    </span>
+                    <a
+                      href={`https://stellar.expert/explorer/testnet/account/${profile.wallet_address}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-muted-foreground/40 transition-colors hover:text-primary"
+                    >
+                      <ExternalLink className="h-3 w-3" />
+                    </a>
+                  </div>
                 )}
               </div>
             </div>
-          </div>
 
-          {/* Content area */}
-          <div className="px-6 py-5">
-            {step === "form" && (
-              <div className="space-y-4">
-                {/* Amount + Asset */}
-                <div>
-                  <Label className="mb-1.5 text-xs text-muted-foreground">Amount</Label>
-                  <div className="flex gap-2">
-                    <Input
-                      type="number"
-                      min="0"
-                      step="any"
-                      placeholder="0.00"
-                      value={amount}
-                      onChange={(e) => setAmount(e.target.value)}
-                      className="h-11 flex-1 border-border bg-secondary/50 font-mono text-base text-foreground placeholder:text-muted-foreground/40 focus-visible:ring-primary"
-                    />
-                    <Select value={assetId} onValueChange={setAssetId}>
-                      <SelectTrigger className="h-11 w-[110px] border-border bg-secondary/50 text-sm text-foreground focus:ring-primary">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {TESTNET_ASSETS.map((asset) => (
-                          <SelectItem key={asset.id} value={asset.id}>
-                            {asset.symbol}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
+            {/* Cascade flow preview */}
+            {dependencies.length > 0 && (
+              <div className="mt-4 rounded-2xl border border-dashed border-border/60 bg-card/40 px-6 py-5 backdrop-blur-sm">
+                <div className="mb-4 flex items-center gap-2">
+                  <GitFork className="h-4 w-4 text-primary" />
+                  <span className="text-sm font-medium text-foreground">Cascade distribution</span>
                 </div>
-
-                {/* Donor name (optional) */}
-                <div>
-                  <Label className="mb-1.5 text-xs text-muted-foreground">
-                    Your name <span className="text-muted-foreground/50">(optional)</span>
-                  </Label>
-                  <div className="relative">
-                    <User className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground/50" />
-                    <Input
-                      value={donorName}
-                      onChange={(e) => setDonorName(e.target.value)}
-                      placeholder="Anonymous"
-                      className="h-10 border-border bg-secondary/50 pl-9 text-sm text-foreground placeholder:text-muted-foreground/40 focus-visible:ring-primary"
-                    />
-                  </div>
-                </div>
-
-                {/* Connected wallet indicator */}
-                {isConnected && walletAddress && (
-                  <div className="flex items-center gap-2 rounded-lg bg-primary/5 px-3 py-2 text-xs text-muted-foreground">
-                    <div className="h-1.5 w-1.5 rounded-full bg-primary" />
-                    <span className="font-mono">
-                      {walletAddress.slice(0, 6)}...{walletAddress.slice(-4)}
+                <p className="mb-4 text-xs text-muted-foreground">
+                  Your donation is automatically split across these recipients in a single atomic transaction.
+                </p>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between rounded-lg bg-secondary/30 px-3 py-2">
+                    <span className="text-sm text-foreground">{displayName}</span>
+                    <span className="font-mono text-sm font-medium text-foreground">
+                      {100 - totalDependencyPercentage}%
                     </span>
                   </div>
-                )}
+                  {dependencies.map((dep) => (
+                    <div key={dep.id} className="flex items-center gap-2">
+                      <ArrowDown className="h-3 w-3 shrink-0 text-primary/50" />
+                      <div className="flex flex-1 items-center justify-between rounded-lg bg-secondary/20 px-3 py-2">
+                        <span className="text-sm text-muted-foreground">{dep.label}</span>
+                        <span className="font-mono text-sm text-muted-foreground">{dep.percentage}%</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
 
-                {/* Error */}
-                {error && (
-                  <div className="rounded-lg bg-destructive/10 px-3 py-2.5 text-xs text-destructive">
-                    {error}
+          {/* Right: Donation form */}
+          <div className="lg:col-span-2">
+            <div className="sticky top-8 rounded-2xl border border-border bg-card/80 shadow-2xl shadow-black/20 backdrop-blur-sm">
+              <div className="border-b border-border px-6 py-4">
+                <h2 className="text-sm font-semibold text-foreground">
+                  Support {profile.display_name || profile.username}
+                </h2>
+              </div>
+
+              <div className="px-6 py-5">
+                {step === "form" && (
+                  <div className="space-y-4">
+                    {/* Amount + Asset */}
+                    <div>
+                      <Label className="mb-1.5 text-xs text-muted-foreground">Amount</Label>
+                      <div className="flex gap-2">
+                        <Input
+                          type="number"
+                          min="0"
+                          step="any"
+                          placeholder="0.00"
+                          value={amount}
+                          onChange={(e) => setAmount(e.target.value)}
+                          className="h-12 flex-1 border-border bg-secondary/50 font-mono text-lg text-foreground placeholder:text-muted-foreground/40 focus-visible:ring-primary"
+                        />
+                        <Select value={assetId} onValueChange={setAssetId}>
+                          <SelectTrigger className="h-12 w-[100px] border-border bg-secondary/50 text-sm text-foreground focus:ring-primary">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {TESTNET_ASSETS.map((asset) => (
+                              <SelectItem key={asset.id} value={asset.id}>
+                                {asset.symbol}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+
+                    {/* Quick amounts */}
+                    <div className="flex gap-2">
+                      {["5", "10", "25", "50"].map((preset) => (
+                        <button
+                          key={preset}
+                          onClick={() => setAmount(preset)}
+                          className={`flex-1 rounded-lg border py-2 text-xs font-medium transition-colors ${
+                            amount === preset
+                              ? "border-primary bg-primary/10 text-primary"
+                              : "border-border bg-secondary/30 text-muted-foreground hover:border-primary/30 hover:text-foreground"
+                          }`}
+                        >
+                          {preset}
+                        </button>
+                      ))}
+                    </div>
+
+                    {/* Donor name */}
+                    <div>
+                      <Label className="mb-1.5 text-xs text-muted-foreground">
+                        Your name <span className="text-muted-foreground/50">(optional)</span>
+                      </Label>
+                      <div className="relative">
+                        <User className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground/50" />
+                        <Input
+                          value={donorName}
+                          onChange={(e) => setDonorName(e.target.value)}
+                          placeholder="Anonymous"
+                          className="h-10 border-border bg-secondary/50 pl-9 text-sm text-foreground placeholder:text-muted-foreground/40 focus-visible:ring-primary"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Connected wallet */}
+                    {isConnected && walletAddress && (
+                      <div className="flex items-center gap-2 rounded-lg bg-primary/5 px-3 py-2 text-xs text-muted-foreground">
+                        <div className="h-1.5 w-1.5 rounded-full bg-primary" />
+                        <span className="font-mono">
+                          {walletAddress.slice(0, 6)}...{walletAddress.slice(-4)}
+                        </span>
+                      </div>
+                    )}
+
+                    {/* Error */}
+                    {error && (
+                      <div className="rounded-lg bg-destructive/10 px-3 py-2.5 text-xs text-destructive">
+                        {error}
+                      </div>
+                    )}
+
+                    {/* CTA */}
+                    <Button
+                      onClick={handleDonate}
+                      className="h-12 w-full gap-2 bg-primary text-sm font-semibold text-primary-foreground hover:bg-primary/90"
+                    >
+                      <Wallet className="h-4 w-4" />
+                      {!isConnected
+                        ? "Connect Wallet & Donate"
+                        : amount && parseFloat(amount) > 0
+                          ? `Donate ${amount} ${selectedAsset.symbol}`
+                          : "Donate"}
+                    </Button>
+
+                    {/* Trust line */}
+                    <p className="text-center text-[10px] text-muted-foreground/40">
+                      Non-custodial. Settled on Stellar in under 5 seconds.
+                    </p>
                   </div>
                 )}
 
-                {/* CTA */}
-                <Button
-                  onClick={handleDonate}
-                  className="h-11 w-full gap-2 bg-primary text-sm font-medium text-primary-foreground hover:bg-primary/90"
-                >
-                  <Wallet className="h-4 w-4" />
-                  {!isConnected
-                    ? "Connect Wallet & Donate"
-                    : amount && parseFloat(amount) > 0
-                      ? `Donate ${amount} ${selectedAsset.symbol}`
-                      : "Donate"}
-                </Button>
-              </div>
-            )}
-
-            {step === "submitting" && (
-              <div className="flex flex-col items-center py-8">
-                <Loader2 className="mb-4 h-8 w-8 animate-spin text-primary" />
-                <p className="text-sm font-medium text-foreground">Processing donation...</p>
-                <p className="mt-1 text-xs text-muted-foreground">
-                  Please confirm in your wallet and wait for settlement.
-                </p>
-              </div>
-            )}
-
-            {step === "success" && (
-              <div className="flex flex-col items-center py-6">
-                <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-[hsl(var(--success))]/10">
-                  <CheckCircle2 className="h-7 w-7 text-[hsl(var(--success))]" />
-                </div>
-                <h2 className="text-lg font-semibold text-foreground">Donation sent!</h2>
-                <p className="mt-1 text-center text-xs text-muted-foreground">
-                  Your donation of {amount} {selectedAsset.symbol} to {displayName} has been confirmed on the Stellar network.
-                </p>
-                {txHash && (
-                  <a
-                    href={`https://stellar.expert/explorer/testnet/tx/${txHash}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="mt-3 inline-flex items-center gap-1.5 text-xs font-medium text-primary transition-colors hover:text-primary/80"
-                  >
-                    View on StellarExpert
-                    <ExternalLink className="h-3 w-3" />
-                  </a>
+                {step === "submitting" && (
+                  <div className="flex flex-col items-center py-10">
+                    <Loader2 className="mb-4 h-8 w-8 animate-spin text-primary" />
+                    <p className="text-sm font-medium text-foreground">Processing donation...</p>
+                    <p className="mt-1 text-xs text-muted-foreground">
+                      Confirm in your wallet and wait for settlement.
+                    </p>
+                  </div>
                 )}
-                <Button
-                  variant="outline"
-                  onClick={handleDonateAgain}
-                  className="mt-5 h-9 border-border text-sm text-foreground hover:bg-secondary"
-                >
-                  Donate Again
-                </Button>
+
+                {step === "success" && (
+                  <div className="flex flex-col items-center py-8">
+                    <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-[hsl(var(--success))]/10">
+                      <CheckCircle2 className="h-8 w-8 text-[hsl(var(--success))]" />
+                    </div>
+                    <h2 className="text-lg font-bold text-foreground">Thank you!</h2>
+                    <p className="mt-2 text-center text-sm text-muted-foreground">
+                      {amount} {selectedAsset.symbol} sent to {displayName}
+                    </p>
+                    {txHash && (
+                      <a
+                        href={`https://stellar.expert/explorer/testnet/tx/${txHash}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="mt-3 inline-flex items-center gap-1.5 text-xs font-medium text-primary transition-colors hover:text-primary/80"
+                      >
+                        View on StellarExpert
+                        <ExternalLink className="h-3 w-3" />
+                      </a>
+                    )}
+                    <Button
+                      variant="outline"
+                      onClick={handleDonateAgain}
+                      className="mt-5 h-9 border-border text-sm text-foreground hover:bg-secondary"
+                    >
+                      Donate Again
+                    </Button>
+                  </div>
+                )}
               </div>
-            )}
+            </div>
           </div>
         </div>
-
-        {/* Cascade flow preview */}
-        {dependencies.length > 0 && step === "form" && (
-          <div className="mt-4 rounded-xl border border-dashed border-border/60 bg-card/40 px-5 py-4 backdrop-blur-sm">
-            <div className="mb-3 flex items-center gap-2">
-              <GitFork className="h-3.5 w-3.5 text-primary" />
-              <span className="text-xs font-medium text-muted-foreground">Cascade distribution</span>
-            </div>
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <span className="text-xs text-foreground">{displayName}</span>
-                <span className="font-mono text-xs text-muted-foreground">
-                  {100 - totalDependencyPercentage}%
-                </span>
-              </div>
-              {dependencies.map((dep) => (
-                <div key={dep.id} className="flex items-center gap-2">
-                  <ArrowDown className="h-3 w-3 shrink-0 text-primary/40" />
-                  <div className="flex flex-1 items-center justify-between">
-                    <span className="truncate text-xs text-muted-foreground">{dep.label}</span>
-                    <span className="ml-2 font-mono text-xs text-muted-foreground">{dep.percentage}%</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* Footer */}
-      <p className="relative mt-8 text-center text-[10px] text-muted-foreground/50">
-        Non-custodial. All signing happens client-side via your Stellar wallet.
-      </p>
+      </main>
     </div>
   )
 }

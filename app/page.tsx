@@ -8,7 +8,7 @@ const features = [
   {
     icon: GitFork,
     title: "Cascading Payments",
-    description: "Automatically split incoming payments across your dependencies and contributors.",
+    description: "Automatically split incoming payments across your configured recipients.",
   },
   {
     icon: Shield,
@@ -31,17 +31,17 @@ const steps = [
   {
     step: "01",
     title: "Connect Wallet",
-    description: "Sign in with your Freighter wallet",
+    description: "Sign in with your Stellar wallet",
   },
   {
     step: "02",
-    title: "Add Dependencies",
-    description: "Configure up to 5 payment splits",
+    title: "Add Recipients",
+    description: "Configure up to 10 payment splits",
   },
   {
     step: "03",
     title: "Share Your Link",
-    description: "Get your trytippa.com/username URL",
+    description: "Get your trytippa.com/d/username URL",
   },
 ]
 
@@ -173,7 +173,7 @@ export default function HomePage() {
             <div className="space-y-2 text-sm leading-relaxed text-muted-foreground">
               <p>
                 Bob sends <span className="font-mono font-semibold text-foreground">100 USDC</span> to{" "}
-                <span className="font-mono text-primary">trytippa.com/alice</span>
+                <span className="font-mono text-primary">trytippa.com/d/alice</span>
               </p>
               <div className="flex flex-col gap-1 pl-4 text-xs">
                 <span>
@@ -183,7 +183,7 @@ export default function HomePage() {
                   Alice receives: <span className="font-mono text-foreground">93.50 USDC</span>
                 </span>
                 <span>
-                  Dependency A, B, C each receive: <span className="font-mono text-primary">2.00 USDC</span>
+                  Recipient A, B, C each receive: <span className="font-mono text-primary">2.00 USDC</span>
                 </span>
               </div>
               <p className="text-xs text-muted-foreground">All executed atomically in a single Stellar multi-op transaction.</p>
