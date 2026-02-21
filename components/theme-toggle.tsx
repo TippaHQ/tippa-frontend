@@ -2,13 +2,11 @@
 
 import { useTheme } from "next-themes"
 import { useEffect, useState } from "react"
-import { Sun, Moon, Monitor } from "lucide-react"
+import { Sun, Moon } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
-const modes = ["light", "dark", "system"] as const
-
 export function ThemeToggle() {
-  const { theme, setTheme } = useTheme()
+  const { resolvedTheme, setTheme } = useTheme()
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => setMounted(true), [])
@@ -22,22 +20,17 @@ export function ThemeToggle() {
     )
   }
 
-  const cycle = () => {
-    const idx = modes.indexOf(theme as (typeof modes)[number])
-    setTheme(modes[(idx + 1) % modes.length])
-  }
+  const toggle = () => setTheme(resolvedTheme === "dark" ? "light" : "dark")
 
   return (
     <Button
       variant="ghost"
       size="icon"
-      onClick={cycle}
+      onClick={toggle}
       className="h-9 w-9 text-muted-foreground hover:text-foreground"
     >
-      {theme === "light" && <Sun className="h-[18px] w-[18px]" />}
-      {theme === "dark" && <Moon className="h-[18px] w-[18px]" />}
-      {theme === "system" && <Monitor className="h-[18px] w-[18px]" />}
-      <span className="sr-only">Toggle theme ({theme})</span>
+      {resolvedTheme === "dark" ? <Moon className="h-[18px] w-[18px]" /> : <Sun className="h-[18px] w-[18px]" />}
+      <span className="sr-only">Toggle theme</span>
     </Button>
   )
 }
