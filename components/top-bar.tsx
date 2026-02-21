@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react"
 import { Bell, Search, ChevronDown, Wallet } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { ThemeToggle } from "@/components/theme-toggle"
 import { Input } from "@/components/ui/input"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { createClient } from "@/lib/supabase/client"
@@ -60,6 +61,9 @@ export function TopBar() {
             <span className="text-xs font-medium text-muted-foreground">No wallet</span>
           </div>
         )}
+
+        {/* Theme toggle */}
+        <ThemeToggle />
 
         {/* Notifications */}
         <Button variant="ghost" size="icon" className="relative h-9 w-9 text-muted-foreground hover:text-foreground">

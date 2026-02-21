@@ -1,6 +1,6 @@
 "use client"
 
-import { Shield, Bell, Trash2 } from "lucide-react"
+import { Shield, Bell, Trash2, Sun, Moon, Monitor } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -8,6 +8,8 @@ import { Switch } from "@/components/ui/switch"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { updateProfile, updateNotificationPreferences } from "@/lib/actions"
 import { useRouter } from "next/navigation"
+import { useTheme } from "next-themes"
+import { useEffect, useState } from "react"
 import type { Profile, NotificationPreferences } from "@/lib/types"
 
 interface SettingsClientProps {
@@ -17,6 +19,10 @@ interface SettingsClientProps {
 
 export function SettingsClient({ profile, notifPrefs }: SettingsClientProps) {
   const router = useRouter()
+  const { theme, setTheme } = useTheme()
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => setMounted(true), [])
 
   const handleNotifToggle = async (field: string, checked: boolean) => {
     await updateNotificationPreferences({ [field]: checked })
@@ -80,6 +86,41 @@ export function SettingsClient({ profile, notifPrefs }: SettingsClientProps) {
             </Select>
           </div>
         </div>
+      </div>
+
+      {/* Theme */}
+      <div className="rounded-xl border border-border bg-card p-5">
+        <div className="mb-4 flex items-center gap-3">
+          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10">
+            <Sun className="h-4 w-4 text-primary" />
+          </div>
+          <div>
+            <h3 className="text-sm font-semibold text-foreground">Appearance</h3>
+            <p className="text-xs text-muted-foreground">Choose how Tippa looks for you</p>
+          </div>
+        </div>
+        {mounted && (
+          <div className="grid grid-cols-3 gap-3">
+            {([
+              { value: "light", icon: Sun, label: "Light" },
+              { value: "dark", icon: Moon, label: "Dark" },
+              { value: "system", icon: Monitor, label: "System" },
+            ] as const).map((opt) => (
+              <button
+                key={opt.value}
+                onClick={() => setTheme(opt.value)}
+                className={`flex flex-col items-center gap-2 rounded-lg border p-4 transition-colors ${
+                  theme === opt.value
+                    ? "border-primary bg-primary/10 text-primary"
+                    : "border-border bg-secondary/20 text-muted-foreground hover:border-primary/50 hover:text-foreground"
+                }`}
+              >
+                <opt.icon className="h-5 w-5" />
+                <span className="text-xs font-medium">{opt.label}</span>
+              </button>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Notifications */}
