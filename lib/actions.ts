@@ -91,7 +91,7 @@ export async function saveCascadeDependencies(
   deps: Array<{
     id?: string
     label: string
-    stellar_address: string
+    recipient_username: string
     percentage: number
     sort_order: number
   }>,
@@ -100,7 +100,7 @@ export async function saveCascadeDependencies(
   if (!user) return { error: "Not authenticated" }
   const supabase = await createClient()
 
-  // Delete all existing then re-insert (simplest approach for up to 5 items)
+  // Delete all existing then re-insert (simplest approach for up to 10 items)
   const { error: deleteError } = await supabase.from("cascade_dependencies").delete().eq("user_id", user.id)
   if (deleteError) return { error: deleteError.message }
 
@@ -108,7 +108,7 @@ export async function saveCascadeDependencies(
     const rows = deps.map((d, i) => ({
       user_id: user.id,
       label: d.label,
-      stellar_address: d.stellar_address,
+      recipient_username: d.recipient_username,
       percentage: d.percentage,
       sort_order: i,
     }))
@@ -120,6 +120,12 @@ export async function saveCascadeDependencies(
   revalidatePath("/dashboard")
   revalidatePath("/dashboard/profile")
   return { error: null }
+}
+
+export async function checkUsernameExists(username: string): Promise<boolean> {
+  const supabase = await createClient()
+  const { data } = await supabase.from("profiles").select("username").eq("username", username).single()
+  return !!data
 }
 
 // ────────────────────────────────────────────────────────────

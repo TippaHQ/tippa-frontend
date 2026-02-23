@@ -60,8 +60,8 @@ export function CascadePreview({ dependencies, username }: CascadePreviewProps) 
                 <div className={`h-2.5 w-2.5 rounded-full ${COLORS[idx % COLORS.length]}`} />
                 <div className="flex-1 overflow-hidden">
                   <span className="text-sm font-medium text-foreground">{dep.label}</span>
-                  <span className="ml-2 font-mono text-xs text-muted-foreground">
-                    {dep.stellar_address.slice(0, 4)}...{dep.stellar_address.slice(-4)}
+                  <span className="ml-2 text-xs text-muted-foreground">
+                    @{dep.recipient_username}
                   </span>
                 </div>
                 <span className="font-mono text-sm font-semibold text-primary">{Number(dep.percentage)}%</span>

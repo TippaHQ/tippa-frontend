@@ -73,12 +73,16 @@ export function DonateForm({ profile, dependencies }: DonateFormProps) {
         throw new Error(buildData.error || "Failed to build transaction.")
       }
 
-      const signedXdr = await signTransaction(buildData.xdr)
+      const signedXdr = await signTransaction(buildData.xdr, walletAddress!)
 
       const submitRes = await fetch("/api/donate/submit", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ signedXdr }),
+        body: JSON.stringify({
+          signedXdr,
+          username: profile.username,
+          assetContractId: selectedAsset.contractId,
+        }),
       })
 
       const submitData = await submitRes.json()

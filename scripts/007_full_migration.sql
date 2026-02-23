@@ -71,7 +71,7 @@ create table if not exists public.cascade_dependencies (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null references public.profiles(id) on delete cascade,
   label text not null,
-  stellar_address text not null,
+  recipient_username text not null,
   percentage numeric(5, 2) not null check (percentage > 0 and percentage <= 50),
   sort_order int not null default 0,
   created_at timestamptz not null default now(),
@@ -355,3 +355,28 @@ create trigger on_auth_user_created
   after insert on auth.users
   for each row
   execute function public.handle_new_user();
+
+
+-- ============================================================
+-- 10. Distribution queue (background distribute() processor)
+-- ============================================================
+create table if not exists public.distribution_queue (
+  id uuid primary key default gen_random_uuid(),
+  username text not null,
+  asset_contract_id text not null,
+  depth integer not null default 0,
+  status text not null default 'pending',
+  attempts integer not null default 0,
+  error text,
+  tx_hash text,
+  source_tx text,
+  created_at timestamptz not null default now(),
+  processed_at timestamptz
+);
+
+-- No RLS policies — accessed via service role only
+alter table public.distribution_queue enable row level security;
+
+create index if not exists idx_distribution_queue_status_created
+  on public.distribution_queue(status, created_at)
+  where status = 'pending';

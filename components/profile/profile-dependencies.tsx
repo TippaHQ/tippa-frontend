@@ -27,16 +27,14 @@ export function ProfileDependencies({ dependencies }: ProfileDependenciesProps) 
               </div>
               <div className="flex-1 overflow-hidden">
                 <p className="text-sm font-medium text-foreground">{dep.label}</p>
-                <p className="truncate font-mono text-xs text-muted-foreground">
-                  {dep.stellar_address.slice(0, 4)}...{dep.stellar_address.slice(-4)}
-                </p>
+                <p className="text-xs text-muted-foreground">@{dep.recipient_username}</p>
               </div>
               <a
-                href={`https://stellar.expert/explorer/public/account/${dep.stellar_address}`}
+                href={`/d/${dep.recipient_username}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="shrink-0 text-muted-foreground transition-colors hover:text-primary"
-                aria-label={`View ${dep.label} on explorer`}
+                aria-label={`View ${dep.label} profile`}
               >
                 <ExternalLink className="h-3.5 w-3.5" />
               </a>

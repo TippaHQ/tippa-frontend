@@ -21,7 +21,7 @@ export interface CascadeDependency {
   id: string
   user_id: string
   label: string
-  stellar_address: string
+  recipient_username: string
   percentage: number
   sort_order: number
   created_at: string

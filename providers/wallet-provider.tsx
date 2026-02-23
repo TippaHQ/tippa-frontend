@@ -10,7 +10,7 @@ type WalletContextType = {
   isConnected: boolean
   connectWallet: () => Promise<void>
   disconnectWallet: () => void
-  signTransaction: (xdr: string) => Promise<string>
+  signTransaction: (xdr: string, address?: string) => Promise<string>
 }
 
 const WalletContext = createContext<WalletContextType | undefined>(undefined)
@@ -39,10 +39,11 @@ export function WalletProvider({ children }: { children: ReactNode }) {
     setWalletName(null)
   }, [])
 
-  const signTransaction = useCallback(async (xdr: string): Promise<string> => {
+  const signTransaction = useCallback(async (xdr: string, address?: string): Promise<string> => {
     const kit = getKit()
     const { signedTxXdr } = await kit.signTransaction(xdr, {
       networkPassphrase: WalletNetwork.TESTNET,
+      address,
     })
     return signedTxXdr
   }, [])

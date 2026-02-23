@@ -1,10 +1,10 @@
 import { CascadeEditor } from "@/components/cascades/cascade-editor"
 import { CascadeSimulator } from "@/components/cascades/cascade-simulator"
 import { CascadeRules } from "@/components/cascades/cascade-rules"
-import { getCascadeDependencies, getCascadeRules } from "@/lib/actions"
+import { getCascadeDependencies, getCascadeRules, getProfile } from "@/lib/actions"
 
 export default async function CascadesPage() {
-  const [deps, rules] = await Promise.all([getCascadeDependencies(), getCascadeRules()])
+  const [deps, rules, profile] = await Promise.all([getCascadeDependencies(), getCascadeRules(), getProfile()])
 
   return (
     <div className="mx-auto max-w-7xl space-y-6">
@@ -17,7 +17,7 @@ export default async function CascadesPage() {
 
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-5">
         <div className="xl:col-span-3">
-          <CascadeEditor initialDeps={deps} />
+          <CascadeEditor initialDeps={deps} ownerUsername={profile?.username ?? null} ownerWalletAddress={profile?.wallet_address ?? null} />
         </div>
         <div className="space-y-6 xl:col-span-2">
           <CascadeSimulator dependencies={deps} />
