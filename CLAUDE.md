@@ -71,3 +71,78 @@ Core tables in Supabase PostgreSQL: `profiles`, `cascade_dependencies` (payment 
 ### Styling
 
 Dark-first theme with teal primary (`hsl(168 80% 50%)`). Uses `cn()` utility from `lib/utils.ts` (clsx + tailwind-merge) for conditional class composition. Fonts: Geist Sans and Geist Mono.
+
+## Soroban/Stellar Integration
+
+Tippa uses Soroban smart contracts on the Stellar network for non-custodial payment distribution. Contract bindings are generated in the `tippa-client` package.
+
+### Contract Configuration
+
+- **Network**: TESTNET (change to PUBLIC in `lib/stellar-kit.ts` for production)
+- **Contract ID**: `CA5VXIBSSD4DNM2LXJBMAEQM66VBQTZJE2ZLYWXYHDAB6N5RB27NKIMI`
+- **RPC URL**: `https://soroban-testnet.stellar.org` (configurable via `SOROBAN_RPC_URL` env var)
+
+### Supported Assets
+
+| Asset | Contract ID | Decimals |
+|-------|-------------|----------|
+| USDC | `CBIELTK6YBZJU5UP2WWQEUCYKLPU6AUNZ2BQ4WWFEIE3USCIHMXQDAMA` | 7 |
+| XLM | `CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC` | 7 |
+
+Defined in `lib/constants/assets.ts`.
+
+### Wallet Integration
+
+Uses `@creit.tech/stellar-wallets-kit` with 6 wallet modules:
+- Freighter (default)
+- Albedo
+- xBull
+- Lobstr
+- Hana
+- Rabet
+
+**Setup**: `lib/stellar-kit.ts` initializes the kit singleton. `providers/wallet-provider.tsx` provides `useWallet()` hook for connection state, signing, and disconnection.
+
+### Contract Functions (tippa-client)
+
+| Function | Purpose | Mutates State |
+|----------|---------|---------------|
+| `register(caller, username)` | Register a new username | Yes |
+| `set_rules(caller, username, rules)` | Set cascade distribution rules | Yes |
+| `get_rules(username)` | Get user's cascade rules | No |
+| `donate(caller, username, asset, amount, donor_override?)` | Send payment to user | Yes |
+| `distribute(username, asset, min_distribution)` | Distribute pooled funds to dependencies | Yes |
+| `claim(caller, username, asset, to?)` | Withdraw unclaimed funds | Yes |
+| `get_unclaimed(username, asset)` | Get unclaimed balance for asset | No |
+| `get_pool(username, asset)` | Get current pool balance | No |
+| `get_total_received(username, asset)` | Get total received for asset | No |
+| `get_owner(username)` | Get owner address for username | No |
+| `transfer_ownership(caller, username, new_owner)` | Transfer username ownership | Yes |
+| `distribute_and_claim(caller, username, asset, to?, min_distribution)` | Combined distribute + claim | Yes |
+
+### API Route Pattern
+
+Contract interactions follow a **Build → Sign → Submit** pattern:
+
+1. **Build** (`/api/*/build`): Simulate transaction, return XDR
+   - Client sends: `callerAddress`, `username`, `asset`, `amount`, etc.
+   - Server returns: `{ xdr: "..." }`
+
+2. **Sign**: User signs XDR via wallet (frontend)
+   - Use `useWallet().signTransaction(xdr)`
+
+3. **Submit** (`/api/*/submit`): Send signed transaction to RPC
+   - Client sends: `{ signedXdr, ...metadata }`
+   - Server polls for result, returns `{ success: true, txHash: "..." }`
+
+### Key Files for Stellar Integration
+
+| File | Purpose |
+|------|---------|
+| `packages/tippa-client/src/index.ts` | Generated contract bindings |
+| `lib/stellar-kit.ts` | Wallet kit initialization |
+| `providers/wallet-provider.tsx` | Wallet context and hooks |
+| `lib/distribute.ts` | Server-side distribution queue processor |
+| `lib/constants/assets.ts` | Supported asset definitions |
+| `app/api/*/build/route.ts` | Transaction building endpoints |
+| `app/api/*/submit/route.ts` | Transaction submission endpoints |
