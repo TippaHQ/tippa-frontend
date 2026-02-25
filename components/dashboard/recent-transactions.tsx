@@ -50,9 +50,7 @@ export function RecentTransactions({ transactions, currentUsername }: RecentTran
                   <div className="flex items-center gap-2">
                     <span className="text-sm font-medium text-foreground">{counterparty}</span>
                     <span className="font-mono text-xs text-muted-foreground">
-                      {counterpartyAddress
-                        ? counterpartyAddress.slice(0, 4) + "..." + counterpartyAddress.slice(-4)
-                        : "N/A"}
+                      {counterpartyAddress ? counterpartyAddress.slice(0, 4) + "..." + counterpartyAddress.slice(-4) : "N/A"}
                     </span>
                   </div>
                   <p className="mt-0.5 text-xs text-muted-foreground capitalize">{tx.type}</p>

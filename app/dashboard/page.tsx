@@ -2,12 +2,12 @@ import { StatCards } from "@/components/dashboard/stat-cards"
 import { FlowChart } from "@/components/dashboard/flow-chart"
 import { RecentTransactions } from "@/components/dashboard/recent-transactions"
 import { CascadePreview } from "@/components/dashboard/cascade-preview"
-import { getDashboardStats, getMonthlyFlowStats, getTransactions, getCascadeDependencies, getProfile } from "@/lib/actions"
+import { getDashboardStats, getTransactions, getCascadeDependencies, getProfile, getPaymentFlowStats } from "@/lib/actions"
 
 export default async function DashboardPage() {
-  const [stats, monthlyStats, txResult, deps, profile] = await Promise.all([
+  const [stats, paymentFlowStats, txResult, deps, profile] = await Promise.all([
     getDashboardStats(),
-    getMonthlyFlowStats(),
+    getPaymentFlowStats(),
     getTransactions({ limit: 5 }),
     getCascadeDependencies(),
     getProfile(),
@@ -23,9 +23,7 @@ export default async function DashboardPage() {
       <StatCards activeCascades={stats.activeCascades} depCount={stats.depCount} />
 
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
-        <div className="xl:col-span-2">
-          <FlowChart data={monthlyStats} />
-        </div>
+        <FlowChart data={paymentFlowStats} className="xl:col-span-2" />
         <CascadePreview dependencies={deps} username={profile?.username ?? profile?.display_name ?? "you"} />
       </div>
 

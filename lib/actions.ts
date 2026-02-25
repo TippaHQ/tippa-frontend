@@ -1,8 +1,19 @@
 "use server"
 
-import { createClient } from "@/lib/supabase/server"
 import { revalidatePath } from "next/cache"
-import type { Profile, CascadeDependency, CascadeRules, Transaction, MonthlyFlowStat, NotificationPreferences, ProfileAnalytics } from "@/lib/types"
+import { createClient } from "@/lib/supabase/server"
+import type {
+  Profile,
+  CascadeDependency,
+  CascadeRules,
+  Transaction,
+  PartialTransaction,
+  MonthlyFlowStat,
+  NotificationPreferences,
+  ProfileAnalytics,
+} from "@/lib/types"
+import { parseTransactions } from "@/lib/utils"
+import { DEFAULT_ASSET_ID } from "@/lib/constants/assets"
 
 // ────────────────────────────────────────────────────────────
 // Auth helpers
@@ -175,9 +186,7 @@ export async function getTransactions(opts?: {
     // Sanitize search input to prevent PostgREST filter injection
     const q = opts.search.replace(/[,.()"\\]/g, "")
     if (q) {
-      query = query.or(
-        `from_username.ilike.%${q}%,to_username.ilike.%${q}%,from_address.ilike.%${q}%,stellar_tx_hash.ilike.%${q}%`,
-      )
+      query = query.or(`from_username.ilike.%${q}%,to_username.ilike.%${q}%,from_address.ilike.%${q}%,stellar_tx_hash.ilike.%${q}%`)
     }
   }
   if (opts?.limit) {
@@ -199,6 +208,29 @@ export async function getMonthlyFlowStats(): Promise<MonthlyFlowStat[]> {
   const supabase = await createClient()
   const { data } = await supabase.from("monthly_flow_stats").select("*").eq("user_id", user.id).order("month", { ascending: true })
   return data ?? []
+}
+
+export interface PaymentFlowStats {
+  date: string
+  asset: string
+  received: number
+  forwarded: number
+}
+
+export async function getPaymentFlowStats(): Promise<PaymentFlowStats[]> {
+  const profile = await getProfile()
+  if (!profile?.username) return []
+
+  const supabase = await createClient()
+  const { data } = await supabase
+    .from("transactions")
+    .select("amount, asset, type, created_at, from_username, to_username")
+    .eq("status", "completed")
+    .or(`from_username.eq.${profile.username},to_username.eq.${profile.username}`)
+    .order("created_at", { ascending: true })
+
+  if (!data) return []
+  return parseTransactions(data as PartialTransaction[], profile.username)
 }
 
 // ────────────────────────────────────────────────────────────

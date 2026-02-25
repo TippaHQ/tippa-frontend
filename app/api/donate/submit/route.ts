@@ -44,18 +44,10 @@ export async function POST(request: Request) {
       if (username && donorAddress && amount && assetId) {
         try {
           // Look up recipient's wallet address
-          const { data: recipientProfile } = await adminClient
-            .from("profiles")
-            .select("wallet_address")
-            .eq("username", username)
-            .single()
+          const { data: recipientProfile } = await adminClient.from("profiles").select("wallet_address").eq("username", username).single()
 
           // Look up donor's username (nullable - they may not have a tippa account)
-          const { data: donorProfile } = await adminClient
-            .from("profiles")
-            .select("username")
-            .eq("wallet_address", donorAddress)
-            .single()
+          const { data: donorProfile } = await adminClient.from("profiles").select("username").eq("wallet_address", donorAddress).single()
 
           await adminClient.from("transactions").insert({
             type: "donate",

@@ -110,13 +110,7 @@ export async function processDistributionQueue(): Promise<ProcessResults> {
 
       // Record distribute transactions per recipient
       if (poolAmount > BigInt(0)) {
-        await recordDistributeTransactions(
-          adminClient,
-          item.username,
-          item.asset_contract_id,
-          poolAmount,
-          sendResponse.hash,
-        )
+        await recordDistributeTransactions(adminClient, item.username, item.asset_contract_id, poolAmount, sendResponse.hash)
       }
 
       // Enqueue downstream recipients if depth allows
@@ -169,11 +163,7 @@ async function recordDistributeTransactions(
 ) {
   try {
     // Look up distributor's profile
-    const { data: distributorProfile } = await adminClient
-      .from("profiles")
-      .select("id, wallet_address")
-      .eq("username", username)
-      .single()
+    const { data: distributorProfile } = await adminClient.from("profiles").select("id, wallet_address").eq("username", username).single()
 
     if (!distributorProfile) return
 
@@ -201,11 +191,7 @@ async function recordDistributeTransactions(
       const shareHuman = Number(shareStroops) / 10 ** ASSET_DECIMALS
 
       // Look up recipient's wallet address
-      const { data: recipientProfile } = await adminClient
-        .from("profiles")
-        .select("wallet_address")
-        .eq("username", dep.recipient_username)
-        .single()
+      const { data: recipientProfile } = await adminClient.from("profiles").select("wallet_address").eq("username", dep.recipient_username).single()
 
       txRows.push({
         type: "distribute" as const,
@@ -229,7 +215,7 @@ async function recordDistributeTransactions(
 }
 
 function resolveAssetSymbol(contractId: string): string {
-  return TESTNET_ASSETS.find(a => a.contractId === contractId)?.symbol ?? "UNKNOWN"
+  return TESTNET_ASSETS.find((a) => a.contractId === contractId)?.symbol ?? "UNKNOWN"
 }
 
 async function enqueueDownstream(

@@ -142,9 +142,7 @@ export function TransactionsClient({ initialTransactions, initialCount, currentU
                         <td className="px-5 py-3.5">
                           <p className="text-sm font-medium text-foreground">{counterparty}</p>
                           <p className="font-mono text-xs text-muted-foreground">
-                            {counterpartyAddress
-                              ? counterpartyAddress.slice(0, 4) + "..." + counterpartyAddress.slice(-4)
-                              : "N/A"}
+                            {counterpartyAddress ? counterpartyAddress.slice(0, 4) + "..." + counterpartyAddress.slice(-4) : "N/A"}
                           </p>
                         </td>
                         <td className="px-5 py-3.5">
