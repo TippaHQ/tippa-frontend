@@ -43,10 +43,7 @@ export async function processDistributionQueue(): Promise<ProcessResults> {
     results.processed++
 
     // Mark as processing
-    await adminClient
-      .from("distribution_queue")
-      .update({ status: "processing" })
-      .eq("id", item.id)
+    await adminClient.from("distribution_queue").update({ status: "processing" }).eq("id", item.id)
 
     try {
       // Build distribute tx
@@ -147,36 +144,22 @@ async function enqueueDownstream(
   results: { enqueued: number },
 ) {
   // Find the user's profile ID
-  const { data: profile } = await adminClient
-    .from("profiles")
-    .select("id")
-    .eq("username", username)
-    .single()
+  const { data: profile } = await adminClient.from("profiles").select("id").eq("username", username).single()
 
   if (!profile) return
 
   // Get their cascade dependencies
-  const { data: deps } = await adminClient
-    .from("cascade_dependencies")
-    .select("recipient_username")
-    .eq("user_id", profile.id)
+  const { data: deps } = await adminClient.from("cascade_dependencies").select("recipient_username").eq("user_id", profile.id)
 
   if (!deps || deps.length === 0) return
 
   for (const dep of deps) {
     // Check if recipient has their own cascade rules (dependencies)
-    const { data: recipientProfile } = await adminClient
-      .from("profiles")
-      .select("id")
-      .eq("username", dep.recipient_username)
-      .single()
+    const { data: recipientProfile } = await adminClient.from("profiles").select("id").eq("username", dep.recipient_username).single()
 
     if (!recipientProfile) continue
 
-    const { count } = await adminClient
-      .from("cascade_dependencies")
-      .select("*", { count: "exact", head: true })
-      .eq("user_id", recipientProfile.id)
+    const { count } = await adminClient.from("cascade_dependencies").select("*", { count: "exact", head: true }).eq("user_id", recipientProfile.id)
 
     if (count && count > 0) {
       await adminClient.from("distribution_queue").insert({

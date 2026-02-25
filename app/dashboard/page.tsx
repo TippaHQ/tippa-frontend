@@ -20,10 +20,7 @@ export default async function DashboardPage() {
         <p className="mt-1 text-sm text-muted-foreground">Overview of your cascading payment activity</p>
       </div>
 
-      <StatCards
-        activeCascades={stats.activeCascades}
-        depCount={stats.depCount}
-      />
+      <StatCards activeCascades={stats.activeCascades} depCount={stats.depCount} />
 
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
         <div className="xl:col-span-2">

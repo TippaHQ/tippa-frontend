@@ -122,10 +122,7 @@ export function DonateForm({ profile, dependencies }: DonateFormProps) {
           </div>
           <span className="text-sm font-semibold tracking-tight text-foreground">Tippa</span>
         </div>
-        <a
-          href="/"
-          className="text-xs text-muted-foreground transition-colors hover:text-foreground"
-        >
+        <a href="/" className="text-xs text-muted-foreground transition-colors hover:text-foreground">
           Create your own
         </a>
       </header>
@@ -133,7 +130,6 @@ export function DonateForm({ profile, dependencies }: DonateFormProps) {
       {/* Main content */}
       <main className="relative mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:py-16">
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-5 lg:gap-12">
-
           {/* Left: Profile showcase */}
           <div className="lg:col-span-3">
             {/* Profile hero */}
@@ -145,22 +141,16 @@ export function DonateForm({ profile, dependencies }: DonateFormProps) {
                 {/* Avatar */}
                 <div className="-mt-10 mb-4">
                   <Avatar className="h-20 w-20 border-4 border-card shadow-lg">
-                    <AvatarFallback className="bg-primary/10 text-xl font-bold text-primary">
-                      {initials}
-                    </AvatarFallback>
+                    <AvatarFallback className="bg-primary/10 text-xl font-bold text-primary">{initials}</AvatarFallback>
                   </Avatar>
                 </div>
 
                 {/* Name + username */}
                 <h1 className="text-2xl font-bold tracking-tight text-foreground">{displayName}</h1>
-                {profile.username && (
-                  <p className="mt-0.5 font-mono text-sm text-primary">@{profile.username}</p>
-                )}
+                {profile.username && <p className="mt-0.5 font-mono text-sm text-primary">@{profile.username}</p>}
 
                 {/* Bio */}
-                {profile.bio && (
-                  <p className="mt-4 whitespace-pre-line text-sm leading-relaxed text-muted-foreground">{profile.bio}</p>
-                )}
+                {profile.bio && <p className="mt-4 whitespace-pre-line text-sm leading-relaxed text-muted-foreground">{profile.bio}</p>}
 
                 {/* Social links */}
                 {hasSocials && (
@@ -234,9 +224,7 @@ export function DonateForm({ profile, dependencies }: DonateFormProps) {
                 <div className="space-y-2">
                   <div className="flex items-center justify-between rounded-lg bg-secondary/30 px-3 py-2">
                     <span className="text-sm text-foreground">{displayName}</span>
-                    <span className="font-mono text-sm font-medium text-foreground">
-                      {100 - totalDependencyPercentage}%
-                    </span>
+                    <span className="font-mono text-sm font-medium text-foreground">{100 - totalDependencyPercentage}%</span>
                   </div>
                   {dependencies.map((dep) => (
                     <div key={dep.id} className="flex items-center gap-2">
@@ -256,9 +244,7 @@ export function DonateForm({ profile, dependencies }: DonateFormProps) {
           <div className="lg:col-span-2">
             <div className="sticky top-8 rounded-2xl border border-border bg-card/80 shadow-2xl shadow-black/20 backdrop-blur-sm">
               <div className="border-b border-border px-6 py-4">
-                <h2 className="text-sm font-semibold text-foreground">
-                  Support {profile.display_name || profile.username}
-                </h2>
+                <h2 className="text-sm font-semibold text-foreground">Support {profile.display_name || profile.username}</h2>
               </div>
 
               <div className="px-6 py-5">
@@ -336,11 +322,7 @@ export function DonateForm({ profile, dependencies }: DonateFormProps) {
                     )}
 
                     {/* Error */}
-                    {error && (
-                      <div className="rounded-lg bg-destructive/10 px-3 py-2.5 text-xs text-destructive">
-                        {error}
-                      </div>
-                    )}
+                    {error && <div className="rounded-lg bg-destructive/10 px-3 py-2.5 text-xs text-destructive">{error}</div>}
 
                     {/* CTA */}
                     <Button
@@ -356,9 +338,7 @@ export function DonateForm({ profile, dependencies }: DonateFormProps) {
                     </Button>
 
                     {/* Trust line */}
-                    <p className="text-center text-[10px] text-muted-foreground/40">
-                      Non-custodial. Settled on Stellar in under 5 seconds.
-                    </p>
+                    <p className="text-center text-[10px] text-muted-foreground/40">Non-custodial. Settled on Stellar in under 5 seconds.</p>
                   </div>
                 )}
 
@@ -366,9 +346,7 @@ export function DonateForm({ profile, dependencies }: DonateFormProps) {
                   <div className="flex flex-col items-center py-10">
                     <Loader2 className="mb-4 h-8 w-8 animate-spin text-primary" />
                     <p className="text-sm font-medium text-foreground">Processing donation...</p>
-                    <p className="mt-1 text-xs text-muted-foreground">
-                      Confirm in your wallet and wait for settlement.
-                    </p>
+                    <p className="mt-1 text-xs text-muted-foreground">Confirm in your wallet and wait for settlement.</p>
                   </div>
                 )}
 

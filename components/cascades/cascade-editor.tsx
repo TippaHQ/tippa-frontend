@@ -65,28 +65,25 @@ export function CascadeEditor({ initialDeps, ownerUsername, ownerWalletAddress }
   // Debounced username validation
   const validationTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>({})
 
-  const validateUsername = useCallback(
-    (depId: string, username: string) => {
-      // Clear previous timer for this dep
-      if (validationTimers.current[depId]) {
-        clearTimeout(validationTimers.current[depId])
-      }
+  const validateUsername = useCallback((depId: string, username: string) => {
+    // Clear previous timer for this dep
+    if (validationTimers.current[depId]) {
+      clearTimeout(validationTimers.current[depId])
+    }
 
-      if (!username.trim()) {
-        setDeps((prev) => prev.map((d) => (d.id === depId ? { ...d, usernameValid: null } : d)))
-        return
-      }
-
-      // Set loading state
+    if (!username.trim()) {
       setDeps((prev) => prev.map((d) => (d.id === depId ? { ...d, usernameValid: null } : d)))
+      return
+    }
 
-      validationTimers.current[depId] = setTimeout(async () => {
-        const exists = await checkUsernameExists(username.trim())
-        setDeps((prev) => prev.map((d) => (d.id === depId ? { ...d, usernameValid: exists } : d)))
-      }, 300)
-    },
-    [],
-  )
+    // Set loading state
+    setDeps((prev) => prev.map((d) => (d.id === depId ? { ...d, usernameValid: null } : d)))
+
+    validationTimers.current[depId] = setTimeout(async () => {
+      const exists = await checkUsernameExists(username.trim())
+      setDeps((prev) => prev.map((d) => (d.id === depId ? { ...d, usernameValid: exists } : d)))
+    }, 300)
+  }, [])
 
   const handleUsernameChange = (depId: string, value: string) => {
     updateDep(depId, "username", value)
@@ -378,7 +375,6 @@ export function CascadeEditor({ initialDeps, ownerUsername, ownerWalletAddress }
             <span className="text-xs text-destructive">{errorMessage}</span>
           </div>
         )}
-
 
         {totalPct > 50 && (
           <div className="mt-3 flex items-center gap-2 rounded-lg bg-destructive/10 px-3 py-2">
