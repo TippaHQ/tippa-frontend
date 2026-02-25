@@ -16,10 +16,9 @@ import {
   Wallet,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { useState, useEffect } from "react"
-import { createClient } from "@/lib/supabase/client"
+import { useState } from "react"
+import { useUserStore } from "@/lib/store/user-store"
 import { useRouter } from "next/navigation"
-import type { Profile } from "@/lib/types"
 
 const mainNav = [
   { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
@@ -42,29 +41,14 @@ export function AppSidebar() {
   const pathname = usePathname()
   const router = useRouter()
   const [collapsed, setCollapsed] = useState(false)
-  const [profile, setProfile] = useState<Profile | null>(null)
-  useEffect(() => {
-    const supabase = createClient()
-    const fetchProfile = async () => {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser()
-      if (user) {
-        const { data } = await supabase.from("profiles").select("*").eq("id", user.id).single()
-        setProfile(data)
-      }
-    }
-    fetchProfile()
-  }, [])
+  const profile = useUserStore((state) => state.profile)
+  const signOut = useUserStore((state) => state.signOut)
 
-  const handleLogout = async () => {
-    const supabase = createClient()
-    await supabase.auth.signOut()
+  async function handleLogout() {
+    await signOut()
     router.push("/")
     router.refresh()
   }
-
-
 
   return (
     <aside className={cn("flex h-screen flex-col border-r border-border bg-sidebar transition-all duration-300", collapsed ? "w-[72px]" : "w-64")}>
@@ -75,7 +59,6 @@ export function AppSidebar() {
         </div>
         {!collapsed && <span className="text-lg font-semibold tracking-tight text-foreground">Tippa</span>}
       </Link>
-
 
       {/* Main Navigation */}
       <nav className="mt-6 flex flex-1 flex-col gap-1 px-3">
