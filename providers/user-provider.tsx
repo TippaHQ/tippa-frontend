@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, type ReactNode } from "react"
+import { type ReactNode, useEffect } from "react"
 import { useUserStore } from "@/lib/store/user-store"
 
 export function UserProvider({ children }: { children: ReactNode }) {
@@ -8,7 +8,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     initialize()
-  }, [initialize])
+  }, [])
 
   return <>{children}</>
 }
