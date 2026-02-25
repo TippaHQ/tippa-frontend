@@ -12,9 +12,10 @@ import type { Transaction, TransactionType } from "@/lib/types"
 interface TransactionsClientProps {
   initialTransactions: Transaction[]
   initialCount: number
+  currentUsername: string | null
 }
 
-export function TransactionsClient({ initialTransactions, initialCount }: TransactionsClientProps) {
+export function TransactionsClient({ initialTransactions, initialCount, currentUsername }: TransactionsClientProps) {
   const [filter, setFilter] = useState<"all" | TransactionType>("all")
   const [searchQuery, setSearchQuery] = useState("")
 
@@ -23,8 +24,8 @@ export function TransactionsClient({ initialTransactions, initialCount }: Transa
     if (searchQuery) {
       const q = searchQuery.toLowerCase()
       return (
-        tx.from_name.toLowerCase().includes(q) ||
-        tx.to_name.toLowerCase().includes(q) ||
+        (tx.from_username ?? "").toLowerCase().includes(q) ||
+        tx.to_username.toLowerCase().includes(q) ||
         tx.from_address.toLowerCase().includes(q) ||
         (tx.stellar_tx_hash ?? "").toLowerCase().includes(q)
       )
@@ -59,7 +60,7 @@ export function TransactionsClient({ initialTransactions, initialCount }: Transa
         </div>
         <div className="flex items-center gap-2">
           <div className="flex items-center gap-1 rounded-lg border border-border bg-secondary/30 p-0.5">
-            {(["all", "received", "forwarded"] as const).map((f) => (
+            {(["all", "donate", "distribute"] as const).map((f) => (
               <button
                 key={f}
                 onClick={() => setFilter(f)}
@@ -68,7 +69,7 @@ export function TransactionsClient({ initialTransactions, initialCount }: Transa
                   filter === f ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground",
                 )}
               >
-                {f}
+                {f === "all" ? "All" : f === "donate" ? "Donations" : "Distributions"}
               </button>
             ))}
           </div>
@@ -103,7 +104,6 @@ export function TransactionsClient({ initialTransactions, initialCount }: Transa
                     <th className="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">Type</th>
                     <th className="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">From / To</th>
                     <th className="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">Amount</th>
-                    <th className="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">Cascade</th>
                     <th className="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">Status</th>
                     <th className="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">Time</th>
                     <th className="px-5 py-3 text-right text-xs font-semibold uppercase tracking-wider text-muted-foreground">Explorer</th>
@@ -111,7 +111,9 @@ export function TransactionsClient({ initialTransactions, initialCount }: Transa
                 </thead>
                 <tbody className="divide-y divide-border">
                   {filtered.map((tx) => {
-                    const isReceived = tx.type === "received"
+                    const isIncoming = tx.to_username === currentUsername
+                    const counterparty = isIncoming ? (tx.from_username ?? tx.from_address) : tx.to_username
+                    const counterpartyAddress = isIncoming ? tx.from_address : tx.to_address
                     const timeAgo = formatDistanceToNow(new Date(tx.created_at), { addSuffix: true })
                     const dateStr = new Date(tx.created_at).toLocaleDateString("en-US", {
                       month: "short",
@@ -121,36 +123,36 @@ export function TransactionsClient({ initialTransactions, initialCount }: Transa
                     return (
                       <tr key={tx.id} className="transition-colors hover:bg-secondary/20">
                         <td className="px-5 py-3.5">
-                          <div
-                            className={cn(
-                              "flex h-8 w-8 items-center justify-center rounded-lg",
-                              isReceived ? "bg-primary/10" : "bg-[hsl(var(--chart-2))]/10",
-                            )}
-                          >
-                            {isReceived ? (
-                              <ArrowDownLeft className="h-4 w-4 text-primary" />
-                            ) : (
-                              <ArrowUpRight className="h-4 w-4 text-[hsl(var(--chart-2))]" />
-                            )}
+                          <div className="flex items-center gap-2.5">
+                            <div
+                              className={cn(
+                                "flex h-8 w-8 shrink-0 items-center justify-center rounded-lg",
+                                isIncoming ? "bg-primary/10" : "bg-[hsl(var(--chart-2))]/10",
+                              )}
+                            >
+                              {isIncoming ? (
+                                <ArrowDownLeft className="h-4 w-4 text-primary" />
+                              ) : (
+                                <ArrowUpRight className="h-4 w-4 text-[hsl(var(--chart-2))]" />
+                              )}
+                            </div>
+                            <span className="text-xs font-medium capitalize text-muted-foreground">{tx.type}</span>
                           </div>
                         </td>
                         <td className="px-5 py-3.5">
-                          <p className="text-sm font-medium text-foreground">{isReceived ? tx.from_name : tx.to_name}</p>
+                          <p className="text-sm font-medium text-foreground">{counterparty}</p>
                           <p className="font-mono text-xs text-muted-foreground">
-                            {isReceived
-                              ? tx.from_address.slice(0, 4) + "..." + tx.from_address.slice(-4)
-                              : tx.to_address.slice(0, 4) + "..." + tx.to_address.slice(-4)}
+                            {counterpartyAddress
+                              ? counterpartyAddress.slice(0, 4) + "..." + counterpartyAddress.slice(-4)
+                              : "N/A"}
                           </p>
                         </td>
                         <td className="px-5 py-3.5">
-                          <span className={cn("font-mono text-sm font-semibold", isReceived ? "text-[hsl(var(--success))]" : "text-foreground")}>
-                            {isReceived ? "+" : "-"}
+                          <span className={cn("font-mono text-sm font-semibold", isIncoming ? "text-[hsl(var(--success))]" : "text-foreground")}>
+                            {isIncoming ? "+" : "-"}
                             {Math.abs(Number(tx.amount)).toFixed(2)}
                           </span>
                           <span className="ml-1.5 text-xs text-muted-foreground">{tx.asset}</span>
-                        </td>
-                        <td className="px-5 py-3.5">
-                          <span className="text-xs text-muted-foreground">{tx.cascade_info ?? "Direct"}</span>
                         </td>
                         <td className="px-5 py-3.5">
                           <span
@@ -179,7 +181,7 @@ export function TransactionsClient({ initialTransactions, initialCount }: Transa
                         <td className="px-5 py-3.5 text-right">
                           {tx.stellar_tx_hash ? (
                             <a
-                              href={`https://stellar.expert/explorer/public/tx/${tx.stellar_tx_hash}`}
+                              href={`https://stellar.expert/explorer/testnet/tx/${tx.stellar_tx_hash}`}
                               target="_blank"
                               rel="noopener noreferrer"
                               className="text-muted-foreground transition-colors hover:text-primary"

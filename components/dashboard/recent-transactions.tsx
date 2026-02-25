@@ -8,9 +8,10 @@ import { formatDistanceToNow } from "date-fns"
 
 interface RecentTransactionsProps {
   transactions: Transaction[]
+  currentUsername: string | null
 }
 
-export function RecentTransactions({ transactions }: RecentTransactionsProps) {
+export function RecentTransactions({ transactions, currentUsername }: RecentTransactionsProps) {
   const isEmpty = transactions.length === 0
 
   return (
@@ -31,39 +32,41 @@ export function RecentTransactions({ transactions }: RecentTransactionsProps) {
           </div>
         ) : (
           transactions.map((tx) => {
-            const isReceived = tx.type === "received"
+            const isIncoming = tx.to_username === currentUsername
+            const counterparty = isIncoming ? (tx.from_username ?? tx.from_address) : tx.to_username
+            const counterpartyAddress = isIncoming ? tx.from_address : tx.to_address
             const timeAgo = formatDistanceToNow(new Date(tx.created_at), { addSuffix: true })
             return (
               <div key={tx.id} className="flex items-center gap-4 px-5 py-3.5 transition-colors hover:bg-secondary/30">
                 <div
                   className={cn(
                     "flex h-9 w-9 shrink-0 items-center justify-center rounded-lg",
-                    isReceived ? "bg-primary/10" : "bg-[hsl(var(--chart-2))]/10",
+                    isIncoming ? "bg-primary/10" : "bg-[hsl(var(--chart-2))]/10",
                   )}
                 >
-                  {isReceived ? <ArrowDownLeft className="h-4 w-4 text-primary" /> : <ArrowUpRight className="h-4 w-4 text-[hsl(var(--chart-2))]" />}
+                  {isIncoming ? <ArrowDownLeft className="h-4 w-4 text-primary" /> : <ArrowUpRight className="h-4 w-4 text-[hsl(var(--chart-2))]" />}
                 </div>
                 <div className="flex-1 overflow-hidden">
                   <div className="flex items-center gap-2">
-                    <span className="text-sm font-medium text-foreground">{isReceived ? tx.from_name : tx.to_name}</span>
+                    <span className="text-sm font-medium text-foreground">{counterparty}</span>
                     <span className="font-mono text-xs text-muted-foreground">
-                      {isReceived
-                        ? tx.from_address.slice(0, 4) + "..." + tx.from_address.slice(-4)
-                        : tx.to_address.slice(0, 4) + "..." + tx.to_address.slice(-4)}
+                      {counterpartyAddress
+                        ? counterpartyAddress.slice(0, 4) + "..." + counterpartyAddress.slice(-4)
+                        : "N/A"}
                     </span>
                   </div>
-                  <p className="mt-0.5 text-xs text-muted-foreground">{tx.cascade_info ?? "Direct payment"}</p>
+                  <p className="mt-0.5 text-xs text-muted-foreground capitalize">{tx.type}</p>
                 </div>
                 <div className="text-right">
-                  <p className={cn("text-sm font-semibold", isReceived ? "text-[hsl(var(--success))]" : "text-foreground")}>
-                    {isReceived ? "+" : "-"}
+                  <p className={cn("text-sm font-semibold", isIncoming ? "text-[hsl(var(--success))]" : "text-foreground")}>
+                    {isIncoming ? "+" : "-"}
                     {Math.abs(Number(tx.amount)).toFixed(2)} {tx.asset}
                   </p>
                   <p className="mt-0.5 text-xs text-muted-foreground">{timeAgo}</p>
                 </div>
                 {tx.stellar_tx_hash && (
                   <a
-                    href={`https://stellar.expert/explorer/public/tx/${tx.stellar_tx_hash}`}
+                    href={`https://stellar.expert/explorer/testnet/tx/${tx.stellar_tx_hash}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="shrink-0 text-muted-foreground transition-colors hover:text-primary"

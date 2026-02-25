@@ -32,7 +32,7 @@ export default async function DashboardPage() {
         <CascadePreview dependencies={deps} username={profile?.username ?? profile?.display_name ?? "you"} />
       </div>
 
-      <RecentTransactions transactions={txResult.data} />
+      <RecentTransactions transactions={txResult.data} currentUsername={profile?.username ?? null} />
     </div>
   )
 }

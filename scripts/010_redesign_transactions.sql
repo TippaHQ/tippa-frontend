@@ -10,6 +10,9 @@ ALTER TABLE public.transactions
   DROP COLUMN IF EXISTS user_id,
   DROP COLUMN IF EXISTS cascade_info;
 
+-- Clear any pre-existing rows (no code was writing to this table before)
+DELETE FROM public.transactions;
+
 -- Change type enum: received/forwarded -> donate/distribute
 ALTER TABLE public.transactions ALTER COLUMN type TYPE text;
 DROP TYPE IF EXISTS public.transaction_type;

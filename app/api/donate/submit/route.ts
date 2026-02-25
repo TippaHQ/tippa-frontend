@@ -6,10 +6,13 @@ import { processDistributionQueue } from "@/lib/distribute"
 
 export async function POST(request: Request) {
   const body = await request.json()
-  const { signedXdr, username, assetContractId } = body as {
+  const { signedXdr, username, assetContractId, donorAddress, amount, assetId } = body as {
     signedXdr: string
     username?: string
     assetContractId?: string
+    donorAddress?: string
+    amount?: string
+    assetId?: string
   }
 
   if (!signedXdr) {
@@ -35,10 +38,44 @@ export async function POST(request: Request) {
     }
 
     if (getResponse.status === "SUCCESS") {
-      // Enqueue distribution if username and asset are provided
+      const adminClient = createAdminClient()
+
+      // Record the donate transaction
+      if (username && donorAddress && amount && assetId) {
+        try {
+          // Look up recipient's wallet address
+          const { data: recipientProfile } = await adminClient
+            .from("profiles")
+            .select("wallet_address")
+            .eq("username", username)
+            .single()
+
+          // Look up donor's username (nullable - they may not have a tippa account)
+          const { data: donorProfile } = await adminClient
+            .from("profiles")
+            .select("username")
+            .eq("wallet_address", donorAddress)
+            .single()
+
+          await adminClient.from("transactions").insert({
+            type: "donate",
+            from_address: donorAddress,
+            from_username: donorProfile?.username ?? null,
+            to_address: recipientProfile?.wallet_address ?? "",
+            to_username: username,
+            amount: parseFloat(amount),
+            asset: assetId,
+            status: "completed",
+            stellar_tx_hash: sendResponse.hash,
+          })
+        } catch (txRecordErr) {
+          console.error("Failed to record donate transaction:", txRecordErr)
+        }
+      }
+
+      // Enqueue distribution
       if (username && assetContractId) {
         try {
-          const adminClient = createAdminClient()
           await adminClient.from("distribution_queue").insert({
             username,
             asset_contract_id: assetContractId,
@@ -46,7 +83,6 @@ export async function POST(request: Request) {
             source_tx: sendResponse.hash,
           })
 
-          // Process the queue in the background after the response is sent
           after(async () => {
             try {
               const results = await processDistributionQueue()
@@ -56,7 +92,6 @@ export async function POST(request: Request) {
             }
           })
         } catch (enqueueErr) {
-          // Log but don't fail the donation — distribution can be retried via cron
           console.error("Failed to enqueue distribution:", enqueueErr)
         }
       }

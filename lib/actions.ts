@@ -157,24 +157,32 @@ export async function updateCascadeRules(
 // ────────────────────────────────────────────────────────────
 
 export async function getTransactions(opts?: {
-  type?: "received" | "forwarded"
+  type?: "donate" | "distribute"
   search?: string
   limit?: number
   offset?: number
 }): Promise<{ data: Transaction[]; count: number }> {
-  const user = await getCurrentUser()
-  if (!user) return { data: [], count: 0 }
+  const profile = await getProfile()
+  if (!profile?.username) return { data: [], count: 0 }
   const supabase = await createClient()
 
-  let query = supabase.from("transactions").select("*", { count: "exact" }).eq("user_id", user.id).order("created_at", { ascending: false })
+  let query = supabase
+    .from("transactions")
+    .select("*", { count: "exact" })
+    .or(`from_username.eq.${profile.username},to_username.eq.${profile.username}`)
+    .order("created_at", { ascending: false })
 
   if (opts?.type) {
     query = query.eq("type", opts.type)
   }
   if (opts?.search) {
-    query = query.or(
-      `from_name.ilike.%${opts.search}%,to_name.ilike.%${opts.search}%,from_address.ilike.%${opts.search}%,stellar_tx_hash.ilike.%${opts.search}%`,
-    )
+    // Sanitize search input to prevent PostgREST filter injection
+    const q = opts.search.replace(/[,.()"\\]/g, "")
+    if (q) {
+      query = query.or(
+        `from_username.ilike.%${q}%,to_username.ilike.%${q}%,from_address.ilike.%${q}%,stellar_tx_hash.ilike.%${q}%`,
+      )
+    }
   }
   if (opts?.limit) {
     const offset = opts.offset ?? 0

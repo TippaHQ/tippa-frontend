@@ -82,6 +82,9 @@ export function DonateForm({ profile, dependencies }: DonateFormProps) {
           signedXdr,
           username: profile.username,
           assetContractId: selectedAsset.contractId,
+          donorAddress: walletAddress,
+          amount,
+          assetId,
         }),
       })
 

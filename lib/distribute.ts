@@ -2,9 +2,11 @@ import { Keypair, TransactionBuilder, Networks } from "@stellar/stellar-sdk"
 import { Server } from "@stellar/stellar-sdk/rpc"
 import { Client, networks } from "tippa-client"
 import { createAdminClient } from "@/lib/supabase/admin"
+import { TESTNET_ASSETS } from "@/lib/constants/assets"
 
 const MAX_ATTEMPTS = 3
 const MAX_DEPTH = 10
+const ASSET_DECIMALS = 7
 
 export interface ProcessResults {
   processed: number
@@ -49,13 +51,25 @@ export async function processDistributionQueue(): Promise<ProcessResults> {
       .eq("id", item.id)
 
     try {
-      // Build distribute tx
       const client = new Client({
         ...networks.testnet,
         rpcUrl,
         publicKey: keypair.publicKey(),
       })
 
+      // Read pool amount BEFORE distributing (for transaction recording)
+      let poolAmount: bigint = BigInt(0)
+      try {
+        const poolResult = await client.get_pool({
+          username: item.username,
+          asset: item.asset_contract_id,
+        })
+        poolAmount = poolResult.result
+      } catch {
+        // Pool read failed — will still attempt distribute (contract handles NothingToDistribute)
+      }
+
+      // Build distribute tx
       const assembled = await client.distribute({
         username: item.username,
         asset: item.asset_contract_id,
@@ -97,6 +111,17 @@ export async function processDistributionQueue(): Promise<ProcessResults> {
 
       results.succeeded++
 
+      // Record distribute transactions per recipient
+      if (poolAmount > BigInt(0)) {
+        await recordDistributeTransactions(
+          adminClient,
+          item.username,
+          item.asset_contract_id,
+          poolAmount,
+          sendResponse.hash,
+        )
+      }
+
       // Enqueue downstream recipients if depth allows
       if (item.depth < MAX_DEPTH) {
         await enqueueDownstream(adminClient, item.username, item.asset_contract_id, item.depth, item.source_tx, results)
@@ -136,6 +161,78 @@ export async function processDistributionQueue(): Promise<ProcessResults> {
   }
 
   return results
+}
+
+async function recordDistributeTransactions(
+  adminClient: ReturnType<typeof createAdminClient>,
+  username: string,
+  assetContractId: string,
+  poolAmount: bigint,
+  txHash: string,
+) {
+  try {
+    // Look up distributor's profile
+    const { data: distributorProfile } = await adminClient
+      .from("profiles")
+      .select("id, wallet_address")
+      .eq("username", username)
+      .single()
+
+    if (!distributorProfile) return
+
+    // Get cascade dependencies (rules with percentages)
+    const { data: deps } = await adminClient
+      .from("cascade_dependencies")
+      .select("recipient_username, percentage")
+      .eq("user_id", distributorProfile.id)
+
+    if (!deps || deps.length === 0) return
+
+    // Determine asset symbol from contract ID
+    const assetSymbol = resolveAssetSymbol(assetContractId)
+
+    // Calculate each recipient's share and insert transaction rows
+    const txRows = []
+    for (const dep of deps) {
+      // Match contract math: pool * bps / 10000 (integer division in stroops)
+      const bps = BigInt(Math.round(dep.percentage * 100))
+      const shareStroops = (poolAmount * bps) / BigInt(10000)
+
+      if (shareStroops <= BigInt(0)) continue
+
+      // Convert stroops back to human-readable (7 decimals)
+      const shareHuman = Number(shareStroops) / 10 ** ASSET_DECIMALS
+
+      // Look up recipient's wallet address
+      const { data: recipientProfile } = await adminClient
+        .from("profiles")
+        .select("wallet_address")
+        .eq("username", dep.recipient_username)
+        .single()
+
+      txRows.push({
+        type: "distribute" as const,
+        from_address: distributorProfile.wallet_address,
+        from_username: username,
+        to_address: recipientProfile?.wallet_address ?? "",
+        to_username: dep.recipient_username,
+        amount: shareHuman,
+        asset: assetSymbol,
+        status: "completed" as const,
+        stellar_tx_hash: txHash,
+      })
+    }
+
+    if (txRows.length > 0) {
+      await adminClient.from("transactions").insert(txRows)
+    }
+  } catch (err) {
+    console.error("Failed to record distribute transactions:", err)
+  }
+}
+
+function resolveAssetSymbol(contractId: string): string {
+  return TESTNET_ASSETS.find(a => a.contractId === contractId)?.symbol ?? "UNKNOWN"
 }
 
 async function enqueueDownstream(
