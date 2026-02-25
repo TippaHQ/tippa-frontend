@@ -13,6 +13,7 @@ import {
   ChevronLeft,
   ChevronRight,
   LogOut,
+  Wallet,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useState, useEffect } from "react"
@@ -22,6 +23,7 @@ import type { Profile } from "@/lib/types"
 
 const mainNav = [
   { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+  { label: "Funds", href: "/dashboard/funds", icon: Wallet },
   { label: "Cascades", href: "/dashboard/cascades", icon: GitFork },
   {
     label: "Transactions",
