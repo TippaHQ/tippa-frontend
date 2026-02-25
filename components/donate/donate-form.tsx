@@ -1,15 +1,17 @@
 "use client"
 
-import { useState } from "react"
+import Link from "next/link"
+import { useState, useEffect } from "react"
 import { GitFork, Loader2, CheckCircle2, ExternalLink, Wallet, ArrowDown, User, Github, Twitter, Globe } from "lucide-react"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { Button } from "@/components/ui/button"
+import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { useWallet } from "@/providers/wallet-provider"
 import { TESTNET_ASSETS, DEFAULT_ASSET_ID } from "@/lib/constants/assets"
 import type { Profile, CascadeDependency } from "@/lib/types"
+import { useWallet } from "@/providers/wallet-provider"
+import { useUserStore } from "@/lib/store/user-store"
 
 type Step = "form" | "submitting" | "success"
 
@@ -20,11 +22,12 @@ interface DonateFormProps {
 
 export function DonateForm({ profile, dependencies }: DonateFormProps) {
   const { walletAddress, isConnected, connectWallet, signTransaction } = useWallet()
+  const userProfile = useUserStore((state) => state.profile)
 
   const [step, setStep] = useState<Step>("form")
   const [amount, setAmount] = useState("")
   const [assetId, setAssetId] = useState(DEFAULT_ASSET_ID)
-  const [donorName, setDonorName] = useState("")
+  const [donorName, setDonorName] = useState(userProfile?.display_name || "")
   const [error, setError] = useState<string | null>(null)
   const [txHash, setTxHash] = useState<string | null>(null)
 
@@ -109,6 +112,12 @@ export function DonateForm({ profile, dependencies }: DonateFormProps) {
     setError(null)
   }
 
+  useEffect(() => {
+    if (userProfile) {
+      setDonorName(userProfile.display_name || "")
+    }
+  }, [userProfile])
+
   return (
     <div className="relative min-h-screen overflow-hidden bg-background">
       {/* Atmospheric background */}
@@ -119,24 +128,22 @@ export function DonateForm({ profile, dependencies }: DonateFormProps) {
 
       {/* Top bar */}
       <header className="relative flex items-center justify-between px-6 py-4">
-        <div className="flex items-center gap-2.5">
+        <a href={userProfile ? "/dashboard" : "/"} className="flex items-center gap-2.5">
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
             <GitFork className="h-4 w-4 text-primary-foreground" />
           </div>
           <span className="text-sm font-semibold tracking-tight text-foreground">Tippa</span>
-        </div>
-        <a
-          href="/"
-          className="text-xs text-muted-foreground transition-colors hover:text-foreground"
-        >
-          Create your own
         </a>
+        {!userProfile && (
+          <Button asChild>
+            <Link href="/">Create Your Tippa</Link>
+          </Button>
+        )}
       </header>
 
       {/* Main content */}
       <main className="relative mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:py-16">
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-5 lg:gap-12">
-
           {/* Left: Profile showcase */}
           <div className="lg:col-span-3">
             {/* Profile hero */}
@@ -148,22 +155,16 @@ export function DonateForm({ profile, dependencies }: DonateFormProps) {
                 {/* Avatar */}
                 <div className="-mt-10 mb-4">
                   <Avatar className="h-20 w-20 border-4 border-card shadow-lg">
-                    <AvatarFallback className="bg-primary/10 text-xl font-bold text-primary">
-                      {initials}
-                    </AvatarFallback>
+                    <AvatarFallback className="bg-primary/10 text-xl font-bold text-primary">{initials}</AvatarFallback>
                   </Avatar>
                 </div>
 
                 {/* Name + username */}
                 <h1 className="text-2xl font-bold tracking-tight text-foreground">{displayName}</h1>
-                {profile.username && (
-                  <p className="mt-0.5 font-mono text-sm text-primary">@{profile.username}</p>
-                )}
+                {profile.username && <p className="mt-0.5 font-mono text-sm text-primary">@{profile.username}</p>}
 
                 {/* Bio */}
-                {profile.bio && (
-                  <p className="mt-4 whitespace-pre-line text-sm leading-relaxed text-muted-foreground">{profile.bio}</p>
-                )}
+                {profile.bio && <p className="mt-2 whitespace-pre-line text-sm leading-relaxed text-muted-foreground">{profile.bio}</p>}
 
                 {/* Social links */}
                 {hasSocials && (
@@ -208,7 +209,7 @@ export function DonateForm({ profile, dependencies }: DonateFormProps) {
                 {profile.wallet_address && (
                   <div className="mt-5 flex items-center gap-2">
                     <Wallet className="h-3.5 w-3.5 text-muted-foreground/50" />
-                    <span className="font-mono text-xs text-muted-foreground/60">
+                    <span className="font-mono text-xs text-muted-foreground">
                       {profile.wallet_address.slice(0, 6)}...{profile.wallet_address.slice(-6)}
                     </span>
                     <a
@@ -237,9 +238,7 @@ export function DonateForm({ profile, dependencies }: DonateFormProps) {
                 <div className="space-y-2">
                   <div className="flex items-center justify-between rounded-lg bg-secondary/30 px-3 py-2">
                     <span className="text-sm text-foreground">{displayName}</span>
-                    <span className="font-mono text-sm font-medium text-foreground">
-                      {100 - totalDependencyPercentage}%
-                    </span>
+                    <span className="font-mono text-sm font-medium text-foreground">{100 - totalDependencyPercentage}%</span>
                   </div>
                   {dependencies.map((dep) => (
                     <div key={dep.id} className="flex items-center gap-2">
@@ -259,9 +258,7 @@ export function DonateForm({ profile, dependencies }: DonateFormProps) {
           <div className="lg:col-span-2">
             <div className="sticky top-8 rounded-2xl border border-border bg-card/80 shadow-2xl shadow-black/20 backdrop-blur-sm">
               <div className="border-b border-border px-6 py-4">
-                <h2 className="text-sm font-semibold text-foreground">
-                  Support {profile.display_name || profile.username}
-                </h2>
+                <h2 className="text-sm font-semibold text-foreground">Support {profile.display_name || profile.username}</h2>
               </div>
 
               <div className="px-6 py-5">
@@ -330,8 +327,10 @@ export function DonateForm({ profile, dependencies }: DonateFormProps) {
 
                     {/* Connected wallet */}
                     {isConnected && walletAddress && (
-                      <div className="flex items-center gap-2 rounded-lg bg-primary/5 px-3 py-2 text-xs text-muted-foreground">
-                        <div className="h-1.5 w-1.5 rounded-full bg-primary" />
+                      <div className="flex items-center gap-2 w-fit rounded-lg bg-primary/5 px-3 py-2 text-xs text-foreground/80">
+                        Sending from:
+                        <br />
+                        <Wallet className="h-3.5 w-3.5" />
                         <span className="font-mono">
                           {walletAddress.slice(0, 6)}...{walletAddress.slice(-4)}
                         </span>
@@ -339,11 +338,7 @@ export function DonateForm({ profile, dependencies }: DonateFormProps) {
                     )}
 
                     {/* Error */}
-                    {error && (
-                      <div className="rounded-lg bg-destructive/10 px-3 py-2.5 text-xs text-destructive">
-                        {error}
-                      </div>
-                    )}
+                    {error && <div className="rounded-lg bg-destructive/10 px-3 py-2.5 text-xs text-destructive">{error}</div>}
 
                     {/* CTA */}
                     <Button
@@ -359,9 +354,7 @@ export function DonateForm({ profile, dependencies }: DonateFormProps) {
                     </Button>
 
                     {/* Trust line */}
-                    <p className="text-center text-[10px] text-muted-foreground/40">
-                      Non-custodial. Settled on Stellar in under 5 seconds.
-                    </p>
+                    <p className="text-center text-[10px] text-muted-foreground/40">Non-custodial. Settled on Stellar in under 5 seconds.</p>
                   </div>
                 )}
 
@@ -369,9 +362,7 @@ export function DonateForm({ profile, dependencies }: DonateFormProps) {
                   <div className="flex flex-col items-center py-10">
                     <Loader2 className="mb-4 h-8 w-8 animate-spin text-primary" />
                     <p className="text-sm font-medium text-foreground">Processing donation...</p>
-                    <p className="mt-1 text-xs text-muted-foreground">
-                      Confirm in your wallet and wait for settlement.
-                    </p>
+                    <p className="mt-1 text-xs text-muted-foreground">Confirm in your wallet and wait for settlement.</p>
                   </div>
                 )}
 

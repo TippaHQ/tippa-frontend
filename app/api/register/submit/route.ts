@@ -43,10 +43,7 @@ export async function POST(request: Request) {
     }
 
     if (getResponse.status === "SUCCESS") {
-      const { error: updateError } = await supabase
-        .from("profiles")
-        .update({ username, wallet_address: walletAddress })
-        .eq("id", user.id)
+      const { error: updateError } = await supabase.from("profiles").update({ username, wallet_address: walletAddress }).eq("id", user.id)
 
       if (updateError) {
         console.error("Failed to update profile:", updateError)

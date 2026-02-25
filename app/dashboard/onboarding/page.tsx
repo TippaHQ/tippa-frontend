@@ -149,9 +149,7 @@ export default function OnboardingPage() {
           <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary">
             <GitFork className="h-6 w-6 text-primary-foreground" />
           </div>
-          <h1 className="text-2xl font-semibold tracking-tight text-foreground">
-            {step === "success" ? "You're all set!" : "Set up your account"}
-          </h1>
+          <h1 className="text-2xl font-semibold tracking-tight text-foreground">{step === "success" ? "You're all set!" : "Set up your account"}</h1>
           {step !== "success" && <p className="text-sm text-muted-foreground">Choose a username and connect your wallet to get started.</p>}
         </div>
 
@@ -193,9 +191,7 @@ export default function OnboardingPage() {
                     className="h-10 border-border bg-secondary/50 text-foreground placeholder:text-muted-foreground/60 focus-visible:ring-primary"
                     autoFocus
                   />
-                  {checkingUsername && (
-                    <Loader2 className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 animate-spin text-muted-foreground" />
-                  )}
+                  {checkingUsername && <Loader2 className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 animate-spin text-muted-foreground" />}
                   {!checkingUsername && usernameAvailable === true && (
                     <CheckCircle2 className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[hsl(var(--success))]" />
                   )}
@@ -206,12 +202,8 @@ export default function OnboardingPage() {
                   </p>
                 )}
                 {usernameError && <p className="mt-1.5 text-xs text-destructive">{usernameError}</p>}
-                {!usernameError && usernameAvailable === true && (
-                  <p className="mt-1.5 text-xs text-[hsl(var(--success))]">Username is available!</p>
-                )}
-                <p className="mt-2 text-xs text-muted-foreground">
-                  This will be your on-chain project ID. It can't be changed later.
-                </p>
+                {!usernameError && usernameAvailable === true && <p className="mt-1.5 text-xs text-[hsl(var(--success))]">Username is available!</p>}
+                <p className="mt-2 text-xs text-muted-foreground">This will be your on-chain project ID. It can't be changed later.</p>
               </div>
 
               <Button
@@ -288,11 +280,7 @@ export default function OnboardingPage() {
                 </div>
               )}
 
-              <Button
-                onClick={handleRegister}
-                disabled={loading}
-                className="w-full gap-2 bg-primary text-primary-foreground hover:bg-primary/90"
-              >
+              <Button onClick={handleRegister} disabled={loading} className="w-full gap-2 bg-primary text-primary-foreground hover:bg-primary/90">
                 {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <GitFork className="h-4 w-4" />}
                 {loading ? "Registering..." : "Register on Stellar"}
               </Button>
@@ -317,7 +305,9 @@ export default function OnboardingPage() {
                 <p className="text-center text-sm text-foreground">
                   <span className="font-medium">{username}</span> is registered on Stellar.
                 </p>
-                <p className="text-center text-xs text-muted-foreground">Your account is ready. You can now set up cascade rules and start receiving payments.</p>
+                <p className="text-center text-xs text-muted-foreground">
+                  Your account is ready. You can now set up cascade rules and start receiving payments.
+                </p>
               </div>
 
               <Button

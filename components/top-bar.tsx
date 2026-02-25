@@ -1,30 +1,14 @@
 "use client"
 
-import { useState, useEffect } from "react"
 import { Bell, Search, ChevronDown, Wallet } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { Input } from "@/components/ui/input"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import { createClient } from "@/lib/supabase/client"
-import type { Profile } from "@/lib/types"
+import { useUserStore } from "@/lib/store/user-store"
 
 export function TopBar() {
-  const [profile, setProfile] = useState<Profile | null>(null)
-
-  useEffect(() => {
-    const supabase = createClient()
-    const fetchProfile = async () => {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser()
-      if (user) {
-        const { data } = await supabase.from("profiles").select("*").eq("id", user.id).single()
-        setProfile(data)
-      }
-    }
-    fetchProfile()
-  }, [])
+  const profile = useUserStore((state) => state.profile)
 
   const displayName = profile?.display_name || "User"
   const initials = displayName

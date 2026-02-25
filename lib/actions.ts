@@ -79,11 +79,7 @@ export async function getCascadeDependencies(): Promise<CascadeDependency[]> {
 
 export async function getPublicCascadeDependencies(userId: string): Promise<CascadeDependency[]> {
   const supabase = await createClient()
-  const { data } = await supabase
-    .from("cascade_dependencies")
-    .select("*")
-    .eq("user_id", userId)
-    .order("sort_order", { ascending: true })
+  const { data } = await supabase.from("cascade_dependencies").select("*").eq("user_id", userId).order("sort_order", { ascending: true })
   return data ?? []
 }
 

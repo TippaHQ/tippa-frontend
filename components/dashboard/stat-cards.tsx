@@ -78,9 +78,7 @@ export function StatCards({ activeCascades, depCount }: StatCardsProps) {
           <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
             <ArrowDownLeft className="h-5 w-5 text-primary" />
           </div>
-          <span className="flex items-center gap-1 rounded-full bg-secondary px-2 py-0.5 text-xs font-medium text-muted-foreground">
-            On-chain
-          </span>
+          <span className="flex items-center gap-1 rounded-full bg-secondary px-2 py-0.5 text-xs font-medium text-muted-foreground">On-chain</span>
         </div>
         <div className="mt-4 flex items-baseline gap-3">
           {unclaimedLoading ? (
@@ -105,9 +103,7 @@ export function StatCards({ activeCascades, depCount }: StatCardsProps) {
           <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[hsl(var(--chart-2))]/10">
             <ArrowUpRight className="h-5 w-5 text-[hsl(var(--chart-2))]" />
           </div>
-          <span className="flex items-center gap-1 rounded-full bg-secondary px-2 py-0.5 text-xs font-medium text-muted-foreground">
-            On-chain
-          </span>
+          <span className="flex items-center gap-1 rounded-full bg-secondary px-2 py-0.5 text-xs font-medium text-muted-foreground">On-chain</span>
         </div>
         <div className="mt-4 flex items-baseline gap-3">
           {unclaimedLoading ? (

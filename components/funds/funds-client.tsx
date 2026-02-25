@@ -221,9 +221,7 @@ export function FundsClient({ username, walletAddress }: FundsClientProps) {
               <Wallet className="h-3.5 w-3.5 shrink-0" />
               <span>
                 Funds will be sent to{" "}
-                <span className="font-mono">
-                  {customAddress.trim() || `${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}`}
-                </span>
+                <span className="font-mono">{customAddress.trim() || `${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}`}</span>
               </span>
             </div>
 
@@ -245,9 +243,7 @@ export function FundsClient({ username, walletAddress }: FundsClientProps) {
                   placeholder={walletAddress}
                   className="h-9 border-border bg-secondary/50 font-mono text-sm text-foreground placeholder:text-muted-foreground/40 focus-visible:ring-primary"
                 />
-                <p className="mt-1 text-[10px] text-muted-foreground">
-                  Leave empty to use your registered wallet address.
-                </p>
+                <p className="mt-1 text-[10px] text-muted-foreground">Leave empty to use your registered wallet address.</p>
               </div>
             )}
           </div>

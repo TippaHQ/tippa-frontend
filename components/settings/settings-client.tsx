@@ -101,11 +101,13 @@ export function SettingsClient({ profile, notifPrefs }: SettingsClientProps) {
         </div>
         {mounted && (
           <div className="grid grid-cols-3 gap-3">
-            {([
-              { value: "light", icon: Sun, label: "Light" },
-              { value: "dark", icon: Moon, label: "Dark" },
-              { value: "system", icon: Monitor, label: "System" },
-            ] as const).map((opt) => (
+            {(
+              [
+                { value: "light", icon: Sun, label: "Light" },
+                { value: "dark", icon: Moon, label: "Dark" },
+                { value: "system", icon: Monitor, label: "System" },
+              ] as const
+            ).map((opt) => (
               <button
                 key={opt.value}
                 onClick={() => setTheme(opt.value)}
