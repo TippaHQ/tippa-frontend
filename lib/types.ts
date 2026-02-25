@@ -39,20 +39,18 @@ export interface CascadeRules {
   updated_at: string
 }
 
-export type TransactionType = "received" | "forwarded"
+export type TransactionType = "donate" | "distribute"
 export type TransactionStatus = "completed" | "pending" | "failed"
 
 export interface Transaction {
   id: string
-  user_id: string
   type: TransactionType
-  from_name: string
   from_address: string
-  to_name: string
+  from_username: string | null
   to_address: string
+  to_username: string
   amount: number
   asset: string
-  cascade_info: string | null
   status: TransactionStatus
   stellar_tx_hash: string | null
   created_at: string
