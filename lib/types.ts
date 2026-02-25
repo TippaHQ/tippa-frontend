@@ -80,3 +80,12 @@ export interface ProfileAnalytics {
   unique_supporters: number
   total_payments_received: number
 }
+
+export type PartialTransaction = Pick<Transaction, "amount" | "asset" | "type" | "created_at" | "from_username" | "to_username">
+
+export interface AggregatedData {
+  date: string
+  asset: string
+  received: number
+  forwarded: number
+}
