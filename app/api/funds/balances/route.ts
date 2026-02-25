@@ -30,6 +30,8 @@ export async function GET() {
       TESTNET_ASSETS.map(async (asset) => {
         let pool = "0"
         let unclaimed = "0"
+        let totalReceived = "0"
+        let totalForwarded = "0"
 
         try {
           const poolTx = await client.get_pool({ username: profile.username!, asset: asset.contractId })
@@ -45,6 +47,20 @@ export async function GET() {
           // User may not have unclaimed for this asset yet
         }
 
+        try {
+          const totalReceivedTx = await client.get_total_received({ username: profile.username!, asset: asset.contractId })
+          totalReceived = formatBalance(totalReceivedTx.result, asset.decimals)
+        } catch {
+          // User may not have received for this asset yet
+        }
+
+        try {
+          const totalForwardedTx = await client.get_total_forwarded({ username: profile.username!, asset: asset.contractId })
+          totalForwarded = formatBalance(totalForwardedTx.result, asset.decimals)
+        } catch {
+          // User may not have forwarded for this asset yet
+        }
+
         return {
           assetId: asset.id,
           assetName: asset.name,
@@ -52,6 +68,8 @@ export async function GET() {
           contractId: asset.contractId,
           pool,
           unclaimed,
+          totalReceived,
+          totalForwarded,
         }
       }),
     )

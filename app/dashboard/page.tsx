@@ -21,8 +21,6 @@ export default async function DashboardPage() {
       </div>
 
       <StatCards
-        totalReceived={stats.totalReceived}
-        totalForwarded={stats.totalForwarded}
         activeCascades={stats.activeCascades}
         depCount={stats.depCount}
       />

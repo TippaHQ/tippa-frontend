@@ -7,7 +7,7 @@ export * as rpc from "@stellar/stellar-sdk/rpc";
 export declare const networks: {
     readonly testnet: {
         readonly networkPassphrase: "Test SDF Network ; September 2015";
-        readonly contractId: "CA5VXIBSSD4DNM2LXJBMAEQM66VBQTZJE2ZLYWXYHDAB6N5RB27NKIMI";
+        readonly contractId: "CBOW3YF5W46PNMJK33VFO2WD6MPK6XKZ5OJKF2UDBUNTQVJWFECPURIO";
     };
 };
 export declare const Errors: {
@@ -68,6 +68,9 @@ export type DataKey = {
     values: readonly [DonorKey];
 } | {
     tag: "DonorTotal";
+    values: readonly [string, string];
+} | {
+    tag: "TotalForwarded";
     values: readonly [string, string];
 } | {
     tag: "GrandTotal";
@@ -197,6 +200,13 @@ export interface Client {
         new_owner: string;
     }, options?: MethodOptions) => Promise<AssembledTransaction<Result<void>>>;
     /**
+     * Construct and simulate a get_total_forwarded transaction. Returns an `AssembledTransaction` object which will have a `result` field containing the result of the simulation. If this transaction changes contract state, you will need to call `signAndSend()` on the returned object.
+     */
+    get_total_forwarded: ({ username, asset }: {
+        username: string;
+        asset: string;
+    }, options?: MethodOptions) => Promise<AssembledTransaction<i128>>;
+    /**
      * Construct and simulate a distribute_and_claim transaction. Returns an `AssembledTransaction` object which will have a `result` field containing the result of the simulation. If this transaction changes contract state, you will need to call `signAndSend()` on the returned object.
      */
     distribute_and_claim: ({ caller, username, asset, to, min_distribution }: {
@@ -243,6 +253,7 @@ export declare class Client extends ContractClient {
         get_donor_to_user: (json: string) => AssembledTransaction<bigint>;
         get_total_received: (json: string) => AssembledTransaction<bigint>;
         transfer_ownership: (json: string) => AssembledTransaction<Result<void, import("@stellar/stellar-sdk/contract").ErrorMessage>>;
+        get_total_forwarded: (json: string) => AssembledTransaction<bigint>;
         distribute_and_claim: (json: string) => AssembledTransaction<Result<bigint, import("@stellar/stellar-sdk/contract").ErrorMessage>>;
         get_total_received_from_others: (json: string) => AssembledTransaction<bigint>;
     };

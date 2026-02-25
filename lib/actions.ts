@@ -241,39 +241,15 @@ export async function getDashboardStats() {
   const user = await getCurrentUser()
   if (!user)
     return {
-      totalReceived: 0,
-      totalForwarded: 0,
       activeCascades: 0,
       depCount: 0,
     }
   const supabase = await createClient()
 
-  // Total received
-  const { data: receivedData } = await supabase
-    .from("transactions")
-    .select("amount")
-    .eq("user_id", user.id)
-    .eq("type", "received")
-    .eq("status", "completed")
-
-  const totalReceived = (receivedData ?? []).reduce((sum, t) => sum + Number(t.amount), 0)
-
-  // Total forwarded
-  const { data: forwardedData } = await supabase
-    .from("transactions")
-    .select("amount")
-    .eq("user_id", user.id)
-    .eq("type", "forwarded")
-    .eq("status", "completed")
-
-  const totalForwarded = (forwardedData ?? []).reduce((sum, t) => sum + Math.abs(Number(t.amount)), 0)
-
   // Active cascades count
   const { count: depCount } = await supabase.from("cascade_dependencies").select("*", { count: "exact", head: true }).eq("user_id", user.id)
 
   return {
-    totalReceived,
-    totalForwarded,
     activeCascades: depCount ?? 0,
     depCount: depCount ?? 0,
   }

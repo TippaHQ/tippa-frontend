@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { ArrowDownLeft, ArrowUpRight, TrendingUp, Wallet, Loader2 } from "lucide-react"
+import { ArrowDownLeft, ArrowUpRight, TrendingUp, Wallet } from "lucide-react"
 import { cn } from "@/lib/utils"
 import Link from "next/link"
 
@@ -41,16 +41,16 @@ interface AssetBalance {
   assetId: string
   symbol: string
   unclaimed: string
+  totalReceived: string
+  totalForwarded: string
 }
 
 interface StatCardsProps {
-  totalReceived: number
-  totalForwarded: number
   activeCascades: number
   depCount: number
 }
 
-export function StatCards({ totalReceived, totalForwarded, activeCascades, depCount }: StatCardsProps) {
+export function StatCards({ activeCascades, depCount }: StatCardsProps) {
   const [balances, setBalances] = useState<AssetBalance[]>([])
   const [unclaimedLoading, setUnclaimedLoading] = useState(true)
 
@@ -72,21 +72,59 @@ export function StatCards({ totalReceived, totalForwarded, activeCascades, depCo
 
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-      <StatCard
-        label="Total Received"
-        value={`$${totalReceived.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
-        change={totalReceived > 0 ? "Live" : "No data yet"}
-        changeType={totalReceived > 0 ? "positive" : "neutral"}
-        icon={<ArrowDownLeft className="h-5 w-5 text-primary" />}
-      />
-      <StatCard
-        label="Total Forwarded"
-        value={`$${totalForwarded.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
-        change={totalForwarded > 0 ? "Live" : "No data yet"}
-        changeType={totalForwarded > 0 ? "positive" : "neutral"}
-        icon={<ArrowUpRight className="h-5 w-5 text-[hsl(var(--chart-2))]" />}
-        accent="bg-[hsl(var(--chart-2))]/10"
-      />
+      {/* Total Received — on-chain data, per-asset rows */}
+      <div className="group rounded-xl border border-border bg-card p-5 transition-colors hover:border-primary/30">
+        <div className="flex items-start justify-between">
+          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
+            <ArrowDownLeft className="h-5 w-5 text-primary" />
+          </div>
+          <span className="flex items-center gap-1 rounded-full bg-secondary px-2 py-0.5 text-xs font-medium text-muted-foreground">
+            On-chain
+          </span>
+        </div>
+        <div className="mt-4 flex items-baseline gap-3">
+          {unclaimedLoading ? (
+            <span className="text-2xl font-semibold tracking-tight text-muted-foreground">--</span>
+          ) : balances.length > 0 ? (
+            balances.map((b) => (
+              <div key={b.assetId} className="flex items-baseline gap-1">
+                <span className="text-2xl font-semibold tracking-tight text-foreground">{b.totalReceived}</span>
+                <span className="text-xs font-medium text-muted-foreground">{b.symbol}</span>
+              </div>
+            ))
+          ) : (
+            <p className="text-2xl font-semibold tracking-tight text-foreground">0.00</p>
+          )}
+        </div>
+        <p className="mt-1 text-sm text-muted-foreground">Total Received</p>
+      </div>
+
+      {/* Total Forwarded — on-chain data, per-asset rows */}
+      <div className="group rounded-xl border border-border bg-card p-5 transition-colors hover:border-primary/30">
+        <div className="flex items-start justify-between">
+          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[hsl(var(--chart-2))]/10">
+            <ArrowUpRight className="h-5 w-5 text-[hsl(var(--chart-2))]" />
+          </div>
+          <span className="flex items-center gap-1 rounded-full bg-secondary px-2 py-0.5 text-xs font-medium text-muted-foreground">
+            On-chain
+          </span>
+        </div>
+        <div className="mt-4 flex items-baseline gap-3">
+          {unclaimedLoading ? (
+            <span className="text-2xl font-semibold tracking-tight text-muted-foreground">--</span>
+          ) : balances.length > 0 ? (
+            balances.map((b) => (
+              <div key={b.assetId} className="flex items-baseline gap-1">
+                <span className="text-2xl font-semibold tracking-tight text-foreground">{b.totalForwarded}</span>
+                <span className="text-xs font-medium text-muted-foreground">{b.symbol}</span>
+              </div>
+            ))
+          ) : (
+            <p className="text-2xl font-semibold tracking-tight text-foreground">0.00</p>
+          )}
+        </div>
+        <p className="mt-1 text-sm text-muted-foreground">Total Forwarded</p>
+      </div>
 
       {/* Unclaimed Balance — custom card with per-asset rows */}
       <Link href="/dashboard/funds">
