@@ -1,15 +1,17 @@
 "use client"
 
-import { useState } from "react"
+import Link from "next/link"
+import { useState, useEffect } from "react"
 import { GitFork, Loader2, CheckCircle2, ExternalLink, Wallet, ArrowDown, User, Github, Twitter, Globe } from "lucide-react"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { Button } from "@/components/ui/button"
+import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { useWallet } from "@/providers/wallet-provider"
 import { TESTNET_ASSETS, DEFAULT_ASSET_ID } from "@/lib/constants/assets"
 import type { Profile, CascadeDependency } from "@/lib/types"
+import { useWallet } from "@/providers/wallet-provider"
+import { useUserStore } from "@/lib/store/user-store"
 
 type Step = "form" | "submitting" | "success"
 
@@ -20,11 +22,12 @@ interface DonateFormProps {
 
 export function DonateForm({ profile, dependencies }: DonateFormProps) {
   const { walletAddress, isConnected, connectWallet, signTransaction } = useWallet()
+  const userProfile = useUserStore((state) => state.profile)
 
   const [step, setStep] = useState<Step>("form")
   const [amount, setAmount] = useState("")
   const [assetId, setAssetId] = useState(DEFAULT_ASSET_ID)
-  const [donorName, setDonorName] = useState("")
+  const [donorName, setDonorName] = useState(userProfile?.display_name || "")
   const [error, setError] = useState<string | null>(null)
   const [txHash, setTxHash] = useState<string | null>(null)
 
@@ -106,6 +109,12 @@ export function DonateForm({ profile, dependencies }: DonateFormProps) {
     setError(null)
   }
 
+  useEffect(() => {
+    if (userProfile) {
+      setDonorName(userProfile.display_name || "")
+    }
+  }, [userProfile])
+
   return (
     <div className="relative min-h-screen overflow-hidden bg-background">
       {/* Atmospheric background */}
@@ -116,15 +125,17 @@ export function DonateForm({ profile, dependencies }: DonateFormProps) {
 
       {/* Top bar */}
       <header className="relative flex items-center justify-between px-6 py-4">
-        <div className="flex items-center gap-2.5">
+        <a href={userProfile ? "/dashboard" : "/"} className="flex items-center gap-2.5">
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
             <GitFork className="h-4 w-4 text-primary-foreground" />
           </div>
           <span className="text-sm font-semibold tracking-tight text-foreground">Tippa</span>
-        </div>
-        <a href="/" className="text-xs text-muted-foreground transition-colors hover:text-foreground">
-          Create your own
         </a>
+        {!userProfile && (
+          <Button asChild>
+            <Link href="/">Create Your Tippa</Link>
+          </Button>
+        )}
       </header>
 
       {/* Main content */}
@@ -150,7 +161,7 @@ export function DonateForm({ profile, dependencies }: DonateFormProps) {
                 {profile.username && <p className="mt-0.5 font-mono text-sm text-primary">@{profile.username}</p>}
 
                 {/* Bio */}
-                {profile.bio && <p className="mt-4 whitespace-pre-line text-sm leading-relaxed text-muted-foreground">{profile.bio}</p>}
+                {profile.bio && <p className="mt-2 whitespace-pre-line text-sm leading-relaxed text-muted-foreground">{profile.bio}</p>}
 
                 {/* Social links */}
                 {hasSocials && (
@@ -195,7 +206,7 @@ export function DonateForm({ profile, dependencies }: DonateFormProps) {
                 {profile.wallet_address && (
                   <div className="mt-5 flex items-center gap-2">
                     <Wallet className="h-3.5 w-3.5 text-muted-foreground/50" />
-                    <span className="font-mono text-xs text-muted-foreground/60">
+                    <span className="font-mono text-xs text-muted-foreground">
                       {profile.wallet_address.slice(0, 6)}...{profile.wallet_address.slice(-6)}
                     </span>
                     <a
@@ -313,8 +324,10 @@ export function DonateForm({ profile, dependencies }: DonateFormProps) {
 
                     {/* Connected wallet */}
                     {isConnected && walletAddress && (
-                      <div className="flex items-center gap-2 rounded-lg bg-primary/5 px-3 py-2 text-xs text-muted-foreground">
-                        <div className="h-1.5 w-1.5 rounded-full bg-primary" />
+                      <div className="flex items-center gap-2 w-fit rounded-lg bg-primary/5 px-3 py-2 text-xs text-foreground/80">
+                        Sending from:
+                        <br />
+                        <Wallet className="h-3.5 w-3.5" />
                         <span className="font-mono">
                           {walletAddress.slice(0, 6)}...{walletAddress.slice(-4)}
                         </span>
