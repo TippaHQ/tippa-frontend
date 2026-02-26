@@ -7,9 +7,10 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
-import { AvatarProfile, BannerImage } from "@/components/shared/user-profile"
+import { ImageUpload } from "@/components/shared/image-upload"
+import { ProfileAvatar, ProfileBanner } from "@/components/shared/user-profile"
 
-import { updateProfile } from "@/lib/actions"
+import { updateProfile, updateAvatar, updateBanner } from "@/lib/actions"
 import { useRouter } from "next/navigation"
 import { getInitials } from "@/lib/utils"
 import type { Profile } from "@/lib/types"
@@ -51,11 +52,15 @@ export function ProfileCard({ profile }: ProfileCardProps) {
 
   return (
     <div className="rounded-2xl border border-border bg-card">
-      <BannerImage editMode bannerUrl={profile?.banner_url} />
+      <ProfileBanner bannerUrl={profile?.banner_url}>
+        <ImageUpload onFileChange={(file) => updateBanner(file, profile?.username ?? "")} />
+      </ProfileBanner>
 
       <div className="relative px-5 pb-5">
         <div className="relative -mt-14 mb-5 flex items-end gap-4">
-          <AvatarProfile editMode initials={initials} avatarUrl={profile?.avatar_url ?? ""} />
+          <ProfileAvatar initials={initials} avatarUrl={profile?.avatar_url ?? ""}>
+            <ImageUpload onFileChange={(file) => updateAvatar(file, profile?.username ?? "")} />
+          </ProfileAvatar>
         </div>
 
         <div className="space-y-4">
