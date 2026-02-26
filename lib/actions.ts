@@ -8,12 +8,10 @@ import type {
   CascadeRules,
   Transaction,
   PartialTransaction,
-  MonthlyFlowStat,
   NotificationPreferences,
   ProfileAnalytics,
 } from "@/lib/types"
 import { parseTransactions } from "@/lib/utils"
-import { DEFAULT_ASSET_ID } from "@/lib/constants/assets"
 
 // ────────────────────────────────────────────────────────────
 // Auth helpers
@@ -199,16 +197,8 @@ export async function getTransactions(opts?: {
 }
 
 // ────────────────────────────────────────────────────────────
-// Monthly Flow Stats (dashboard chart)
+// Payment Flow Stats (dashboard chart)
 // ────────────────────────────────────────────────────────────
-
-export async function getMonthlyFlowStats(): Promise<MonthlyFlowStat[]> {
-  const user = await getCurrentUser()
-  if (!user) return []
-  const supabase = await createClient()
-  const { data } = await supabase.from("monthly_flow_stats").select("*").eq("user_id", user.id).order("month", { ascending: true })
-  return data ?? []
-}
 
 export interface PaymentFlowStats {
   date: string
@@ -289,4 +279,16 @@ export async function getDashboardStats() {
     activeCascades: depCount ?? 0,
     depCount: depCount ?? 0,
   }
+}
+
+
+// ────────────────────────────────────────────────────────────
+// Upload file
+// ────────────────────────────────────────────────────────────
+
+export async function uploadFile(file: File) {
+  const supabase = await createClient()
+  const { data, error } = await supabase.storage.from("profile-avatars").upload(file.name, file)
+  if (error) return { error }
+  return { url: data?.path }
 }
