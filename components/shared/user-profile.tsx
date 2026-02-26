@@ -1,7 +1,7 @@
 "use client"
 
 import Image from "next/image"
-import { useState, useTransition } from "react"
+import { useState, useEffect, useTransition } from "react"
 import { Camera } from "lucide-react"
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
 import { uploadFile } from "@/lib/actions"
@@ -22,6 +22,10 @@ const variants = {
 export function AvatarProfile({ initials, avatarUrl, editMode = false, variant = "default" }: AvatarProfileProps) {
   const [localAvatarUrl, setLocalAvatarUrl] = useState<string | undefined>(avatarUrl)
   const choosedVariant = variants[variant as keyof typeof variants] || variants.default
+
+  useEffect(() => {
+    setLocalAvatarUrl(avatarUrl)
+  }, [avatarUrl])
 
   return (
     <Avatar className={cn("group relative border-card", choosedVariant)}>
