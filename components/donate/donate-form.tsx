@@ -7,7 +7,7 @@ import { GitFork, Loader2, CheckCircle2, ExternalLink, Wallet, ArrowDown, User, 
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
-import { AvatarProfile, BannerImage } from "@/components/shared/user-profile"
+import { ProfileAvatar, ProfileBanner } from "@/components/shared/user-profile"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 import { TESTNET_ASSETS, DEFAULT_ASSET_ID } from "@/lib/constants/assets"
@@ -147,12 +147,12 @@ export function DonateForm({ profile, dependencies }: DonateFormProps) {
             {/* Profile hero */}
             <div className="rounded-2xl border border-border bg-card/80 backdrop-blur-sm">
               {/* Banner gradient */}
-              <BannerImage bannerUrl={profile?.banner_url} />
+              <ProfileBanner bannerUrl={profile?.banner_url} />
 
               <div className="relative px-6 pb-6">
                 {/* Avatar */}
                 <div className="-mt-14 mb-2">
-                  <AvatarProfile initials={initials} avatarUrl={profile?.avatar_url ?? ""} />
+                  <ProfileAvatar initials={initials} avatarUrl={profile?.avatar_url ?? ""} />
                 </div>
 
                 {/* Name + username */}

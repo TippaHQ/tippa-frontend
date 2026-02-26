@@ -4,7 +4,7 @@ import { Bell, Search, ChevronDown, Wallet } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { ThemeToggle } from "@/components/theme-toggle"
-import { AvatarProfile } from "@/components/shared/user-profile"
+import { ProfileAvatar } from "@/components/shared/user-profile"
 import { getInitials, getWalletShort } from "@/lib/utils"
 import { useUserStore } from "@/lib/store/user-store"
 
@@ -52,7 +52,7 @@ export function TopBar() {
 
         {/* User */}
         <button className="flex items-center gap-2 rounded-lg px-2 py-1.5 transition-colors hover:bg-secondary">
-          <AvatarProfile variant="small" initials={initials} avatarUrl={profile?.avatar_url ?? ""} />
+          <ProfileAvatar variant="small" initials={initials} avatarUrl={profile?.avatar_url ?? ""} />
           <div className="hidden text-left md:block">
             <p className="text-sm font-medium text-foreground">{displayName}</p>
           </div>
