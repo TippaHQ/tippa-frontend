@@ -1,12 +1,8 @@
 "use client"
 
 import Link from "next/link"
-import { useLayoutEffect } from "react"
-import { redirect } from "next/navigation"
-import { useUserStore } from "@/lib/store/user-store"
 import { GitFork, Wallet, Shield, Zap, ArrowRight, Globe, ChevronRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { toast } from "sonner"
 
 const features = [
   {
@@ -50,15 +46,6 @@ const steps = [
 ]
 
 export default function HomePage() {
-  const isAuthenticated = useUserStore((state) => state.isAuthenticated)
-
-  useLayoutEffect(() => {
-    if (isAuthenticated) {
-      toast.info("Welcome back!", { position: "top-center", description: "You were already logged in! Go check out your dashboard!" })
-      redirect("/dashboard")
-    }
-  }, [isAuthenticated])
-
   return (
     <div className="flex min-h-screen flex-col bg-background">
       {/* Header */}
