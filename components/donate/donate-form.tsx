@@ -3,15 +3,18 @@
 import Link from "next/link"
 import { useState, useEffect } from "react"
 import { GitFork, Loader2, CheckCircle2, ExternalLink, Wallet, ArrowDown, User, Github, Twitter, Globe } from "lucide-react"
+
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { AvatarProfile, BannerImage } from "@/components/shared/user-profile"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+
 import { TESTNET_ASSETS, DEFAULT_ASSET_ID } from "@/lib/constants/assets"
 import type { Profile, CascadeDependency } from "@/lib/types"
 import { useWallet } from "@/providers/wallet-provider"
 import { useUserStore } from "@/lib/store/user-store"
+import { getInitials, getWalletShort } from "@/lib/utils"
 
 type Step = "form" | "submitting" | "success"
 
@@ -22,23 +25,18 @@ interface DonateFormProps {
 
 export function DonateForm({ profile, dependencies }: DonateFormProps) {
   const { walletAddress, isConnected, connectWallet, signTransaction } = useWallet()
-  const userProfile = useUserStore((state) => state.profile)
+  const currentUserProfile = useUserStore((state) => state.profile)
 
   const [step, setStep] = useState<Step>("form")
   const [amount, setAmount] = useState("")
   const [assetId, setAssetId] = useState(DEFAULT_ASSET_ID)
-  const [donorName, setDonorName] = useState(userProfile?.display_name || "")
+  const [donorName, setDonorName] = useState(currentUserProfile?.display_name || "")
   const [error, setError] = useState<string | null>(null)
   const [txHash, setTxHash] = useState<string | null>(null)
 
   const selectedAsset = TESTNET_ASSETS.find((a) => a.id === assetId)!
   const displayName = profile.display_name || profile.username || "Anonymous"
-  const initials = displayName
-    .split(" ")
-    .map((n) => n[0])
-    .join("")
-    .toUpperCase()
-    .slice(0, 2)
+  const initials = getInitials(displayName)
 
   const totalDependencyPercentage = dependencies.reduce((sum, d) => sum + d.percentage, 0)
   const hasSocials = profile.github || profile.twitter || profile.website
@@ -113,10 +111,10 @@ export function DonateForm({ profile, dependencies }: DonateFormProps) {
   }
 
   useEffect(() => {
-    if (userProfile) {
-      setDonorName(userProfile.display_name || "")
+    if (currentUserProfile) {
+      setDonorName(currentUserProfile.display_name || "")
     }
-  }, [userProfile])
+  }, [currentUserProfile])
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-background">
@@ -128,13 +126,13 @@ export function DonateForm({ profile, dependencies }: DonateFormProps) {
 
       {/* Top bar */}
       <header className="relative flex items-center justify-between px-6 py-4">
-        <a href={userProfile ? "/dashboard" : "/"} className="flex items-center gap-2.5">
+        <a href={currentUserProfile ? "/dashboard" : "/"} className="flex items-center gap-2.5">
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
             <GitFork className="h-4 w-4 text-primary-foreground" />
           </div>
           <span className="text-sm font-semibold tracking-tight text-foreground">Tippa</span>
         </a>
-        {!userProfile && (
+        {!currentUserProfile && (
           <Button asChild>
             <Link href="/">Create Your Tippa</Link>
           </Button>
@@ -149,14 +147,12 @@ export function DonateForm({ profile, dependencies }: DonateFormProps) {
             {/* Profile hero */}
             <div className="rounded-2xl border border-border bg-card/80 backdrop-blur-sm">
               {/* Banner gradient */}
-              <div className="h-24 rounded-t-2xl bg-gradient-to-br from-primary/20 via-[hsl(200_70%_50%/0.15)] to-primary/5" />
+              <BannerImage bannerUrl={profile?.banner_url} />
 
               <div className="relative px-6 pb-6">
                 {/* Avatar */}
-                <div className="-mt-10 mb-4">
-                  <Avatar className="h-20 w-20 border-4 border-card shadow-lg">
-                    <AvatarFallback className="bg-primary/10 text-xl font-bold text-primary">{initials}</AvatarFallback>
-                  </Avatar>
+                <div className="-mt-14 mb-2">
+                  <AvatarProfile initials={initials} avatarUrl={profile?.avatar_url ?? ""} />
                 </div>
 
                 {/* Name + username */}
@@ -209,9 +205,7 @@ export function DonateForm({ profile, dependencies }: DonateFormProps) {
                 {profile.wallet_address && (
                   <div className="mt-5 flex items-center gap-2">
                     <Wallet className="h-3.5 w-3.5 text-muted-foreground/50" />
-                    <span className="font-mono text-xs text-muted-foreground">
-                      {profile.wallet_address.slice(0, 6)}...{profile.wallet_address.slice(-6)}
-                    </span>
+                    <span className="font-mono text-xs text-muted-foreground">{getWalletShort(profile.wallet_address)}</span>
                     <a
                       href={`https://stellar.expert/explorer/testnet/account/${profile.wallet_address}`}
                       target="_blank"
