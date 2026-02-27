@@ -330,7 +330,9 @@ export async function uploadImage(file: File, imageType: ImageType, imageName: s
 // Update avatar and banner images
 // ────────────────────────────────────────────────────────────
 
-export async function updateAvatar(file: File, username: string) {
+export type UpdateImageResponse = { error: string | null }
+
+export async function updateAvatar(file: File, username: string): Promise<UpdateImageResponse> {
   const user = await getCurrentUser()
   if (!user) return { error: "Not authenticated" }
 
@@ -339,14 +341,14 @@ export async function updateAvatar(file: File, username: string) {
 
   const imageName = `${username}-profile-avatar`
   const { url, error } = await uploadImage(file, "avatar", imageName)
-  if (error) return { error }
+  if (error) return { error: error.message }
 
   const { error: updateError } = await updateProfile({ avatar_url: url })
   if (updateError) return { error: updateError }
   return { error: null }
 }
 
-export async function updateBanner(file: File, username: string) {
+export async function updateBanner(file: File, username: string): Promise<UpdateImageResponse> {
   const user = await getCurrentUser()
   if (!user) return { error: "Not authenticated" }
 
@@ -355,7 +357,7 @@ export async function updateBanner(file: File, username: string) {
 
   const imageName = `${username}-profile-banner`
   const { url, error } = await uploadImage(file, "banner", imageName)
-  if (error) return { error }
+  if (error) return { error: error.message }
 
   const { error: updateError } = await updateProfile({ banner_url: url })
   if (updateError) return { error: updateError }

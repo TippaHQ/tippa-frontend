@@ -1,16 +1,32 @@
 import { useTransition } from "react"
 import { Camera } from "lucide-react"
+import { toast } from "sonner"
+import type { UpdateImageResponse } from "@/lib/actions"
 
 interface ImageUploadProps {
-  onFileChange: (file: File) => void
+  onFileChange: (file: File) => Promise<UpdateImageResponse>
 }
+
+const IMAGE_MAX_SIZE = 5 * 1024 * 1024
 
 export function ImageUpload({ onFileChange }: ImageUploadProps) {
   const [isPending, startTransition] = useTransition()
 
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
-    if (file) startTransition(async () => onFileChange(file))
+    if (file)
+      startTransition(async () => {
+        if (file.size > IMAGE_MAX_SIZE) {
+          toast.error("File size must be less than 5MB")
+          return
+        }
+        const response = await onFileChange(file)
+        if (response.error) {
+          toast.error(response.error)
+        } else {
+          toast.success("Image uploaded successfully")
+        }
+      })
   }
 
   return (
