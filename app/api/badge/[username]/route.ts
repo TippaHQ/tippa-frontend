@@ -28,7 +28,7 @@ function generateRichBadge(
   const safeName = escapeXml(displayName)
   const safeUsername = escapeXml(username)
 
-  const cardWidth = 340
+  const cardWidth = 400
   const headerHeight = 72
   const depRowHeight = 26
   const depStartY = headerHeight + 20
