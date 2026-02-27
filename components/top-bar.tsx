@@ -52,7 +52,7 @@ export function TopBar() {
 
         {/* User */}
         <button className="flex items-center gap-2 rounded-lg px-2 py-1.5 transition-colors hover:bg-secondary">
-          <ProfileAvatar variant="small" initials={initials} avatarUrl={profile?.avatar_url ?? ""} />
+          <ProfileAvatar variant="small" initials={initials} avatarUrl={profile?.avatar_url} />
           <div className="hidden text-left md:block">
             <p className="text-sm font-medium text-foreground">{displayName}</p>
           </div>

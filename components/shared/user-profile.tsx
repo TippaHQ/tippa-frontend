@@ -11,7 +11,7 @@ const avatarVariants = {
 
 interface ProfileAvatarProps {
   initials: string
-  avatarUrl?: string
+  avatarUrl?: string | null
   variant?: keyof typeof avatarVariants
   children?: React.ReactNode
 }

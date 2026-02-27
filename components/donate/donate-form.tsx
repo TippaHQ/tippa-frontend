@@ -152,7 +152,7 @@ export function DonateForm({ profile, dependencies }: DonateFormProps) {
               <div className="relative px-6 pb-6">
                 {/* Avatar */}
                 <div className="-mt-14 mb-2">
-                  <ProfileAvatar initials={initials} avatarUrl={profile?.avatar_url ?? ""} />
+                  <ProfileAvatar initials={initials} avatarUrl={profile?.avatar_url} />
                 </div>
 
                 {/* Name + username */}

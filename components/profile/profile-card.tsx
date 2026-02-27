@@ -58,7 +58,7 @@ export function ProfileCard({ profile }: ProfileCardProps) {
 
       <div className="relative px-5 pb-5">
         <div className="relative -mt-14 mb-5 flex items-end gap-4">
-          <ProfileAvatar initials={initials} avatarUrl={profile?.avatar_url ?? ""}>
+          <ProfileAvatar initials={initials} avatarUrl={profile?.avatar_url}>
             <ImageUpload onFileChange={(file) => updateAvatar(file, profile?.username ?? "")} />
           </ProfileAvatar>
         </div>
