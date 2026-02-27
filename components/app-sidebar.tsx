@@ -2,33 +2,28 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import {
-  LayoutDashboard,
-  GitFork,
-  ArrowLeftRight,
-  User,
-  ExternalLink,
-  Settings,
-  HelpCircle,
-  ChevronLeft,
-  ChevronRight,
-  LogOut,
-  Wallet,
-} from "lucide-react"
-import { cn } from "@/lib/utils"
-import { useState } from "react"
+import { LayoutDashboard, GitFork, ArrowLeftRight, User, ExternalLink, Settings, HelpCircle, Wallet } from "lucide-react"
 import { useUserStore } from "@/lib/store/user-store"
-import { useRouter } from "next/navigation"
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarGroupLabel,
+  SidebarHeader,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarSeparator,
+} from "@/components/ui/sidebar"
+import { UserProfileButton } from "@/components/shared/user-button"
 
 const mainNav = [
   { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
   { label: "Funds", href: "/dashboard/funds", icon: Wallet },
   { label: "Cascades", href: "/dashboard/cascades", icon: GitFork },
-  {
-    label: "Transactions",
-    href: "/dashboard/transactions",
-    icon: ArrowLeftRight,
-  },
+  { label: "Transactions", href: "/dashboard/transactions", icon: ArrowLeftRight },
   { label: "Profile", href: "/dashboard/profile", icon: User },
 ]
 
@@ -39,116 +34,94 @@ const secondaryNav = [
 
 export function AppSidebar() {
   const pathname = usePathname()
-  const router = useRouter()
-  const [collapsed, setCollapsed] = useState(false)
   const profile = useUserStore((state) => state.profile)
-  const signOut = useUserStore((state) => state.signOut)
-
-  async function handleLogout() {
-    await signOut()
-    router.push("/")
-    router.refresh()
-  }
 
   return (
-    <aside className={cn("flex h-screen flex-col border-r border-border bg-sidebar transition-all duration-300", collapsed ? "w-[72px]" : "w-64")}>
-      {/* Logo */}
-      <Link href="/" className="flex h-16 items-center gap-3 border-b border-border px-4 transition-opacity hover:opacity-80">
-        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary">
-          <GitFork className="h-5 w-5 text-primary-foreground" />
-        </div>
-        {!collapsed && <span className="text-lg font-semibold tracking-tight text-foreground">Tippa</span>}
-      </Link>
+    <Sidebar collapsible="icon">
+      {/* Logo / Brand */}
+      <SidebarHeader>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton size="lg" asChild tooltip="Tippa">
+              <Link href="/">
+                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary">
+                  <GitFork className="h-4 w-4 text-primary-foreground" />
+                </div>
+                <span className="text-base font-semibold tracking-tight">Tippa</span>
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarHeader>
 
-      {/* Main Navigation */}
-      <nav className="mt-6 flex flex-1 flex-col gap-1 px-3">
-        <span className={cn("mb-2 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground", collapsed && "sr-only")}>Menu</span>
-        {mainNav.map((item) => {
-          const isActive = pathname === item.href
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={cn(
-                "group flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
-                isActive ? "bg-primary/10 text-primary" : "text-muted-foreground hover:bg-secondary hover:text-foreground",
-                collapsed && "justify-center px-0",
-              )}
-            >
-              <item.icon className={cn("h-[18px] w-[18px] shrink-0", isActive && "text-primary")} />
-              {!collapsed && <span>{item.label}</span>}
-            </Link>
-          )
-        })}
+      <SidebarContent>
+        <SidebarGroup>
+          <SidebarGroupLabel>Menu</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {mainNav.map((item) => (
+                <SidebarMenuItem key={item.href}>
+                  <SidebarMenuButton asChild isActive={pathname === item.href} tooltip={item.label}>
+                    <Link href={item.href}>
+                      <item.icon />
+                      <span>{item.label}</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
 
-        <div className="my-4 h-px bg-border" />
+        <SidebarSeparator />
 
-        <span className={cn("mb-2 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground", collapsed && "sr-only")}>Support</span>
-        {secondaryNav.map((item) => {
-          const isActive = pathname === item.href
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={cn(
-                "group flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
-                isActive ? "bg-primary/10 text-primary" : "text-muted-foreground hover:bg-secondary hover:text-foreground",
-                collapsed && "justify-center px-0",
-              )}
-            >
-              <item.icon className="h-[18px] w-[18px] shrink-0" />
-              {!collapsed && <span>{item.label}</span>}
-            </Link>
-          )
-        })}
+        {/* Support navigation */}
+        <SidebarGroup className="overflow-x-hidden">
+          <SidebarGroupLabel>Support</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {secondaryNav.map((item) => (
+                <SidebarMenuItem key={item.href}>
+                  <SidebarMenuButton asChild isActive={pathname === item.href} tooltip={item.label}>
+                    <Link href={item.href}>
+                      <item.icon />
+                      <span>{item.label}</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+      </SidebarContent>
 
-        <div className="flex-1" />
-
-        {/* Tippa Link */}
-        {!collapsed && profile?.username && (
-          <div className="mb-2 rounded-lg border border-dashed border-primary/30 bg-primary/5 p-3">
-            <div className="flex items-center gap-2">
-              <ExternalLink className="h-4 w-4 text-primary" />
-              <span className="text-xs font-medium text-foreground">Your Tippa Link</span>
-            </div>
-            <a
-              href={`${process.env.NEXT_PUBLIC_APPLICATION_URL}/d/${profile.username}`}
-              target="_blank"
-              className="mt-1 truncate font-mono text-xs text-primary"
-            >
-              trytippa.com/d/{profile.username}
-            </a>
-          </div>
+      {/* Footer — user info + logout */}
+      <SidebarFooter>
+        {profile?.username && (
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <Link
+                href={`${process.env.NEXT_PUBLIC_APPLICATION_URL}/d/${profile.username}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-3 rounded-md border-2 border-dashed border-primary/30 bg-primary/5 p-3 text-xs transition-all hover:bg-primary/10 group-data-[collapsible=icon]:hidden"
+              >
+                <ExternalLink className="h-4 w-4 shrink-0 text-primary" />
+                <div className="min-w-0">
+                  <p className="truncate font-semibold text-foreground">Your Tippa Link</p>
+                  <p className="truncate font-mono text-primary">trytippa.com/d/{profile.username}</p>
+                </div>
+              </Link>
+            </SidebarMenuItem>
+          </SidebarMenu>
         )}
-
-        {/* Logout */}
-        <button
-          onClick={handleLogout}
-          className={cn(
-            "flex items-center gap-2 rounded-lg py-2.5 text-sm text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground",
-            collapsed ? "justify-center px-0" : "px-3",
-          )}
-        >
-          <LogOut className="h-4 w-4" />
-          {!collapsed && <span>Sign out</span>}
-        </button>
-
-        {/* Collapse Toggle */}
-        <button
-          onClick={() => setCollapsed(!collapsed)}
-          className="mb-4 flex items-center justify-center gap-2 rounded-lg py-2.5 text-sm text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
-          aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-        >
-          {collapsed ? (
-            <ChevronRight className="h-4 w-4" />
-          ) : (
-            <>
-              <ChevronLeft className="h-4 w-4" />
-              <span>Collapse</span>
-            </>
-          )}
-        </button>
-      </nav>
-    </aside>
+        <SidebarSeparator />
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <UserProfileButton />
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarFooter>
+    </Sidebar>
   )
 }
