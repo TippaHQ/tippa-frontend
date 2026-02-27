@@ -228,6 +228,7 @@ function ButtonTab({ username }: ButtonTabProps) {
 /*  BadgeTab                                                            */
 /* ------------------------------------------------------------------ */
 
+type BadgeMode = "simple" | "rich"
 type BadgeStyle = "flat" | "flat-square" | "for-the-badge" | "plastic"
 type BadgeFormat = "markdown" | "html"
 
@@ -243,133 +244,184 @@ interface BadgeTabProps {
 }
 
 function BadgeTab({ username }: BadgeTabProps) {
-  const [style, setStyle] = useState<BadgeStyle>("flat")
+  const [mode, setMode] = useState<BadgeMode>("simple")
+  const [style, setStyle] = useState<BadgeStyle>("for-the-badge")
   const [color, setColor] = useState("2dd4a8")
   const [label, setLabel] = useState("tippa")
   const [message, setMessage] = useState("Tip me")
   const [format, setFormat] = useState<BadgeFormat>("markdown")
 
-  const badgeUrl = `https://trytippa.com/api/badge/${username}?style=${style}&color=${encodeURIComponent(color)}&label=${encodeURIComponent(label)}&message=${encodeURIComponent(message)}`
   const profileUrl = `https://trytippa.com/d/${username}`
 
-  // Local preview URL uses the same API route but relative
-  const previewUrl = `/api/badge/${username}?style=${style}&color=${encodeURIComponent(color)}&label=${encodeURIComponent(label)}&message=${encodeURIComponent(message)}`
-  const previewKey = `${style}-${color}-${label}-${message}`
+  // Simple badge uses shields.io
+  const shieldsUrl = `https://img.shields.io/badge/${encodeURIComponent(label)}-${encodeURIComponent(message)}-${encodeURIComponent(color)}?style=${style}`
+
+  // Rich badge uses our API
+  const richPreviewUrl = `/api/badge/${username}`
+  const richProdUrl = `https://trytippa.com/api/badge/${username}`
 
   const safeMessage = escapeHtml(message)
 
+  const previewUrl = mode === "simple" ? shieldsUrl : richPreviewUrl
+  const badgeUrl = mode === "simple" ? shieldsUrl : richProdUrl
+  const previewKey = mode === "simple" ? `${mode}-${style}-${color}-${label}-${message}` : `${mode}-${username}`
+
   const generatedCode =
     format === "markdown"
-      ? `[![${message}](${badgeUrl})](${profileUrl})`
-      : `<a href="${profileUrl}"><img src="${badgeUrl}" alt="${safeMessage}" /></a>`
-
-  // Validate hex color for swatch display
-  const swatchColor = /^[0-9a-fA-F]{3,8}$/.test(color) ? `#${color}` : "#2dd4a8"
+      ? `[![${mode === "simple" ? message : `Donate to ${username}`}](${badgeUrl})](${profileUrl})`
+      : `<a href="${profileUrl}"><img src="${badgeUrl}" alt="${mode === "simple" ? safeMessage : escapeHtml(`Donate to ${username}`)}" /></a>`
 
   return (
     <div className="space-y-6">
-      {/* Controls */}
-      <div className="space-y-4">
-        {/* Style */}
-        <div>
-          <label className="mb-2 block text-xs font-medium text-muted-foreground">Style</label>
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-            {BADGE_STYLES.map((s) => (
-              <button
-                key={s.value}
-                onClick={() => setStyle(s.value)}
-                className={cn(
-                  "rounded-lg border px-3 py-2.5 text-xs font-medium transition-colors",
-                  style === s.value
-                    ? "border-primary bg-primary/10 text-primary"
-                    : "border-border bg-secondary/30 text-muted-foreground hover:border-primary/30 hover:text-foreground"
-                )}
-              >
-                {s.label}
-              </button>
-            ))}
-          </div>
+      {/* Mode toggle */}
+      <div>
+        <label className="mb-2 block text-xs font-medium text-muted-foreground">Badge Type</label>
+        <div className="flex gap-2">
+          <button
+            onClick={() => setMode("simple")}
+            className={cn(
+              "flex-1 rounded-lg border px-3 py-2.5 text-xs font-medium transition-colors",
+              mode === "simple"
+                ? "border-primary bg-primary/10 text-primary"
+                : "border-border bg-secondary/30 text-muted-foreground hover:border-primary/30 hover:text-foreground"
+            )}
+          >
+            <span className="block font-semibold">Simple</span>
+            <span className="mt-0.5 block text-[10px] font-normal opacity-70">Shields.io badge for READMEs</span>
+          </button>
+          <button
+            onClick={() => setMode("rich")}
+            className={cn(
+              "flex-1 rounded-lg border px-3 py-2.5 text-xs font-medium transition-colors",
+              mode === "rich"
+                ? "border-primary bg-primary/10 text-primary"
+                : "border-border bg-secondary/30 text-muted-foreground hover:border-primary/30 hover:text-foreground"
+            )}
+          >
+            <span className="block font-semibold">Rich Card</span>
+            <span className="mt-0.5 block text-[10px] font-normal opacity-70">Shows cascade distribution</span>
+          </button>
         </div>
+      </div>
 
-        {/* Color */}
-        <div>
-          <label className="mb-2 block text-xs font-medium text-muted-foreground">Color</label>
-          <div className="flex items-center gap-3">
-            <span
-              className="inline-block h-8 w-8 shrink-0 rounded-full border border-border"
-              style={{ backgroundColor: swatchColor }}
-            />
-            <div className="relative flex-1">
-              <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
-                #
-              </span>
-              <input
-                type="text"
-                value={color}
-                onChange={(e) => setColor(e.target.value.replace(/^#/, "").slice(0, 8))}
-                className="h-9 w-full rounded-lg border border-border bg-secondary/30 pl-7 pr-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
-                placeholder="2dd4a8"
-                maxLength={8}
-              />
+      {/* Simple mode controls */}
+      {mode === "simple" && (
+        <div className="space-y-4">
+          {/* Style */}
+          <div>
+            <label className="mb-2 block text-xs font-medium text-muted-foreground">Style</label>
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+              {BADGE_STYLES.map((s) => (
+                <button
+                  key={s.value}
+                  onClick={() => setStyle(s.value)}
+                  className={cn(
+                    "rounded-lg border px-3 py-2.5 text-xs font-medium transition-colors",
+                    style === s.value
+                      ? "border-primary bg-primary/10 text-primary"
+                      : "border-border bg-secondary/30 text-muted-foreground hover:border-primary/30 hover:text-foreground"
+                  )}
+                >
+                  {s.label}
+                </button>
+              ))}
             </div>
           </div>
-        </div>
 
-        {/* Label */}
-        <div>
-          <label className="mb-2 block text-xs font-medium text-muted-foreground">Label</label>
-          <input
-            type="text"
-            value={label}
-            onChange={(e) => setLabel(e.target.value)}
-            className="h-9 w-full rounded-lg border border-border bg-secondary/30 px-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
-            placeholder="tippa"
-          />
-        </div>
-
-        {/* Message */}
-        <div>
-          <label className="mb-2 block text-xs font-medium text-muted-foreground">Message</label>
-          <input
-            type="text"
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
-            className="h-9 w-full rounded-lg border border-border bg-secondary/30 px-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
-            placeholder="Tip me"
-          />
-        </div>
-
-        {/* Format */}
-        <div>
-          <label className="mb-2 block text-xs font-medium text-muted-foreground">Format</label>
-          <div className="flex gap-2">
-            {(["markdown", "html"] as const).map((f) => (
-              <button
-                key={f}
-                onClick={() => setFormat(f)}
-                className={cn(
-                  "rounded-lg border px-4 py-2 text-xs font-medium capitalize transition-colors",
-                  format === f
-                    ? "border-primary bg-primary/10 text-primary"
-                    : "border-border bg-secondary/30 text-muted-foreground hover:border-primary/30 hover:text-foreground"
-                )}
-              >
-                {f === "markdown" ? "Markdown" : "HTML"}
-              </button>
-            ))}
+          {/* Color */}
+          <div>
+            <label className="mb-2 block text-xs font-medium text-muted-foreground">Color</label>
+            <div className="flex items-center gap-3">
+              <span
+                className="inline-block h-8 w-8 shrink-0 rounded-full border border-border"
+                style={{ backgroundColor: /^[0-9a-fA-F]{3,8}$/.test(color) ? `#${color}` : "#2dd4a8" }}
+              />
+              <div className="relative flex-1">
+                <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
+                  #
+                </span>
+                <input
+                  type="text"
+                  value={color}
+                  onChange={(e) => setColor(e.target.value.replace(/^#/, "").slice(0, 8))}
+                  className="h-9 w-full rounded-lg border border-border bg-secondary/30 pl-7 pr-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+                  placeholder="2dd4a8"
+                  maxLength={8}
+                />
+              </div>
+            </div>
           </div>
+
+          {/* Label */}
+          <div>
+            <label className="mb-2 block text-xs font-medium text-muted-foreground">Label</label>
+            <input
+              type="text"
+              value={label}
+              onChange={(e) => setLabel(e.target.value)}
+              className="h-9 w-full rounded-lg border border-border bg-secondary/30 px-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+              placeholder="tippa"
+            />
+          </div>
+
+          {/* Message */}
+          <div>
+            <label className="mb-2 block text-xs font-medium text-muted-foreground">Message</label>
+            <input
+              type="text"
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              className="h-9 w-full rounded-lg border border-border bg-secondary/30 px-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+              placeholder="Tip me"
+            />
+          </div>
+        </div>
+      )}
+
+      {/* Rich mode info */}
+      {mode === "rich" && (
+        <div className="rounded-lg border border-border bg-secondary/20 px-4 py-3">
+          <p className="text-xs text-muted-foreground">
+            This card automatically shows your current cascade distribution rules. It updates whenever you change your cascade configuration.
+          </p>
+        </div>
+      )}
+
+      {/* Format toggle (both modes) */}
+      <div>
+        <label className="mb-2 block text-xs font-medium text-muted-foreground">Format</label>
+        <div className="flex gap-2">
+          {(["markdown", "html"] as const).map((f) => (
+            <button
+              key={f}
+              onClick={() => setFormat(f)}
+              className={cn(
+                "rounded-lg border px-4 py-2 text-xs font-medium capitalize transition-colors",
+                format === f
+                  ? "border-primary bg-primary/10 text-primary"
+                  : "border-border bg-secondary/30 text-muted-foreground hover:border-primary/30 hover:text-foreground"
+              )}
+            >
+              {f === "markdown" ? "Markdown" : "HTML"}
+            </button>
+          ))}
         </div>
       </div>
 
       {/* Preview */}
       <div>
         <label className="mb-2 block text-xs font-medium text-muted-foreground">Preview</label>
-        <div className="flex min-h-[80px] items-center justify-center rounded-lg border border-dashed border-border bg-[repeating-conic-gradient(hsl(var(--muted))_0%_25%,transparent_0%_50%)] bg-[length:16px_16px]">
+        <div className={cn(
+          "flex items-center justify-center rounded-lg border border-dashed border-border",
+          mode === "simple"
+            ? "min-h-[80px] bg-[repeating-conic-gradient(hsl(var(--muted))_0%_25%,transparent_0%_50%)] bg-[length:16px_16px]"
+            : "min-h-[120px] bg-secondary/20 p-4"
+        )}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             key={previewKey}
             src={previewUrl}
-            alt={`${label} - ${message}`}
+            alt={mode === "simple" ? `${label} - ${message}` : `Cascade badge for ${username}`}
             className="max-w-full"
           />
         </div>
