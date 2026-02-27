@@ -1,8 +1,12 @@
 "use client"
 
 import Link from "next/link"
+import { useEffect } from "react"
+import { redirect } from "next/navigation"
 import { GitFork, Wallet, Shield, Zap, ArrowRight, Globe, ChevronRight } from "lucide-react"
+import { useUserStore } from "@/lib/store/user-store"
 import { Button } from "@/components/ui/button"
+import { toast } from "sonner"
 
 const features = [
   {
@@ -45,7 +49,26 @@ const steps = [
   },
 ]
 
+function GoDashboardAction() {
+  return (
+    <Button size="sm" className="ml-16 py-0 h-8" onClick={() => redirect("/dashboard")}>
+      Go to Dashboard
+    </Button>
+  )
+}
+
 export default function HomePage() {
+  const isAuthenticated = useUserStore((state) => state.isAuthenticated)
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      toast("Already logged in?", {
+        position: "top-center",
+        action: <GoDashboardAction />,
+      })
+    }
+  }, [isAuthenticated])
+
   return (
     <div className="flex min-h-screen flex-col bg-background">
       {/* Header */}
