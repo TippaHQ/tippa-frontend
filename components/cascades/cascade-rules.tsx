@@ -20,9 +20,12 @@ export function CascadeRules({ rules }: CascadeRulesProps) {
     router.refresh()
   }
 
-  const handleMinAmount = async (value: string) => {
-    const num = parseFloat(value)
-    if (!isNaN(num)) {
+  const handleMinAmount = async (e: React.FocusEvent<HTMLInputElement>) => {
+    const num = parseFloat(e.target.value)
+    if (isNaN(num) || num < 0.5) {
+      e.target.value = "0.50"
+      await updateCascadeRules({ min_hop_amount: 0.5 })
+    } else {
       await updateCascadeRules({ min_hop_amount: num })
     }
   }
@@ -63,10 +66,13 @@ export function CascadeRules({ rules }: CascadeRulesProps) {
             </div>
             <p className="mt-1 text-xs text-muted-foreground">Skip forwarding when the cascaded amount is too small to be meaningful.</p>
             <div className="mt-2">
-              <Label className="mb-1 text-xs text-muted-foreground">Min amount</Label>
+              <Label className="mb-1 text-xs text-muted-foreground">Min amount (0.5 minimum)</Label>
               <Input
-                defaultValue={rules?.min_hop_amount?.toString() ?? "0.10"}
-                onBlur={(e) => handleMinAmount(e.target.value)}
+                type="number"
+                min={0.5}
+                step={0.1}
+                defaultValue={rules?.min_hop_amount?.toString() ?? "0.50"}
+                onBlur={handleMinAmount}
                 className="h-8 w-28 border-border bg-secondary/50 text-sm text-foreground focus-visible:ring-primary"
               />
             </div>
