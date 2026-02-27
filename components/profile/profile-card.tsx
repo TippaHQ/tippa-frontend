@@ -1,14 +1,18 @@
 "use client"
 
 import { useState, useTransition } from "react"
-import { Camera, Github, Globe, Twitter, Loader2 } from "lucide-react"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import { Button } from "@/components/ui/button"
+import { Github, Globe, Twitter, Loader2 } from "lucide-react"
+
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
-import { updateProfile } from "@/lib/actions"
+import { ImageUpload } from "@/components/shared/image-upload"
+import { ProfileAvatar, ProfileBanner } from "@/components/shared/user-profile"
+
+import { updateProfile, updateAvatar, updateBanner } from "@/lib/actions"
 import { useRouter } from "next/navigation"
+import { getInitials } from "@/lib/utils"
 import type { Profile } from "@/lib/types"
 
 interface ProfileCardProps {
@@ -25,17 +29,9 @@ export function ProfileCard({ profile }: ProfileCardProps) {
   const [github, setGithub] = useState(profile?.github ?? "")
   const [twitter, setTwitter] = useState(profile?.twitter ?? "")
   const [website, setWebsite] = useState(profile?.website ?? "")
+  const initials = getInitials(displayName)
 
-  const initials = displayName
-    ? displayName
-        .split(" ")
-        .map((n) => n[0])
-        .join("")
-        .toUpperCase()
-        .slice(0, 2)
-    : "?"
-
-  const handleSave = () => {
+  function handleSave() {
     setMessage(null)
     startTransition(async () => {
       const result = await updateProfile({
@@ -55,28 +51,16 @@ export function ProfileCard({ profile }: ProfileCardProps) {
   }
 
   return (
-    <div className="rounded-xl border border-border bg-card">
-      <div className="relative h-32 rounded-t-xl bg-gradient-to-r from-primary/20 via-[hsl(var(--chart-2))]/20 to-primary/10">
-        <button
-          className="absolute bottom-3 right-3 flex items-center gap-1.5 rounded-lg bg-background/80 px-3 py-1.5 text-xs text-foreground backdrop-blur-sm transition-colors hover:bg-background"
-          aria-label="Change banner"
-        >
-          <Camera className="h-3.5 w-3.5" />
-          Change
-        </button>
-      </div>
+    <div className="rounded-2xl border border-border bg-card">
+      <ProfileBanner bannerUrl={profile?.banner_url}>
+        <ImageUpload onFileChange={(file) => updateBanner(file, profile?.username ?? "")} />
+      </ProfileBanner>
 
       <div className="relative px-5 pb-5">
-        <div className="relative -mt-10 mb-5 flex items-end gap-4">
-          <Avatar className="h-20 w-20 border-4 border-card">
-            <AvatarFallback className="bg-primary/20 text-xl font-semibold text-primary">{initials}</AvatarFallback>
-          </Avatar>
-          <div className="mb-1">
-            <h3 className="text-lg font-semibold text-foreground">{displayName || "Your Name"}</h3>
-            <p className="font-mono text-xs text-muted-foreground">
-              {profile?.wallet_address ? profile.wallet_address.slice(0, 4) + "..." + profile.wallet_address.slice(-4) : "No wallet connected"}
-            </p>
-          </div>
+        <div className="relative -mt-14 mb-5 flex items-end gap-4">
+          <ProfileAvatar initials={initials} avatarUrl={profile?.avatar_url}>
+            <ImageUpload onFileChange={(file) => updateAvatar(file, profile?.username ?? "")} />
+          </ProfileAvatar>
         </div>
 
         <div className="space-y-4">

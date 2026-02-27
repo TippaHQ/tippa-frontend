@@ -1,15 +1,14 @@
 "use client"
 
+import { useTheme } from "next-themes"
+import { useEffect, useState } from "react"
+import { useRouter } from "next/navigation"
 import { Shield, Bell, Trash2, Sun, Moon, Monitor } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { Button } from "@/components/ui/button"
 import { Switch } from "@/components/ui/switch"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { updateProfile, updateNotificationPreferences } from "@/lib/actions"
-import { useRouter } from "next/navigation"
-import { useTheme } from "next-themes"
-import { useEffect, useState } from "react"
 import type { Profile, NotificationPreferences } from "@/lib/types"
 
 interface SettingsClientProps {
@@ -24,18 +23,14 @@ export function SettingsClient({ profile, notifPrefs }: SettingsClientProps) {
 
   useEffect(() => setMounted(true), [])
 
-  const handleNotifToggle = async (field: string, checked: boolean) => {
+  async function handleNotifToggle(field: string, checked: boolean) {
     await updateNotificationPreferences({ [field]: checked })
     router.refresh()
   }
 
-  const handleAssetChange = async (value: string) => {
+  async function handleAssetChange(value: string) {
     await updateProfile({ default_asset: value })
     router.refresh()
-  }
-
-  const handleFederatedSave = async (value: string) => {
-    await updateProfile({ federated_address: value })
   }
 
   return (
@@ -60,31 +55,18 @@ export function SettingsClient({ profile, notifPrefs }: SettingsClientProps) {
           <div className="h-2.5 w-2.5 rounded-full bg-primary" />
           <span className="flex-1 truncate font-mono text-sm text-foreground">{profile?.wallet_address || "No wallet connected"}</span>
         </div>
-        <div className="mt-3 grid grid-cols-2 gap-3">
-          <div>
-            <Label className="mb-1.5 text-xs text-muted-foreground">Federated Address</Label>
-            <div className="relative">
-              <Input
-                defaultValue={profile?.federated_address ?? ""}
-                onBlur={(e) => handleFederatedSave(e.target.value)}
-                className="h-9 border-border bg-secondary/50 pr-24 text-sm text-foreground focus-visible:ring-primary"
-              />
-              <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">*trytippa.com</span>
-            </div>
-          </div>
-          <div>
-            <Label className="mb-1.5 text-xs text-muted-foreground">Default Asset</Label>
-            <Select defaultValue={profile?.default_asset ?? "USDC"} onValueChange={handleAssetChange}>
-              <SelectTrigger className="h-9 border-border bg-secondary/50 text-sm text-foreground">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent className="border-border bg-popover">
-                <SelectItem value="USDC">USDC</SelectItem>
-                <SelectItem value="XLM">XLM</SelectItem>
-                <SelectItem value="ARS">ARS</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+        <div className="mt-3">
+          <Label className="mb-1.5 text-xs text-muted-foreground">Default Asset</Label>
+          <Select defaultValue={profile?.default_asset ?? "USDC"} onValueChange={handleAssetChange}>
+            <SelectTrigger className="h-9 border-border bg-secondary/50 text-sm text-foreground">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent className="border-border bg-popover">
+              <SelectItem value="USDC">USDC</SelectItem>
+              <SelectItem value="XLM">XLM</SelectItem>
+              <SelectItem value="ARS">ARS</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
       </div>
 

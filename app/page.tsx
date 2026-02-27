@@ -1,10 +1,10 @@
 "use client"
 
 import Link from "next/link"
-import { useLayoutEffect } from "react"
+import { useEffect } from "react"
 import { redirect } from "next/navigation"
-import { useUserStore } from "@/lib/store/user-store"
 import { GitFork, Wallet, Shield, Zap, ArrowRight, Globe, ChevronRight } from "lucide-react"
+import { useUserStore } from "@/lib/store/user-store"
 import { Button } from "@/components/ui/button"
 import { toast } from "sonner"
 
@@ -49,13 +49,23 @@ const steps = [
   },
 ]
 
+function GoDashboardAction() {
+  return (
+    <Button size="sm" className="ml-16 py-0 h-8" onClick={() => redirect("/dashboard")}>
+      Go to Dashboard
+    </Button>
+  )
+}
+
 export default function HomePage() {
   const isAuthenticated = useUserStore((state) => state.isAuthenticated)
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     if (isAuthenticated) {
-      toast.info("Welcome back!", { position: "top-center", description: "You were already logged in! Go check out your dashboard!" })
-      redirect("/dashboard")
+      toast("Already logged in?", {
+        position: "top-center",
+        action: <GoDashboardAction />,
+      })
     }
   }, [isAuthenticated])
 
@@ -85,11 +95,24 @@ export default function HomePage() {
             Stellar Network
           </a>
         </nav>
-        <Link href="/dashboard">
-          <Button variant="outline" size="sm" className="border-border text-foreground hover:bg-secondary">
-            Dashboard
-          </Button>
-        </Link>
+        <div className="flex items-center gap-4">
+          {isAuthenticated ? (
+            <Link href="/dashboard">
+              <Button size="sm">Dashboard</Button>
+            </Link>
+          ) : (
+            <>
+              <Link href="/auth/login">
+                <Button size="sm" variant="outline">
+                  Login
+                </Button>
+              </Link>
+              <Link href="/auth/sign-up">
+                <Button size="sm">Sign Up</Button>
+              </Link>
+            </>
+          )}
+        </div>
       </header>
 
       {/* Hero */}
@@ -113,7 +136,7 @@ export default function HomePage() {
           </p>
 
           {/* Connect CTA */}
-          <div className="mt-10 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
+          <div className="mt-10 flex flex-col items-center gap-4">
             <Link href="/dashboard">
               <Button size="lg" className="gap-2 bg-primary px-8 text-primary-foreground hover:bg-primary/90">
                 <Wallet className="h-5 w-5" />

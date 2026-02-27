@@ -7,6 +7,31 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 /**
+ * Returns initials from a name.
+ * @param name - The name to get initials from
+ * @returns The initials of the name
+ */
+export function getInitials(name?: string | null) {
+  if (!name) return ""
+  return name
+    .split(" ")
+    .map((n) => n[0])
+    .join("")
+    .toUpperCase()
+    .slice(0, 2)
+}
+
+/**
+ * Returns a short version of a wallet address.
+ * @param wallet_address - The wallet address to shorten
+ * @returns The shortened wallet address
+ */
+export function getWalletShort(wallet_address?: string) {
+  if (!wallet_address) return ""
+  return wallet_address.slice(0, 6) + "..." + wallet_address.slice(-6)
+}
+
+/**
  * Parses transactions and aggregates them by month and asset.
  * @param data - Array of partial transactions
  * @param username - Username of the current user

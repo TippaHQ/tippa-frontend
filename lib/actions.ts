@@ -8,12 +8,10 @@ import type {
   CascadeRules,
   Transaction,
   PartialTransaction,
-  MonthlyFlowStat,
   NotificationPreferences,
   ProfileAnalytics,
 } from "@/lib/types"
 import { parseTransactions } from "@/lib/utils"
-import { DEFAULT_ASSET_ID } from "@/lib/constants/assets"
 
 // ────────────────────────────────────────────────────────────
 // Auth helpers
@@ -199,16 +197,8 @@ export async function getTransactions(opts?: {
 }
 
 // ────────────────────────────────────────────────────────────
-// Monthly Flow Stats (dashboard chart)
+// Payment Flow Stats (dashboard chart)
 // ────────────────────────────────────────────────────────────
-
-export async function getMonthlyFlowStats(): Promise<MonthlyFlowStat[]> {
-  const user = await getCurrentUser()
-  if (!user) return []
-  const supabase = await createClient()
-  const { data } = await supabase.from("monthly_flow_stats").select("*").eq("user_id", user.id).order("month", { ascending: true })
-  return data ?? []
-}
 
 export interface PaymentFlowStats {
   date: string
@@ -289,4 +279,87 @@ export async function getDashboardStats() {
     activeCascades: depCount ?? 0,
     depCount: depCount ?? 0,
   }
+}
+
+// ────────────────────────────────────────────────────────────
+// Upload image (with sharp optimisation)
+// ────────────────────────────────────────────────────────────
+
+/** Image-type presets used by sharp before uploading to Supabase storage. */
+const IMAGE_PRESETS = {
+  avatar: { width: 300, height: 300 },
+  banner: { width: 1000, height: 300 },
+} as const
+
+const IMAGE_BUCKETS = {
+  avatar: "profile-avatars",
+  banner: "profile-banners",
+} as const
+
+export type ImageType = keyof typeof IMAGE_PRESETS
+
+export async function uploadImage(file: File, imageType: ImageType, imageName: string) {
+  // Dynamically import sharp so it is only loaded on the server at runtime
+  const sharp = (await import("sharp")).default
+
+  const { width, height } = IMAGE_PRESETS[imageType]
+  const bucket = IMAGE_BUCKETS[imageType]
+
+  // Convert the Web API File to a Node.js Buffer
+  const arrayBuffer = await file.arrayBuffer()
+  const inputBuffer = Buffer.from(arrayBuffer)
+
+  // Optimise: resize with cover crop → convert to WebP
+  const optimisedBuffer = await sharp(inputBuffer).resize(width, height).webp({ quality: 85 }).toBuffer()
+
+  // Keep a stable, collision-free filename
+  const ext = ".webp"
+  const fileName = `${imageName}${ext}`
+
+  const supabase = await createClient()
+  const { data, error } = await supabase.storage.from(bucket).upload(fileName, optimisedBuffer, {
+    contentType: "image/webp",
+    upsert: true,
+  })
+
+  if (error) return { error }
+  return { url: data?.path }
+}
+
+// ────────────────────────────────────────────────────────────
+// Update avatar and banner images
+// ────────────────────────────────────────────────────────────
+
+export type UpdateImageResponse = { error: string | null }
+
+export async function updateAvatar(file: File, username: string): Promise<UpdateImageResponse> {
+  const user = await getCurrentUser()
+  if (!user) return { error: "Not authenticated" }
+
+  const profile = await getProfile()
+  if (profile?.username !== username) return { error: "Not authorized" }
+
+  const imageName = `${username}-profile-avatar`
+  const { url, error } = await uploadImage(file, "avatar", imageName)
+  if (error) return { error: error.message }
+
+  const { error: updateError } = await updateProfile({ avatar_url: url })
+  if (updateError) return { error: updateError }
+  return { error: null }
+}
+
+export async function updateBanner(file: File, username: string): Promise<UpdateImageResponse> {
+  const user = await getCurrentUser()
+  if (!user) return { error: "Not authenticated" }
+
+  const profile = await getProfile()
+  if (profile?.username !== username) return { error: "Not authorized" }
+
+  const imageName = `${username}-profile-banner`
+  const { url, error } = await uploadImage(file, "banner", imageName)
+  if (error) return { error: error.message }
+
+  const { error: updateError } = await updateProfile({ banner_url: url })
+  if (updateError) return { error: updateError }
+  return { error: null }
 }
