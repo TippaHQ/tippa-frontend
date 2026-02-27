@@ -382,6 +382,156 @@ function BadgeTab({ username }: BadgeTabProps) {
 }
 
 /* ------------------------------------------------------------------ */
+/*  WidgetTab                                                           */
+/* ------------------------------------------------------------------ */
+
+type WidgetTheme = "dark" | "light"
+type WidgetAsset = "USDC" | "XLM"
+
+interface WidgetTabProps {
+  username: string
+}
+
+function WidgetTab({ username }: WidgetTabProps) {
+  const [theme, setTheme] = useState<WidgetTheme>("dark")
+  const [asset, setAsset] = useState<WidgetAsset>("USDC")
+  const [amount, setAmount] = useState("")
+  const [width, setWidth] = useState(350)
+  const [height, setHeight] = useState(400)
+
+  const clampedWidth = Math.min(500, Math.max(300, width || 300))
+  const clampedHeight = Math.min(600, Math.max(350, height || 350))
+
+  const previewParams = new URLSearchParams({ theme, asset })
+  if (amount && !isNaN(parseFloat(amount)) && parseFloat(amount) > 0) {
+    previewParams.set("amount", amount)
+  }
+  const previewUrl = `/embed/${username}?${previewParams.toString()}`
+
+  const prodParams = new URLSearchParams({ theme, asset })
+  if (amount && !isNaN(parseFloat(amount)) && parseFloat(amount) > 0) {
+    prodParams.set("amount", amount)
+  }
+  const prodUrl = `https://trytippa.com/embed/${username}?${prodParams.toString()}`
+
+  const iframeCode = `<iframe src="${prodUrl}" width="${clampedWidth}" height="${clampedHeight}" style="border:none;border-radius:12px" title="Donate to ${username} on Tippa" allow="clipboard-write"></iframe>`
+
+  return (
+    <div className="space-y-6">
+      {/* Controls */}
+      <div className="space-y-4">
+        {/* Theme */}
+        <div>
+          <label className="mb-2 block text-xs font-medium text-muted-foreground">Theme</label>
+          <div className="flex gap-2">
+            {(["dark", "light"] as const).map((t) => (
+              <button
+                key={t}
+                onClick={() => setTheme(t)}
+                className={cn(
+                  "flex items-center gap-2 rounded-lg border px-3 py-2 text-xs font-medium capitalize transition-colors",
+                  theme === t
+                    ? "border-primary bg-primary/10 text-primary"
+                    : "border-border bg-secondary/30 text-muted-foreground hover:border-primary/30 hover:text-foreground"
+                )}
+              >
+                <span
+                  className={cn(
+                    "inline-block h-4 w-4 rounded-full border",
+                    t === "light" ? "border-neutral-300" : "border-transparent"
+                  )}
+                  style={{ backgroundColor: t === "dark" ? "#0a0a0a" : "#fafafa" }}
+                />
+                {t === "dark" ? "Dark" : "Light"}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Default asset */}
+        <div>
+          <label className="mb-2 block text-xs font-medium text-muted-foreground">Default asset</label>
+          <div className="flex gap-2">
+            {(["USDC", "XLM"] as const).map((a) => (
+              <button
+                key={a}
+                onClick={() => setAsset(a)}
+                className={cn(
+                  "rounded-lg border px-4 py-2 text-xs font-medium transition-colors",
+                  asset === a
+                    ? "border-primary bg-primary/10 text-primary"
+                    : "border-border bg-secondary/30 text-muted-foreground hover:border-primary/30 hover:text-foreground"
+                )}
+              >
+                {a}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Default amount */}
+        <div>
+          <label className="mb-2 block text-xs font-medium text-muted-foreground">Default amount</label>
+          <input
+            type="number"
+            min="0"
+            step="any"
+            value={amount}
+            onChange={(e) => setAmount(e.target.value)}
+            className="h-9 w-full rounded-lg border border-border bg-secondary/30 px-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+            placeholder="No default"
+          />
+        </div>
+
+        {/* Dimensions */}
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <label className="mb-2 block text-xs font-medium text-muted-foreground">Width (px)</label>
+            <input
+              type="number"
+              min={300}
+              max={500}
+              value={width}
+              onChange={(e) => setWidth(parseInt(e.target.value) || 300)}
+              className="h-9 w-full rounded-lg border border-border bg-secondary/30 px-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+            />
+          </div>
+          <div>
+            <label className="mb-2 block text-xs font-medium text-muted-foreground">Height (px)</label>
+            <input
+              type="number"
+              min={350}
+              max={600}
+              value={height}
+              onChange={(e) => setHeight(parseInt(e.target.value) || 350)}
+              className="h-9 w-full rounded-lg border border-border bg-secondary/30 px-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Live preview */}
+      <div>
+        <label className="mb-2 block text-xs font-medium text-muted-foreground">Preview</label>
+        <div className="flex items-center justify-center overflow-hidden rounded-lg border border-dashed border-border bg-[repeating-conic-gradient(hsl(var(--muted))_0%_25%,transparent_0%_50%)] bg-[length:16px_16px] p-4">
+          <iframe
+            src={previewUrl}
+            width={clampedWidth}
+            height={clampedHeight}
+            style={{ border: "none", borderRadius: 12 }}
+            title={`Donate to ${username} on Tippa`}
+            allow="clipboard-write"
+          />
+        </div>
+      </div>
+
+      {/* Generated Code */}
+      <CodeBlock code={iframeCode} language="html" />
+    </div>
+  )
+}
+
+/* ------------------------------------------------------------------ */
 /*  EmbedGenerator                                                     */
 /* ------------------------------------------------------------------ */
 
@@ -420,9 +570,7 @@ export function EmbedGenerator({ username }: EmbedGeneratorProps) {
         </TabsContent>
 
         <TabsContent value="widget" className="mt-4">
-          <div className="flex min-h-[200px] items-center justify-center rounded-lg border border-dashed border-border">
-            <p className="text-sm text-muted-foreground">Coming soon</p>
-          </div>
+          <WidgetTab username={username} />
         </TabsContent>
 
         <TabsContent value="badge" className="mt-4">
