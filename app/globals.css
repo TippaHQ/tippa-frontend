@@ -24,7 +24,7 @@
     --muted-foreground: 220 10% 46%;
     --accent: 168 80% 42%;
     --accent-foreground: 0 0% 100%;
-    --destructive: 0 72% 51%;
+    --destructive: 0 80% 60%;
     --destructive-foreground: 0 0% 100%;
     --border: 220 13% 87%;
     --input: 220 13% 87%;
@@ -42,7 +42,7 @@
     --sidebar-accent: 240 4.8% 95.9%;
     --sidebar-accent-foreground: 240 5.9% 10%;
     --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-ring: 168 80% 42%;
     --success: 150 70% 38%;
     --success-foreground: 0 0% 100%;
     --warning: 45 90% 48%;
@@ -82,7 +82,7 @@
     --muted-foreground: 215 15% 55%;
     --accent: 168 80% 50%;
     --accent-foreground: 230 15% 8%;
-    --destructive: 0 72% 51%;
+    --destructive: 0 100% 70%;
     --destructive-foreground: 210 20% 95%;
     --border: 230 12% 18%;
     --input: 230 12% 18%;
@@ -99,7 +99,7 @@
     --sidebar-accent: 240 3.7% 15.9%;
     --sidebar-accent-foreground: 240 4.8% 95.9%;
     --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-ring: 168 80% 50%;
     --success: 150 70% 45%;
     --success-foreground: 210 20% 95%;
     --warning: 45 90% 55%;
@@ -111,8 +111,15 @@
   * {
     @apply border-border;
   }
+
   body {
     @apply bg-background text-foreground;
+  }
+
+  /* Apply focus outline to all focusable anchors that dont have already have a ring */
+  a:not(.ring-sidebar-ring):focus-visible {
+    outline: 2px dashed hsl(var(--sidebar-ring));
+    outline-offset: 3px;
   }
 }
 
