@@ -7,6 +7,7 @@ import { TESTNET_ASSETS } from "@/lib/constants/assets"
 const MAX_ATTEMPTS = 3
 const MAX_DEPTH = 10
 const ASSET_DECIMALS = 7
+const MINIMUM_HOP_THRESHOLD = 5000000 // 0.5 <asset>
 
 export interface ProcessResults {
   processed: number
@@ -70,7 +71,7 @@ export async function processDistributionQueue(): Promise<ProcessResults> {
       const assembled = await client.distribute({
         username: item.username,
         asset: item.asset_contract_id,
-        min_distribution: BigInt(0),
+        min_distribution: BigInt(MINIMUM_HOP_THRESHOLD),
       })
 
       // Sign server-side
