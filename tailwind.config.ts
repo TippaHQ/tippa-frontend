@@ -1,6 +1,7 @@
 import type { Config } from "tailwindcss"
+import { withUt } from "uploadthing/tw"
 
-const config: Config = {
+const config: Config = withUt({
   darkMode: ["class"],
   content: ["./pages/**/*.{js,ts,jsx,tsx,mdx}", "./components/**/*.{js,ts,jsx,tsx,mdx}", "./app/**/*.{js,ts,jsx,tsx,mdx}", "*.{js,ts,jsx,tsx,mdx}"],
   theme: {
@@ -55,8 +56,6 @@ const config: Config = {
           "accent-foreground": "hsl(var(--sidebar-accent-foreground))",
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
-          "primary-foreground": "hsl(var(--sidebar-primary-foreground))",
-          "accent-foreground": "hsl(var(--sidebar-accent-foreground))",
         },
         success: {
           DEFAULT: "hsl(var(--success))",
@@ -101,5 +100,6 @@ const config: Config = {
     },
   },
   plugins: [require("tailwindcss-animate")],
-}
+})
+
 export default config

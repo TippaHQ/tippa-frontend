@@ -1,5 +1,6 @@
 "use server"
 
+import { UTApi } from "uploadthing/server"
 import { revalidatePath } from "next/cache"
 import { createClient } from "@/lib/supabase/server"
 import type {
@@ -285,45 +286,47 @@ export async function getDashboardStats() {
 // Upload image (with sharp optimisation)
 // ────────────────────────────────────────────────────────────
 
-/** Image-type presets used by sharp before uploading to Supabase storage. */
 const IMAGE_PRESETS = {
   avatar: { width: 300, height: 300 },
   banner: { width: 1000, height: 300 },
 } as const
 
-const IMAGE_BUCKETS = {
-  avatar: "profile-avatars",
-  banner: "profile-banners",
-} as const
-
 export type ImageType = keyof typeof IMAGE_PRESETS
 
-export async function uploadImage(file: File, imageType: ImageType, imageName: string) {
-  // Dynamically import sharp so it is only loaded on the server at runtime
+export type UploadImageResponse = { error: string | null; url?: string }
+
+export async function uploadImage(file: File, imageType: ImageType, imageName: string): Promise<UploadImageResponse> {
   const sharp = (await import("sharp")).default
 
-  const { width, height } = IMAGE_PRESETS[imageType]
-  const bucket = IMAGE_BUCKETS[imageType]
-
-  // Convert the Web API File to a Node.js Buffer
   const arrayBuffer = await file.arrayBuffer()
   const inputBuffer = Buffer.from(arrayBuffer)
 
-  // Optimise: resize with cover crop → convert to WebP
+  const { width, height } = IMAGE_PRESETS[imageType]
   const optimisedBuffer = await sharp(inputBuffer).resize(width, height).webp({ quality: 85 }).toBuffer()
 
-  // Keep a stable, collision-free filename
   const ext = ".webp"
   const fileName = `${imageName}${ext}`
 
-  const supabase = await createClient()
-  const { data, error } = await supabase.storage.from(bucket).upload(fileName, optimisedBuffer, {
-    contentType: "image/webp",
-    upsert: true,
-  })
+  const utApi = new UTApi()
+  try {
+    const imageToUpload = new File([optimisedBuffer], fileName, { type: "image/webp" })
+    const result = await utApi.uploadFiles([imageToUpload], { contentDisposition: "inline" })
+    const { error, data } = result[0]
 
-  if (error) return { error }
-  return { url: data?.path }
+    if (error) {
+      console.error(error)
+      return { error: error.message }
+    }
+
+    if (data.ufsUrl) {
+      return { url: data.ufsUrl, error: null }
+    }
+
+    return { error: "Upload failed" }
+  } catch (err) {
+    console.error(err)
+    return { error: "Upload failed" }
+  }
 }
 
 // ────────────────────────────────────────────────────────────
@@ -339,9 +342,12 @@ export async function updateAvatar(file: File, username: string): Promise<Update
   const profile = await getProfile()
   if (profile?.username !== username) return { error: "Not authorized" }
 
+  const { error: validationError } = validateImageFile(file)
+  if (validationError) return { error: validationError }
+
   const imageName = `${username}-profile-avatar`
   const { url, error } = await uploadImage(file, "avatar", imageName)
-  if (error) return { error: error.message }
+  if (error) return { error }
 
   const { error: updateError } = await updateProfile({ avatar_url: url })
   if (updateError) return { error: updateError }
@@ -355,12 +361,22 @@ export async function updateBanner(file: File, username: string): Promise<Update
   const profile = await getProfile()
   if (profile?.username !== username) return { error: "Not authorized" }
 
+  const { error: validationError } = validateImageFile(file)
+  if (validationError) return { error: validationError }
+
   const imageName = `${username}-profile-banner`
   const { url, error } = await uploadImage(file, "banner", imageName)
-  if (error) return { error: error.message }
+  if (error) return { error }
 
   const { error: updateError } = await updateProfile({ banner_url: url })
   if (updateError) return { error: updateError }
+  return { error: null }
+}
+
+function validateImageFile(file: File) {
+  const validTypes = ["image/jpeg", "image/png", "image/webp"]
+  if (!validTypes.includes(file.type)) return { error: "Invalid file type" }
+  if (file.size > 4 * 1024 * 1024) return { error: "File size must be less than 4MB" }
   return { error: null }
 }
 

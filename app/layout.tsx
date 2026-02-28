@@ -1,5 +1,9 @@
 import type { Metadata, Viewport } from "next"
 import { Geist, Geist_Mono } from "next/font/google"
+import { extractRouterConfig } from "uploadthing/server"
+import { NextSSRPlugin } from "@uploadthing/react/next-ssr-plugin"
+
+import { uploadFileRouter } from "@/app/api/uploadthing/core"
 import { ThemeProvider } from "@/providers/theme-provider"
 import { UserProvider } from "@/providers/user-provider"
 import { Toaster } from "@/components/ui/sonner"
@@ -29,7 +33,7 @@ export const metadata: Metadata = {
 }
 
 export const viewport: Viewport = {
-  themeColor: "#14b8a6",
+  themeColor: "#15c19f",
   width: "device-width",
   initialScale: 1,
 }
@@ -42,6 +46,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${geistSans.variable} ${geistMono.variable} font-sans antialiased`}>
+        <NextSSRPlugin routerConfig={extractRouterConfig(uploadFileRouter)} />
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
           <UserProvider>{children}</UserProvider>
           <Toaster />
