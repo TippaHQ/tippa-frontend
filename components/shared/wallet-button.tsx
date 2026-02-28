@@ -1,9 +1,12 @@
+"use client"
+
 import { toast } from "sonner"
 import { Wallet, Copy, LogOut } from "lucide-react"
-
 import { useWallet } from "@/providers/wallet-provider"
-import { Button } from "@/components/ui/button"
+import { useIsMobile } from "@/hooks/use-mobile"
 import { getWalletShort } from "@/lib/utils"
+
+import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -14,6 +17,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 
 export function WalletConnectButton() {
+  const isMobile = useIsMobile()
   const { walletAddress, connectWallet, disconnectWallet } = useWallet()
 
   function handleCopyAddress() {
@@ -37,7 +41,7 @@ export function WalletConnectButton() {
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" size="sm" aria-label="Wallet Address" className="group hover:bg-primary/10 dark:hover:bg-primary/30">
           <Wallet className="group-hover:text-primary transition-colors" />
-          <span className="group-hover:text-primary transition-colors">{getWalletShort(walletAddress)}</span>
+          {!isMobile && <span className="group-hover:text-primary transition-colors">{getWalletShort(walletAddress)}</span>}
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent>

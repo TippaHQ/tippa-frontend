@@ -4,8 +4,8 @@ import { PanelLeft, Bell } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useSidebar } from "@/components/ui/sidebar"
 import { ThemeToggle } from "@/components/theme-toggle"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { WalletConnectButton } from "@/components/shared/wallet-button"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 
 export function TopBar() {
   const { toggleSidebar } = useSidebar()
