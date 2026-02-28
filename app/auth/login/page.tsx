@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { AppLogo } from "@/components/shared/app-logo"
+import { IS_SIGNUP_ENABLED } from "@/lib/constants/flags"
 
 export default function LoginPage() {
   const router = useRouter()
@@ -72,12 +73,14 @@ export default function LoginPage() {
         </Button>
       </form>
 
-      <p className="text-center text-sm text-muted-foreground">
-        {"Don't have an account? "}
-        <Link href="/auth/sign-up" className="font-medium text-primary hover:text-primary/80">
-          Sign up
-        </Link>
-      </p>
+      {IS_SIGNUP_ENABLED && (
+        <p className="text-center text-sm text-muted-foreground">
+          {"Don't have an account? "}
+          <Link href="/auth/sign-up" className="font-medium text-primary hover:text-primary/80">
+            Sign up
+          </Link>
+        </p>
+      )}
     </div>
   )
 }

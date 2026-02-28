@@ -4,6 +4,7 @@ import Link from "next/link"
 import { useEffect } from "react"
 import { redirect } from "next/navigation"
 import { GitFork, Wallet, Shield, Zap, ArrowRight, Globe, ChevronRight } from "lucide-react"
+import { IS_SIGNUP_ENABLED } from "@/lib/constants/flags"
 import { useUserStore } from "@/lib/store/user-store"
 import { Button } from "@/components/ui/button"
 import { ThemeToggle } from "@/components/theme-toggle"
@@ -105,9 +106,11 @@ export default function HomePage() {
                   Login
                 </Button>
               </Link>
-              <Link href="/auth/sign-up">
-                <Button size="sm">Sign Up</Button>
-              </Link>
+              {IS_SIGNUP_ENABLED && (
+                <Link href="/auth/sign-up">
+                  <Button size="sm">Sign Up</Button>
+                </Link>
+              )}
             </>
           )}
         </div>
