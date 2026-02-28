@@ -138,10 +138,10 @@ export default function HomePage() {
 
           {/* Connect CTA */}
           <div className="mt-10 flex flex-col items-center gap-4">
-            <Link href="/dashboard">
+            <Link href="/waitlist">
               <Button size="lg" className="gap-2 bg-primary px-8 text-primary-foreground hover:bg-primary/90">
                 <Wallet className="h-5 w-5" />
-                Create Your Tippa Account
+                Join the Waitlist
               </Button>
             </Link>
             <a

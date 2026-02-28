@@ -348,18 +348,77 @@ export async function updateAvatar(file: File, username: string): Promise<Update
   return { error: null }
 }
 
-export async function updateBanner(file: File, username: string): Promise<UpdateImageResponse> {
-  const user = await getCurrentUser()
-  if (!user) return { error: "Not authenticated" }
+// ────────────────────────────────────────────────────────────
+// Waitlist
+// ────────────────────────────────────────────────────────────
 
-  const profile = await getProfile()
-  if (profile?.username !== username) return { error: "Not authorized" }
+export type WaitlistEntry = {
+  id: string
+  email: string
+  name: string
+  role: string | null
+  status: string
+  created_at: string
+}
 
-  const imageName = `${username}-profile-banner`
-  const { url, error } = await uploadImage(file, "banner", imageName)
-  if (error) return { error: error.message }
+export type WaitlistPosition = {
+  position: number
+  total: number
+}
 
-  const { error: updateError } = await updateProfile({ banner_url: url })
-  if (updateError) return { error: updateError }
-  return { error: null }
+export type WaitlistStatus = "EXISTING" | "ERROR" | "SUCCESS"
+
+export async function joinWaitlist(email: string, name: string, role?: string): Promise<{ status: WaitlistStatus; error: string | null }> {
+  const supabase = await createClient()
+
+  const { data: existing } = await supabase.from("waitlist").select("id, status").eq("email", email.toLowerCase()).single()
+  if (existing) {
+    if (existing.status === "approved") {
+      return { status: "EXISTING", error: "You already have access! Please sign up." }
+    }
+    return { status: "EXISTING", error: "You're already on the waitlist. We'll notify you when spots open up." }
+  }
+
+  const { error } = await supabase.from("waitlist").insert({
+    email: email.toLowerCase(),
+    name,
+    role: role || null,
+    status: "pending",
+  })
+
+  if (error) {
+    if (error.code === "23505") {
+      return { status: "EXISTING", error: "You're already on the waitlist!" }
+    }
+    return { status: "ERROR", error: error.message }
+  }
+
+  return { status: "SUCCESS", error: null }
+}
+
+export async function getWaitlistPosition(email: string): Promise<WaitlistPosition | null> {
+  const supabase = await createClient()
+
+  const { data: entry } = await supabase.from("waitlist").select("created_at").eq("email", email.toLowerCase()).single()
+
+  if (!entry) return null
+
+  const { count } = await supabase
+    .from("waitlist")
+    .select("*", { count: "exact", head: true })
+    .lt("created_at", entry.created_at)
+    .eq("status", "pending")
+
+  const { count: total } = await supabase.from("waitlist").select("*", { count: "exact", head: true }).eq("status", "pending")
+
+  return {
+    position: (count ?? 0) + 1,
+    total: total ?? 0,
+  }
+}
+
+export async function getWaitlistCount(): Promise<number> {
+  const supabase = await createClient()
+  const { count } = await supabase.from("waitlist").select("*", { count: "exact", head: true }).eq("status", "pending")
+  return count ?? 0
 }
