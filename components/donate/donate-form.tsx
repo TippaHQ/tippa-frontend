@@ -122,8 +122,9 @@ export function DonateForm({ profile, dependencies }: DonateFormProps) {
     <div className="relative min-h-screen overflow-hidden bg-background">
       {/* Atmospheric background */}
       <div className="pointer-events-none absolute inset-0">
-        <div className="absolute left-1/2 top-0 h-[700px] w-[900px] -translate-x-1/2 -translate-y-1/4 rounded-full bg-primary/[0.05] blur-[150px]" />
-        <div className="absolute bottom-0 left-0 h-[400px] w-[600px] -translate-x-1/4 translate-y-1/4 rounded-full bg-[hsl(200_70%_50%/0.03)] blur-[120px]" />
+        <div className="absolute left-1/2 top-0 h-[1200px] w-[1200px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#15C19F]/10 blur-[100px]" />
+        <div className="absolute left-0 bottom-0 h-[600px] w-[600px] -translate-x-1/2 translate-y-1/2 rounded-full bg-[#15C19F]/10 blur-[100px]" />
+        <div className="absolute right-0 bottom-0 h-[600px] w-[600px] translate-x-1/2 translate-y-1/2 rounded-full bg-[#15C19F]/10 blur-[100px]" />
       </div>
 
       {/* Top bar */}
