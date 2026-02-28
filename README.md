@@ -158,3 +158,7 @@ providers/
 ## License
 
 Private.
+
+
+## Buy us a coffee!
+[![Donate to tippa](https://trytippa.com/api/badge/tippa)](https://trytippa.com/d/tippa)
