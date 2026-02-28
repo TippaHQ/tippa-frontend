@@ -2,12 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
 
 function escapeXml(str: string): string {
-  return str
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&apos;")
+  return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&apos;")
 }
 
 interface Dependency {
@@ -20,11 +15,7 @@ interface Dependency {
  * Generate a rich SVG card showing the user's cascade distribution rules.
  * Inspired by Kivach's cascading donations badge.
  */
-function generateRichBadge(
-  displayName: string,
-  username: string,
-  dependencies: Dependency[],
-): string {
+function generateRichBadge(displayName: string, username: string, dependencies: Dependency[]): string {
   const safeName = escapeXml(displayName)
   const safeUsername = escapeXml(username)
 
@@ -99,10 +90,7 @@ function generateRichBadge(
 </svg>`
 }
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: Promise<{ username: string }> },
-) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ username: string }> }) {
   const { username } = await params
 
   if (!username || username.length > 100) {
@@ -112,11 +100,7 @@ export async function GET(
   const supabase = await createClient()
 
   // Fetch profile
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("id, display_name, username")
-    .eq("username", username)
-    .single()
+  const { data: profile } = await supabase.from("profiles").select("id, display_name, username").eq("username", username).single()
 
   if (!profile) {
     return new NextResponse("User not found", { status: 404 })

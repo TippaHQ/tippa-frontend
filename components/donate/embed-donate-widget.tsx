@@ -27,9 +27,7 @@ export function EmbedDonateWidget({ profile }: EmbedDonateWidgetProps) {
 
   const [step, setStep] = useState<Step>("form")
   const [amount, setAmount] = useState(initialAmount)
-  const [assetId, setAssetId] = useState(
-    TESTNET_ASSETS.some((a) => a.id === initialAsset) ? initialAsset : DEFAULT_ASSET_ID
-  )
+  const [assetId, setAssetId] = useState(TESTNET_ASSETS.some((a) => a.id === initialAsset) ? initialAsset : DEFAULT_ASSET_ID)
   const [error, setError] = useState<string | null>(null)
   const [txHash, setTxHash] = useState<string | null>(null)
 
@@ -108,10 +106,7 @@ export function EmbedDonateWidget({ profile }: EmbedDonateWidgetProps) {
 
   return (
     <div
-      className={cn(
-        "flex min-h-screen flex-col items-center justify-center p-4",
-        isDark ? "bg-[#0a0a0a] text-[#fafafa]" : "bg-white text-[#0a0a0a]"
-      )}
+      className={cn("flex min-h-screen flex-col items-center justify-center p-4", isDark ? "bg-[#0a0a0a] text-[#fafafa]" : "bg-white text-[#0a0a0a]")}
     >
       <div className="w-full max-w-[350px]">
         {/* Header */}
@@ -122,9 +117,7 @@ export function EmbedDonateWidget({ profile }: EmbedDonateWidgetProps) {
           <span className={cn("text-xs font-semibold", isDark ? "text-[#fafafa]" : "text-[#0a0a0a]")}>Tippa</span>
         </div>
 
-        <h2 className={cn("mb-4 text-base font-semibold", isDark ? "text-[#fafafa]" : "text-[#0a0a0a]")}>
-          Support {displayName}
-        </h2>
+        <h2 className={cn("mb-4 text-base font-semibold", isDark ? "text-[#fafafa]" : "text-[#0a0a0a]")}>Support {displayName}</h2>
 
         {step === "form" && (
           <div className="space-y-3">
@@ -141,16 +134,14 @@ export function EmbedDonateWidget({ profile }: EmbedDonateWidgetProps) {
                   "h-11 flex-1 font-mono text-base",
                   isDark
                     ? "border-[#333] bg-[#1a1a1a] text-[#fafafa] placeholder:text-[#666]"
-                    : "border-[#e5e5e5] bg-[#f5f5f5] text-[#0a0a0a] placeholder:text-[#999]"
+                    : "border-[#e5e5e5] bg-[#f5f5f5] text-[#0a0a0a] placeholder:text-[#999]",
                 )}
               />
               <Select value={assetId} onValueChange={setAssetId}>
                 <SelectTrigger
                   className={cn(
                     "h-11 w-[90px] text-sm",
-                    isDark
-                      ? "border-[#333] bg-[#1a1a1a] text-[#fafafa]"
-                      : "border-[#e5e5e5] bg-[#f5f5f5] text-[#0a0a0a]"
+                    isDark ? "border-[#333] bg-[#1a1a1a] text-[#fafafa]" : "border-[#e5e5e5] bg-[#f5f5f5] text-[#0a0a0a]",
                   )}
                 >
                   <SelectValue />
@@ -177,7 +168,7 @@ export function EmbedDonateWidget({ profile }: EmbedDonateWidgetProps) {
                       ? "border-[hsl(168_80%_50%)] bg-[hsl(168_80%_50%/0.1)] text-[hsl(168_80%_50%)]"
                       : isDark
                         ? "border-[#333] bg-[#1a1a1a] text-[#aaa] hover:border-[#555] hover:text-[#fafafa]"
-                        : "border-[#e5e5e5] bg-[#f5f5f5] text-[#666] hover:border-[#ccc] hover:text-[#0a0a0a]"
+                        : "border-[#e5e5e5] bg-[#f5f5f5] text-[#666] hover:border-[#ccc] hover:text-[#0a0a0a]",
                   )}
                 >
                   {preset}
@@ -190,7 +181,7 @@ export function EmbedDonateWidget({ profile }: EmbedDonateWidgetProps) {
               <div
                 className={cn(
                   "flex items-center gap-2 rounded-lg px-3 py-2 text-xs",
-                  isDark ? "bg-[hsl(168_80%_50%/0.05)] text-[#ccc]" : "bg-[hsl(168_80%_50%/0.05)] text-[#555]"
+                  isDark ? "bg-[hsl(168_80%_50%/0.05)] text-[#ccc]" : "bg-[hsl(168_80%_50%/0.05)] text-[#555]",
                 )}
               >
                 <Wallet className="h-3.5 w-3.5" />
@@ -201,9 +192,7 @@ export function EmbedDonateWidget({ profile }: EmbedDonateWidgetProps) {
             )}
 
             {/* Error */}
-            {error && (
-              <div className="rounded-lg bg-red-500/10 px-3 py-2 text-xs text-red-400">{error}</div>
-            )}
+            {error && <div className="rounded-lg bg-red-500/10 px-3 py-2 text-xs text-red-400">{error}</div>}
 
             {/* CTA */}
             <Button
@@ -211,11 +200,7 @@ export function EmbedDonateWidget({ profile }: EmbedDonateWidgetProps) {
               className="h-11 w-full gap-2 bg-[hsl(168_80%_50%)] text-sm font-semibold text-[#042f2e] hover:bg-[hsl(168_80%_45%)]"
             >
               <Wallet className="h-4 w-4" />
-              {!isConnected
-                ? "Connect Wallet & Donate"
-                : amount && parseFloat(amount) > 0
-                  ? `Donate ${amount} ${selectedAsset.symbol}`
-                  : "Donate"}
+              {!isConnected ? "Connect Wallet & Donate" : amount && parseFloat(amount) > 0 ? `Donate ${amount} ${selectedAsset.symbol}` : "Donate"}
             </Button>
 
             {/* Trust line */}
@@ -228,12 +213,8 @@ export function EmbedDonateWidget({ profile }: EmbedDonateWidgetProps) {
         {step === "submitting" && (
           <div className="flex flex-col items-center py-10">
             <Loader2 className="mb-4 h-8 w-8 animate-spin text-[hsl(168_80%_50%)]" />
-            <p className={cn("text-sm font-medium", isDark ? "text-[#fafafa]" : "text-[#0a0a0a]")}>
-              Processing donation...
-            </p>
-            <p className={cn("mt-1 text-xs", isDark ? "text-[#888]" : "text-[#666]")}>
-              Confirm in your wallet and wait for settlement.
-            </p>
+            <p className={cn("text-sm font-medium", isDark ? "text-[#fafafa]" : "text-[#0a0a0a]")}>Processing donation...</p>
+            <p className={cn("mt-1 text-xs", isDark ? "text-[#888]" : "text-[#666]")}>Confirm in your wallet and wait for settlement.</p>
           </div>
         )}
 
@@ -261,9 +242,7 @@ export function EmbedDonateWidget({ profile }: EmbedDonateWidgetProps) {
               onClick={handleDonateAgain}
               className={cn(
                 "mt-5 rounded-lg border px-4 py-2 text-sm font-medium transition-colors",
-                isDark
-                  ? "border-[#333] text-[#fafafa] hover:bg-[#1a1a1a]"
-                  : "border-[#e5e5e5] text-[#0a0a0a] hover:bg-[#f5f5f5]"
+                isDark ? "border-[#333] text-[#fafafa] hover:bg-[#1a1a1a]" : "border-[#e5e5e5] text-[#0a0a0a] hover:bg-[#f5f5f5]",
               )}
             >
               Donate Again

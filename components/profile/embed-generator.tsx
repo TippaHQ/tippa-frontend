@@ -27,15 +27,8 @@ function CodeBlock({ code, language = "html" }: CodeBlockProps) {
   return (
     <div className="overflow-hidden rounded-lg border border-border">
       <div className="flex items-center justify-between bg-secondary/50 px-4 py-2">
-        <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-          {language}
-        </span>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={handleCopy}
-          className="h-7 gap-1.5 text-xs text-muted-foreground hover:text-foreground"
-        >
+        <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">{language}</span>
+        <Button variant="ghost" size="sm" onClick={handleCopy} className="h-7 gap-1.5 text-xs text-muted-foreground hover:text-foreground">
           {copied ? (
             <>
               <Check className="h-3.5 w-3.5" />
@@ -50,9 +43,7 @@ function CodeBlock({ code, language = "html" }: CodeBlockProps) {
         </Button>
       </div>
       <pre className="overflow-x-auto p-4">
-        <code className="break-all font-mono text-xs text-muted-foreground">
-          {code}
-        </code>
+        <code className="break-all font-mono text-xs text-muted-foreground">{code}</code>
       </pre>
     </div>
   )
@@ -67,35 +58,24 @@ type ButtonTheme = "dark" | "light" | "teal"
 type ButtonSize = "small" | "medium" | "large"
 
 const THEMES: Record<ButtonTheme, { label: string; bg: string; text: string; border?: string; swatch: string }> = {
-  dark:  { label: "Dark",  bg: "#0a0a0a", text: "#fafafa", swatch: "#0a0a0a" },
+  dark: { label: "Dark", bg: "#0a0a0a", text: "#fafafa", swatch: "#0a0a0a" },
   light: { label: "Light", bg: "#fafafa", text: "#0a0a0a", border: "#e5e5e5", swatch: "#fafafa" },
-  teal:  { label: "Teal",  bg: "#2dd4a8", text: "#042f2e", swatch: "#2dd4a8" },
+  teal: { label: "Teal", bg: "#2dd4a8", text: "#042f2e", swatch: "#2dd4a8" },
 }
 
 const SIZES: Record<ButtonSize, { label: string; fontSize: number; py: number; px: number }> = {
-  small:  { label: "S", fontSize: 12, py: 8,  px: 16 },
+  small: { label: "S", fontSize: 12, py: 8, px: 16 },
   medium: { label: "M", fontSize: 14, py: 10, px: 20 },
-  large:  { label: "L", fontSize: 16, py: 12, px: 24 },
+  large: { label: "L", fontSize: 16, py: 12, px: 24 },
 }
 
 const ICON_SVG = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="18 13 12 19 6 13"/><line x1="6" y1="5" x2="18" y2="5"/></svg>`
 
 function escapeHtml(str: string): string {
-  return str
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;")
+  return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;")
 }
 
-function generateHtml(
-  username: string,
-  style: ButtonStyle,
-  theme: ButtonTheme,
-  label: string,
-  size: ButtonSize,
-): string {
+function generateHtml(username: string, style: ButtonStyle, theme: ButtonTheme, label: string, size: ButtonSize): string {
   const { bg, text, border } = THEMES[theme]
   const { fontSize, py, px } = SIZES[size]
   const href = `https://trytippa.com/d/${username}`
@@ -139,7 +119,7 @@ function ButtonTab({ username }: ButtonTabProps) {
                   "rounded-lg border px-3 py-2.5 text-xs font-medium capitalize transition-colors",
                   style === s
                     ? "border-primary bg-primary/10 text-primary"
-                    : "border-border bg-secondary/30 text-muted-foreground hover:border-primary/30 hover:text-foreground"
+                    : "border-border bg-secondary/30 text-muted-foreground hover:border-primary/30 hover:text-foreground",
                 )}
               >
                 {s}
@@ -152,7 +132,7 @@ function ButtonTab({ username }: ButtonTabProps) {
         <div>
           <label className="mb-2 block text-xs font-medium text-muted-foreground">Theme</label>
           <div className="flex gap-3">
-            {(Object.entries(THEMES) as [ButtonTheme, typeof THEMES[ButtonTheme]][]).map(([key, t]) => (
+            {(Object.entries(THEMES) as [ButtonTheme, (typeof THEMES)[ButtonTheme]][]).map(([key, t]) => (
               <button
                 key={key}
                 onClick={() => setTheme(key)}
@@ -160,14 +140,11 @@ function ButtonTab({ username }: ButtonTabProps) {
                   "flex items-center gap-2 rounded-lg border px-3 py-2 text-xs font-medium transition-colors",
                   theme === key
                     ? "border-primary bg-primary/10 text-primary"
-                    : "border-border bg-secondary/30 text-muted-foreground hover:border-primary/30 hover:text-foreground"
+                    : "border-border bg-secondary/30 text-muted-foreground hover:border-primary/30 hover:text-foreground",
                 )}
               >
                 <span
-                  className={cn(
-                    "inline-block h-4 w-4 rounded-full border",
-                    key === "light" ? "border-neutral-300" : "border-transparent"
-                  )}
+                  className={cn("inline-block h-4 w-4 rounded-full border", key === "light" ? "border-neutral-300" : "border-transparent")}
                   style={{ backgroundColor: t.swatch }}
                 />
                 {t.label}
@@ -200,7 +177,7 @@ function ButtonTab({ username }: ButtonTabProps) {
                   "rounded-lg border px-4 py-2 text-xs font-medium transition-colors",
                   size === s
                     ? "border-primary bg-primary/10 text-primary"
-                    : "border-border bg-secondary/30 text-muted-foreground hover:border-primary/30 hover:text-foreground"
+                    : "border-border bg-secondary/30 text-muted-foreground hover:border-primary/30 hover:text-foreground",
                 )}
               >
                 {SIZES[s].label}
@@ -283,7 +260,7 @@ function BadgeTab({ username }: BadgeTabProps) {
               "flex-1 rounded-lg border px-3 py-2.5 text-xs font-medium transition-colors",
               mode === "simple"
                 ? "border-primary bg-primary/10 text-primary"
-                : "border-border bg-secondary/30 text-muted-foreground hover:border-primary/30 hover:text-foreground"
+                : "border-border bg-secondary/30 text-muted-foreground hover:border-primary/30 hover:text-foreground",
             )}
           >
             <span className="block font-semibold">Simple</span>
@@ -295,7 +272,7 @@ function BadgeTab({ username }: BadgeTabProps) {
               "flex-1 rounded-lg border px-3 py-2.5 text-xs font-medium transition-colors",
               mode === "rich"
                 ? "border-primary bg-primary/10 text-primary"
-                : "border-border bg-secondary/30 text-muted-foreground hover:border-primary/30 hover:text-foreground"
+                : "border-border bg-secondary/30 text-muted-foreground hover:border-primary/30 hover:text-foreground",
             )}
           >
             <span className="block font-semibold">Rich Card</span>
@@ -319,7 +296,7 @@ function BadgeTab({ username }: BadgeTabProps) {
                     "rounded-lg border px-3 py-2.5 text-xs font-medium transition-colors",
                     style === s.value
                       ? "border-primary bg-primary/10 text-primary"
-                      : "border-border bg-secondary/30 text-muted-foreground hover:border-primary/30 hover:text-foreground"
+                      : "border-border bg-secondary/30 text-muted-foreground hover:border-primary/30 hover:text-foreground",
                   )}
                 >
                   {s.label}
@@ -337,9 +314,7 @@ function BadgeTab({ username }: BadgeTabProps) {
                 style={{ backgroundColor: /^[0-9a-fA-F]{3,8}$/.test(color) ? `#${color}` : "#2dd4a8" }}
               />
               <div className="relative flex-1">
-                <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
-                  #
-                </span>
+                <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">#</span>
                 <input
                   type="text"
                   value={color}
@@ -399,7 +374,7 @@ function BadgeTab({ username }: BadgeTabProps) {
                 "rounded-lg border px-4 py-2 text-xs font-medium capitalize transition-colors",
                 format === f
                   ? "border-primary bg-primary/10 text-primary"
-                  : "border-border bg-secondary/30 text-muted-foreground hover:border-primary/30 hover:text-foreground"
+                  : "border-border bg-secondary/30 text-muted-foreground hover:border-primary/30 hover:text-foreground",
               )}
             >
               {f === "markdown" ? "Markdown" : "HTML"}
@@ -411,12 +386,14 @@ function BadgeTab({ username }: BadgeTabProps) {
       {/* Preview */}
       <div>
         <label className="mb-2 block text-xs font-medium text-muted-foreground">Preview</label>
-        <div className={cn(
-          "flex items-center justify-center rounded-lg border border-dashed border-border",
-          mode === "simple"
-            ? "min-h-[80px] bg-[repeating-conic-gradient(hsl(var(--muted))_0%_25%,transparent_0%_50%)] bg-[length:16px_16px]"
-            : "min-h-[120px] bg-secondary/20 p-4"
-        )}>
+        <div
+          className={cn(
+            "flex items-center justify-center rounded-lg border border-dashed border-border",
+            mode === "simple"
+              ? "min-h-[80px] bg-[repeating-conic-gradient(hsl(var(--muted))_0%_25%,transparent_0%_50%)] bg-[length:16px_16px]"
+              : "min-h-[120px] bg-secondary/20 p-4",
+          )}
+        >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             key={previewKey}
@@ -484,14 +461,11 @@ function WidgetTab({ username }: WidgetTabProps) {
                   "flex items-center gap-2 rounded-lg border px-3 py-2 text-xs font-medium capitalize transition-colors",
                   theme === t
                     ? "border-primary bg-primary/10 text-primary"
-                    : "border-border bg-secondary/30 text-muted-foreground hover:border-primary/30 hover:text-foreground"
+                    : "border-border bg-secondary/30 text-muted-foreground hover:border-primary/30 hover:text-foreground",
                 )}
               >
                 <span
-                  className={cn(
-                    "inline-block h-4 w-4 rounded-full border",
-                    t === "light" ? "border-neutral-300" : "border-transparent"
-                  )}
+                  className={cn("inline-block h-4 w-4 rounded-full border", t === "light" ? "border-neutral-300" : "border-transparent")}
                   style={{ backgroundColor: t === "dark" ? "#0a0a0a" : "#fafafa" }}
                 />
                 {t === "dark" ? "Dark" : "Light"}
@@ -512,7 +486,7 @@ function WidgetTab({ username }: WidgetTabProps) {
                   "rounded-lg border px-4 py-2 text-xs font-medium transition-colors",
                   asset === a
                     ? "border-primary bg-primary/10 text-primary"
-                    : "border-border bg-secondary/30 text-muted-foreground hover:border-primary/30 hover:text-foreground"
+                    : "border-border bg-secondary/30 text-muted-foreground hover:border-primary/30 hover:text-foreground",
                 )}
               >
                 {a}
@@ -596,9 +570,7 @@ export function EmbedGenerator({ username }: EmbedGeneratorProps) {
     <div className="rounded-xl border border-border bg-card p-5">
       <div className="mb-4">
         <h3 className="text-sm font-semibold text-foreground">Embed on Your Site</h3>
-        <p className="mt-0.5 text-xs text-muted-foreground">
-          Add a donation button, widget, or badge to your website or README
-        </p>
+        <p className="mt-0.5 text-xs text-muted-foreground">Add a donation button, widget, or badge to your website or README</p>
       </div>
 
       <Tabs defaultValue="button">
