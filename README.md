@@ -157,7 +157,7 @@ providers/
 
 ## License
 
-Private.
+Private
 
 
 ## Buy us a coffee!
