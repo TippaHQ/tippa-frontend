@@ -16,6 +16,7 @@ import { useWallet } from "@/providers/wallet-provider"
 import { useUserStore } from "@/lib/store/user-store"
 import { getInitials, getWalletShort } from "@/lib/utils"
 import { AppLogo } from "@/components/shared/app-logo"
+import { ThemeToggle } from "@/components/theme-toggle"
 
 type Step = "form" | "submitting" | "success"
 
@@ -126,15 +127,18 @@ export function DonateForm({ profile, dependencies }: DonateFormProps) {
       </div>
 
       {/* Top bar */}
-      <header className="relative flex items-center justify-between px-6 py-4">
+      <header className="relative flex items-center justify-between p-4">
         <a href={currentUserProfile ? "/dashboard" : "/"} className="flex items-center gap-2.5">
           <AppLogo />
         </a>
-        {!currentUserProfile && (
-          <Button asChild>
-            <Link href="/">Create Your Tippa</Link>
-          </Button>
-        )}
+        <div className="flex items-center gap-4">
+          <ThemeToggle />
+          {!currentUserProfile && (
+            <Button asChild>
+              <Link href="/">Create Your Tippa</Link>
+            </Button>
+          )}
+        </div>
       </header>
 
       {/* Main content */}
