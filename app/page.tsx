@@ -1,15 +1,11 @@
 "use client"
 
 import Link from "next/link"
-import { useEffect } from "react"
-import { redirect } from "next/navigation"
 import { GitFork, Wallet, Shield, Zap, ArrowRight, Globe, ChevronRight } from "lucide-react"
-import { IS_SIGNUP_ENABLED } from "@/lib/constants/flags"
-import { useUserStore } from "@/lib/store/user-store"
+
 import { Button } from "@/components/ui/button"
-import { ThemeToggle } from "@/components/theme-toggle"
-import { AppLogo } from "@/components/shared/app-logo"
-import { toast } from "sonner"
+import { MainHeader } from "@/components/main-header"
+import { MainFooter } from "@/components/main-footer"
 
 const features = [
   {
@@ -52,69 +48,11 @@ const steps = [
   },
 ]
 
-function GoDashboardAction() {
-  return (
-    <Button size="sm" className="ml-16 py-0 h-8" onClick={() => redirect("/dashboard")}>
-      Go to Dashboard
-    </Button>
-  )
-}
-
 export default function HomePage() {
-  const isAuthenticated = useUserStore((state) => state.isAuthenticated)
-
-  useEffect(() => {
-    if (isAuthenticated) {
-      toast("Already logged in?", {
-        position: "top-center",
-        action: <GoDashboardAction />,
-      })
-    }
-  }, [isAuthenticated])
-
   return (
     <div className="flex min-h-screen flex-col bg-background">
       {/* Header */}
-      <header className="flex items-center justify-between border-b border-border px-6 py-4">
-        <AppLogo />
-        <nav className="hidden items-center gap-6 md:flex">
-          <a href="#features" className="text-sm text-muted-foreground transition-colors hover:text-foreground">
-            Features
-          </a>
-          <a href="#how-it-works" className="text-sm text-muted-foreground transition-colors hover:text-foreground">
-            How it works
-          </a>
-          <a
-            href="https://stellar.org"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-sm text-muted-foreground transition-colors hover:text-foreground"
-          >
-            Stellar Network
-          </a>
-        </nav>
-        <div className="flex items-center gap-2">
-          <ThemeToggle />
-          {isAuthenticated ? (
-            <Link href="/dashboard">
-              <Button size="sm">Dashboard</Button>
-            </Link>
-          ) : (
-            <>
-              <Link href="/auth/login">
-                <Button size="sm" variant="outline">
-                  Login
-                </Button>
-              </Link>
-              {IS_SIGNUP_ENABLED && (
-                <Link href="/auth/sign-up">
-                  <Button size="sm">Sign Up</Button>
-                </Link>
-              )}
-            </>
-          )}
-        </div>
-      </header>
+      <MainHeader />
 
       {/* Hero */}
       <main className="flex flex-1 flex-col items-center justify-center px-6 py-16">
@@ -230,9 +168,7 @@ export default function HomePage() {
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-border px-6 py-6 text-center text-xs text-muted-foreground">
-        Tippa is a non-custodial interface. All signing happens client-side via your Stellar wallet.
-      </footer>
+      <MainFooter />
     </div>
   )
 }
