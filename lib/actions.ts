@@ -302,14 +302,14 @@ export async function uploadImage(file: File, imageType: ImageType, imageName: s
   const inputBuffer = Buffer.from(arrayBuffer)
 
   const { width, height } = IMAGE_PRESETS[imageType]
-  const optimisedBuffer = await sharp(inputBuffer).resize(width, height).webp({ quality: 85 }).toBuffer()
+  const optimisedBuffer = await sharp(inputBuffer).resize(width, height).jpeg({ quality: 80 }).toBuffer()
 
-  const ext = ".webp"
+  const ext = ".jpeg"
   const fileName = `${imageName}${ext}`
 
   const utApi = new UTApi()
   try {
-    const imageToUpload = new File([optimisedBuffer], fileName, { type: "image/webp" })
+    const imageToUpload = new File([optimisedBuffer], fileName, { type: "image/jpeg" })
     const result = await utApi.uploadFiles([imageToUpload], { contentDisposition: "inline" })
     const { error, data } = result[0]
 
