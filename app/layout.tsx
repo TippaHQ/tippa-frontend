@@ -15,8 +15,17 @@ const geistMono = Geist_Mono({
 })
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://trytippa.com"),
   title: "Tippa - Cascading Payments on Stellar",
   description: "Automate the trickle-down of value on the Stellar network. Ensure every contributor in your ecosystem gets funded.",
+  alternates: {
+    canonical: "/",
+  },
+  other: {
+    llms: "/llms.txt",
+    "google-site-verification": "oqpweEUt-mKmcgoG22IETjVemEIQUhR6W7Ishz6lx1I",
+    "msvalidate.01": "D09C65C1EBDFDC8FF8190255D2986C16",
+  },
 }
 
 export const viewport: Viewport = {
