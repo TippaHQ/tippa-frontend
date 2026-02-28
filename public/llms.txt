@@ -47,6 +47,11 @@ Example flow:
 - `/d/[username]` — Public payment page for any registered Tippa user; anyone can send funds here without an account
 - `/auth/login` — Sign in to Tippa
 - `/auth/sign-up` — Create a Tippa account
+- `/waitlist` — Join the waitlist for limited access
+- `/about` — Tippa mission and values
+- `/contact` — Support and community links
+- `/privacy` — Privacy policy for non-custodial use
+- `/terms` — Terms of service
 
 ## Protected Routes (require authentication)
 
