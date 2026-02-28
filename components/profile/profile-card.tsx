@@ -1,5 +1,6 @@
 "use client"
 
+import { useRouter } from "next/navigation"
 import { useState, useTransition } from "react"
 import { Github, Globe, Twitter, Loader2 } from "lucide-react"
 
@@ -11,7 +12,6 @@ import { ImageUpload } from "@/components/shared/image-upload"
 import { ProfileAvatar, ProfileBanner } from "@/components/shared/user-profile"
 
 import { updateProfile, updateAvatar, updateBanner } from "@/lib/actions"
-import { useRouter } from "next/navigation"
 import { getInitials } from "@/lib/utils"
 import type { Profile } from "@/lib/types"
 

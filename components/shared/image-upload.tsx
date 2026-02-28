@@ -7,7 +7,7 @@ interface ImageUploadProps {
   onFileChange: (file: File) => Promise<UpdateImageResponse>
 }
 
-const IMAGE_MAX_SIZE = 5 * 1024 * 1024
+const IMAGE_MAX_SIZE = 4 * 1024 * 1024
 
 export function ImageUpload({ onFileChange }: ImageUploadProps) {
   const [isPending, startTransition] = useTransition()
@@ -17,7 +17,7 @@ export function ImageUpload({ onFileChange }: ImageUploadProps) {
     if (file)
       startTransition(async () => {
         if (file.size > IMAGE_MAX_SIZE) {
-          toast.error("File size must be less than 5MB")
+          toast.error("File size must be less than 4MB")
           return
         }
         const response = await onFileChange(file)
