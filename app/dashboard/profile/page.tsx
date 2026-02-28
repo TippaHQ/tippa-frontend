@@ -1,5 +1,6 @@
 import { ProfileCard } from "@/components/profile/profile-card"
 import { ProfileLink } from "@/components/profile/profile-link"
+import { EmbedGenerator } from "@/components/profile/embed-generator"
 import { ProfileStats } from "@/components/profile/profile-stats"
 import { ProfileDependencies } from "@/components/profile/profile-dependencies"
 import { getProfile, getProfileAnalytics, getCascadeDependencies } from "@/lib/actions"
@@ -18,6 +19,7 @@ export default async function ProfilePage() {
         <div className="space-y-6 xl:col-span-2">
           <ProfileCard profile={profile} />
           <ProfileLink username={profile?.username ?? null} />
+          {profile?.username && <EmbedGenerator username={profile.username} />}
         </div>
         <div className="space-y-6">
           <ProfileStats analytics={analytics} />

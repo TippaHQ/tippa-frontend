@@ -131,7 +131,7 @@ create table if not exists public.cascade_rules (
   user_id uuid unique not null references public.profiles(id) on delete cascade,
   atomic_execution boolean not null default true,
   min_hop_enabled boolean not null default true,
-  min_hop_amount numeric(12, 2) not null default 0.10,
+  min_hop_amount numeric(12, 2) not null default 0.50,
   auto_cascade boolean not null default true,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()

@@ -1,6 +1,6 @@
 "use client"
 
-import { Shield, Zap, Ban } from "lucide-react"
+import { Zap, Ban } from "lucide-react"
 import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
@@ -20,9 +20,12 @@ export function CascadeRules({ rules }: CascadeRulesProps) {
     router.refresh()
   }
 
-  const handleMinAmount = async (value: string) => {
-    const num = parseFloat(value)
-    if (!isNaN(num)) {
+  const handleMinAmount = async (e: React.FocusEvent<HTMLInputElement>) => {
+    const num = parseFloat(e.target.value)
+    if (isNaN(num) || num < 0.5) {
+      e.target.value = "0.50"
+      await updateCascadeRules({ min_hop_amount: 0.5 })
+    } else {
       await updateCascadeRules({ min_hop_amount: num })
     }
   }
@@ -33,23 +36,6 @@ export function CascadeRules({ rules }: CascadeRulesProps) {
       <p className="mt-0.5 text-xs text-muted-foreground">Fine-tune how payments are processed</p>
 
       <div className="mt-4 space-y-4">
-        <div className="flex items-start gap-3 rounded-lg border border-border bg-secondary/20 p-3">
-          <Shield className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
-          <div className="flex-1">
-            <div className="flex items-center justify-between">
-              <Label className="text-sm font-medium text-foreground">Atomic Execution</Label>
-              <Switch
-                defaultChecked={rules?.atomic_execution ?? true}
-                onCheckedChange={(checked) => handleToggle("atomic_execution", checked)}
-                className="data-[state=checked]:bg-primary"
-              />
-            </div>
-            <p className="mt-1 text-xs text-muted-foreground">
-              All-or-nothing: everyone gets paid or no one does. Uses Stellar multi-op transactions.
-            </p>
-          </div>
-        </div>
-
         <div className="flex items-start gap-3 rounded-lg border border-border bg-secondary/20 p-3">
           <Ban className="mt-0.5 h-4 w-4 shrink-0 text-[hsl(var(--warning))]" />
           <div className="flex-1">
@@ -63,10 +49,13 @@ export function CascadeRules({ rules }: CascadeRulesProps) {
             </div>
             <p className="mt-1 text-xs text-muted-foreground">Skip forwarding when the cascaded amount is too small to be meaningful.</p>
             <div className="mt-2">
-              <Label className="mb-1 text-xs text-muted-foreground">Min amount</Label>
+              <Label className="mb-1 text-xs text-muted-foreground">Min amount (0.5 minimum)</Label>
               <Input
-                defaultValue={rules?.min_hop_amount?.toString() ?? "0.10"}
-                onBlur={(e) => handleMinAmount(e.target.value)}
+                type="number"
+                min={0.5}
+                step={0.1}
+                defaultValue={rules?.min_hop_amount?.toString() ?? "0.50"}
+                onBlur={handleMinAmount}
                 className="h-8 w-28 border-border bg-secondary/50 text-sm text-foreground focus-visible:ring-primary"
               />
             </div>

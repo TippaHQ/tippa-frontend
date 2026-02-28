@@ -7,6 +7,7 @@ import { TESTNET_ASSETS } from "@/lib/constants/assets"
 const MAX_ATTEMPTS = 3
 const MAX_DEPTH = 10
 const ASSET_DECIMALS = 7
+const MINIMUM_HOP_THRESHOLD = 0.5 // absolute floor in human-readable units
 
 export interface ProcessResults {
   processed: number
@@ -54,6 +55,18 @@ export async function processDistributionQueue(): Promise<ProcessResults> {
         publicKey: keypair.publicKey(),
       })
 
+      // Look up user's configured min hop threshold
+      const floorStroops = BigInt(Math.round(MINIMUM_HOP_THRESHOLD * 10 ** ASSET_DECIMALS))
+      let minDistribution = floorStroops
+      const { data: profile } = await adminClient.from("profiles").select("id").eq("username", item.username).single()
+      if (profile) {
+        const { data: rules } = await adminClient.from("cascade_rules").select("min_hop_enabled, min_hop_amount").eq("user_id", profile.id).single()
+        if (rules?.min_hop_enabled && rules.min_hop_amount != null) {
+          const userStroops = BigInt(Math.round(Math.max(rules.min_hop_amount, MINIMUM_HOP_THRESHOLD) * 10 ** ASSET_DECIMALS))
+          minDistribution = userStroops > floorStroops ? userStroops : floorStroops
+        }
+      }
+
       // Read pool amount BEFORE distributing (for transaction recording)
       let poolAmount: bigint = BigInt(0)
       try {
@@ -70,7 +83,7 @@ export async function processDistributionQueue(): Promise<ProcessResults> {
       const assembled = await client.distribute({
         username: item.username,
         asset: item.asset_contract_id,
-        min_distribution: BigInt(0),
+        min_distribution: minDistribution,
       })
 
       // Sign server-side
