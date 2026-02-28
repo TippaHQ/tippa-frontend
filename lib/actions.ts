@@ -348,6 +348,22 @@ export async function updateAvatar(file: File, username: string): Promise<Update
   return { error: null }
 }
 
+export async function updateBanner(file: File, username: string): Promise<UpdateImageResponse> {
+  const user = await getCurrentUser()
+  if (!user) return { error: "Not authenticated" }
+
+  const profile = await getProfile()
+  if (profile?.username !== username) return { error: "Not authorized" }
+
+  const imageName = `${username}-profile-banner`
+  const { url, error } = await uploadImage(file, "banner", imageName)
+  if (error) return { error: error.message }
+
+  const { error: updateError } = await updateProfile({ banner_url: url })
+  if (updateError) return { error: updateError }
+  return { error: null }
+}
+
 // ────────────────────────────────────────────────────────────
 // Waitlist
 // ────────────────────────────────────────────────────────────
