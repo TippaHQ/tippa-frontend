@@ -157,4 +157,4 @@ providers/
 
 ## License
 
-Private
+Private.
