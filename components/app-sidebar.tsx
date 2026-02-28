@@ -18,6 +18,7 @@ import {
   SidebarSeparator,
 } from "@/components/ui/sidebar"
 import { UserProfileButton } from "@/components/shared/user-button"
+import { AppLogo } from "@/components/shared/app-logo"
 
 const mainNav = [
   { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
@@ -44,10 +45,7 @@ export function AppSidebar() {
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild tooltip="Tippa">
               <Link href="/">
-                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary">
-                  <GitFork className="h-4 w-4 text-primary-foreground" />
-                </div>
-                <span className="text-base font-semibold tracking-tight">Tippa</span>
+                <AppLogo />
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>

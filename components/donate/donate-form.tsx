@@ -15,6 +15,7 @@ import type { Profile, CascadeDependency } from "@/lib/types"
 import { useWallet } from "@/providers/wallet-provider"
 import { useUserStore } from "@/lib/store/user-store"
 import { getInitials, getWalletShort } from "@/lib/utils"
+import { AppLogo } from "@/components/shared/app-logo"
 
 type Step = "form" | "submitting" | "success"
 
@@ -127,10 +128,7 @@ export function DonateForm({ profile, dependencies }: DonateFormProps) {
       {/* Top bar */}
       <header className="relative flex items-center justify-between px-6 py-4">
         <a href={currentUserProfile ? "/dashboard" : "/"} className="flex items-center gap-2.5">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
-            <GitFork className="h-4 w-4 text-primary-foreground" />
-          </div>
-          <span className="text-sm font-semibold tracking-tight text-foreground">Tippa</span>
+          <AppLogo />
         </a>
         {!currentUserProfile && (
           <Button asChild>
