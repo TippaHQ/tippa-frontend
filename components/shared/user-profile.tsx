@@ -20,8 +20,8 @@ export function ProfileAvatar({ initials, avatarUrl, variant = "default", childr
   const choosedVariant = avatarVariants[variant as keyof typeof avatarVariants] || avatarVariants.default
 
   return (
-    <Avatar className={cn("group relative border-card", choosedVariant)}>
-      <AvatarImage src={avatarUrl} asChild>
+    <Avatar className={cn("group border-card", choosedVariant)}>
+      <AvatarImage src={avatarUrl ?? undefined} asChild>
         <Image width={100} height={100} src={avatarUrl!} alt={`Profile image of ${initials}`} />
       </AvatarImage>
       <AvatarFallback className="bg-primary/20 text-xl font-semibold text-primary">{initials}</AvatarFallback>
