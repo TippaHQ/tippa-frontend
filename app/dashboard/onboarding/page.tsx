@@ -8,6 +8,7 @@ import { GitFork, Loader2, CheckCircle2, Wallet, ArrowRight, User, AlertCircle }
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { AppLogo } from "@/components/shared/app-logo"
 
 type Step = "username" | "wallet" | "register" | "success"
 
@@ -146,9 +147,7 @@ export default function OnboardingPage() {
       <div className="relative w-full max-w-md space-y-8">
         {/* Header */}
         <div className="flex flex-col items-center gap-3">
-          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary">
-            <GitFork className="h-6 w-6 text-primary-foreground" />
-          </div>
+          <AppLogo hideTitle size="lg" />
           <h1 className="text-2xl font-semibold tracking-tight text-foreground">{step === "success" ? "You're all set!" : "Set up your account"}</h1>
           {step !== "success" && <p className="text-sm text-muted-foreground">Choose a username and connect your wallet to get started.</p>}
         </div>

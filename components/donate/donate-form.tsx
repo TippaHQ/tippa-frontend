@@ -15,6 +15,8 @@ import type { Profile, CascadeDependency } from "@/lib/types"
 import { useWallet } from "@/providers/wallet-provider"
 import { useUserStore } from "@/lib/store/user-store"
 import { getInitials, getWalletShort } from "@/lib/utils"
+import { AppLogo } from "@/components/shared/app-logo"
+import { ThemeToggle } from "@/components/theme-toggle"
 
 type Step = "form" | "submitting" | "success"
 
@@ -120,23 +122,24 @@ export function DonateForm({ profile, dependencies }: DonateFormProps) {
     <div className="relative min-h-screen overflow-hidden bg-background">
       {/* Atmospheric background */}
       <div className="pointer-events-none absolute inset-0">
-        <div className="absolute left-1/2 top-0 h-[700px] w-[900px] -translate-x-1/2 -translate-y-1/4 rounded-full bg-primary/[0.05] blur-[150px]" />
-        <div className="absolute bottom-0 left-0 h-[400px] w-[600px] -translate-x-1/4 translate-y-1/4 rounded-full bg-[hsl(200_70%_50%/0.03)] blur-[120px]" />
+        <div className="absolute left-1/2 top-0 h-[1200px] w-[1200px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#15C19F]/10 blur-[100px]" />
+        <div className="absolute left-0 bottom-0 h-[600px] w-[600px] -translate-x-1/2 translate-y-1/2 rounded-full bg-[#15C19F]/10 blur-[100px]" />
+        <div className="absolute right-0 bottom-0 h-[600px] w-[600px] translate-x-1/2 translate-y-1/2 rounded-full bg-[#15C19F]/10 blur-[100px]" />
       </div>
 
       {/* Top bar */}
-      <header className="relative flex items-center justify-between px-6 py-4">
+      <header className="relative flex items-center justify-between p-4">
         <a href={currentUserProfile ? "/dashboard" : "/"} className="flex items-center gap-2.5">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
-            <GitFork className="h-4 w-4 text-primary-foreground" />
-          </div>
-          <span className="text-sm font-semibold tracking-tight text-foreground">Tippa</span>
+          <AppLogo />
         </a>
-        {!currentUserProfile && (
-          <Button asChild>
-            <Link href="/">Create Your Tippa</Link>
-          </Button>
-        )}
+        <div className="flex items-center gap-4">
+          <ThemeToggle />
+          {!currentUserProfile && (
+            <Button asChild>
+              <Link href="/">Create Your Tippa</Link>
+            </Button>
+          )}
+        </div>
       </header>
 
       {/* Main content */}

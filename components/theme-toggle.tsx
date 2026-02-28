@@ -5,6 +5,8 @@ import { useEffect, useState } from "react"
 import { Sun, Moon } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
+const iconStyles = "group-hover:text-primary transition-colors"
+
 export function ThemeToggle() {
   const { resolvedTheme, setTheme } = useTheme()
   const [mounted, setMounted] = useState(false)
@@ -13,18 +15,32 @@ export function ThemeToggle() {
 
   if (!mounted) {
     return (
-      <Button variant="ghost" size="icon" className="h-9 w-9 text-muted-foreground">
-        <Moon className="h-[18px] w-[18px]" />
+      <Button variant="ghost" size="icon" className="group h-9 w-9 hover:bg-primary/10 dark:hover:bg-primary/30">
+        <Moon className={iconStyles} />
         <span className="sr-only">Toggle theme</span>
       </Button>
     )
   }
 
-  const toggle = () => setTheme(resolvedTheme === "dark" ? "light" : "dark")
+  function toggleTheme() {
+    const isAppearanceTransition =
+      // @ts-expect-error - document.startViewTransition is not yet in the official TS types
+      document.startViewTransition !== undefined && !window.matchMedia("(prefers-reduced-motion: reduce)").matches
+
+    if (!isAppearanceTransition) {
+      setTheme(resolvedTheme === "dark" ? "light" : "dark")
+      return
+    }
+
+    // @ts-expect-error - document.startViewTransition is not yet in the official TS types
+    document.startViewTransition(async () => {
+      setTheme(resolvedTheme === "dark" ? "light" : "dark")
+    })
+  }
 
   return (
-    <Button variant="ghost" size="icon" onClick={toggle} className="h-9 w-9 text-muted-foreground hover:text-foreground">
-      {resolvedTheme === "dark" ? <Moon className="h-[18px] w-[18px]" /> : <Sun className="h-[18px] w-[18px]" />}
+    <Button variant="ghost" size="icon" onClick={toggleTheme} className="group h-9 w-9 hover:bg-primary/10 dark:hover:bg-primary/30">
+      {resolvedTheme === "dark" ? <Moon className={iconStyles} /> : <Sun className={iconStyles} />}
       <span className="sr-only">Toggle theme</span>
     </Button>
   )

@@ -24,7 +24,7 @@
     --muted-foreground: 220 10% 46%;
     --accent: 168 80% 42%;
     --accent-foreground: 0 0% 100%;
-    --destructive: 0 72% 51%;
+    --destructive: 0 80% 60%;
     --destructive-foreground: 0 0% 100%;
     --border: 220 13% 87%;
     --input: 220 13% 87%;
@@ -35,18 +35,36 @@
     --chart-4: 280 65% 55%;
     --chart-5: 340 75% 50%;
     --radius: 0.625rem;
-    --sidebar-background: 220 18% 95%;
-    --sidebar-foreground: 230 15% 20%;
-    --sidebar-primary: 168 80% 42%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 220 14% 90%;
-    --sidebar-accent-foreground: 230 15% 20%;
-    --sidebar-border: 220 13% 87%;
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-primary: 240 5.9% 10%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 240 4.8% 95.9%;
+    --sidebar-accent-foreground: 240 5.9% 10%;
+    --sidebar-border: 220 13% 91%;
     --sidebar-ring: 168 80% 42%;
     --success: 150 70% 38%;
     --success-foreground: 0 0% 100%;
     --warning: 45 90% 48%;
     --warning-foreground: 230 15% 12%;
+    --expo-out: linear(
+      0 0%,
+      0.1684 2.66%,
+      0.3165 5.49%,
+      0.446 8.52%,
+      0.5581 11.78%,
+      0.6535 15.29%,
+      0.7341 19.11%,
+      0.8011 23.3%,
+      0.8557 27.93%,
+      0.8962 32.68%,
+      0.9283 38.01%,
+      0.9529 44.08%,
+      0.9711 51.14%,
+      0.9833 59.06%,
+      0.9915 68.74%,
+      1 100%
+    );
   }
 
   .dark {
@@ -64,7 +82,7 @@
     --muted-foreground: 215 15% 55%;
     --accent: 168 80% 50%;
     --accent-foreground: 230 15% 8%;
-    --destructive: 0 72% 51%;
+    --destructive: 0 100% 70%;
     --destructive-foreground: 210 20% 95%;
     --border: 230 12% 18%;
     --input: 230 12% 18%;
@@ -74,13 +92,13 @@
     --chart-3: 45 90% 55%;
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
-    --sidebar-background: 230 15% 6%;
-    --sidebar-foreground: 210 20% 90%;
-    --sidebar-primary: 168 80% 50%;
-    --sidebar-primary-foreground: 230 15% 8%;
-    --sidebar-accent: 230 12% 14%;
-    --sidebar-accent-foreground: 210 20% 90%;
-    --sidebar-border: 230 12% 16%;
+    --sidebar-background: 240 5.9% 10%;
+    --sidebar-foreground: 240 4.8% 95.9%;
+    --sidebar-primary: 224.3 76.3% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent-foreground: 240 4.8% 95.9%;
+    --sidebar-border: 240 3.7% 15.9%;
     --sidebar-ring: 168 80% 50%;
     --success: 150 70% 45%;
     --success-foreground: 210 20% 95%;
@@ -93,7 +111,41 @@
   * {
     @apply border-border;
   }
+
   body {
     @apply bg-background text-foreground;
+  }
+
+  /* Apply focus outline to all focusable anchors that dont have already have a ring */
+  a:not(.ring-sidebar-ring):focus-visible {
+    outline: 2px dashed hsl(var(--sidebar-ring));
+    outline-offset: 3px;
+  }
+}
+
+::view-transition-group(root) {
+  animation-timing-function: var(--expo-out);
+}
+
+::view-transition-new(root) {
+  mask: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40"><defs><filter id="blur"><feGaussianBlur stdDeviation="2"/></filter></defs><circle cx="0" cy="0" r="18" fill="white" filter="url(%23blur)"/></svg>')
+    top left / 0 no-repeat;
+  mask-origin: content-box;
+  animation: scale 0.5s;
+  animation-fill-mode: both;
+  transform-origin: top left;
+}
+
+::view-transition-old(root),
+.dark::view-transition-old(root) {
+  animation: scale 0.5s;
+  animation-fill-mode: both;
+  transform-origin: top left;
+  z-index: -1;
+}
+
+@keyframes scale {
+  to {
+    mask-size: 350vmax;
   }
 }

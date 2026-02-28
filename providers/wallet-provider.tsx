@@ -1,9 +1,9 @@
 "use client"
 
-import { createContext, useContext, useState, useCallback, useEffect, type ReactNode } from "react"
+import { createContext, useContext, useCallback, useEffect, type ReactNode } from "react"
 import { WalletNetwork } from "@creit.tech/stellar-wallets-kit"
+import { useLocalStorage } from "@/hooks/use-storage"
 import { getKit } from "@/lib/stellar-kit"
-import { useUserStore } from "@/lib/store/user-store"
 
 type WalletContextType = {
   walletAddress: string | null
@@ -17,45 +17,30 @@ type WalletContextType = {
 const WalletContext = createContext<WalletContextType | undefined>(undefined)
 
 export function WalletProvider({ children }: { children: ReactNode }) {
-  const [walletAddress, setWalletAddress] = useState<string | null>(null)
-  const [walletName, setWalletName] = useState<string | null>(null)
-  const [autoConnected, setAutoConnected] = useState(false)
-
-  const profile = useUserStore((state) => state.profile)
-  const isLoading = useUserStore((state) => state.isLoading)
-
+  const [walletAddress, setWalletAddress] = useLocalStorage<string | null>("tippaWalletAddress", null)
+  const [walletName, setWalletName] = useLocalStorage<string | null>("tippaWalletName", null)
+  const [hasAutoConnect, setHasAutoConnect] = useLocalStorage<boolean>("tippaHasAutoConnectWallet", false)
   const isConnected = Boolean(walletAddress)
 
-  const autoConnect = useCallback(async (address: string) => {
+  const autoConnect = useCallback(async () => {
     try {
       const kit = getKit()
-      const allWallets = await kit.getSupportedWallets()
+      if (walletName) kit.setWallet(walletName)
+      else return
 
-      for (const wallet of allWallets) {
-        try {
-          kit.setWallet(wallet.id)
-          const walletAddress = await kit.getAddress()
-          if (walletAddress.address === address) {
-            setWalletAddress(walletAddress.address)
-            setWalletName(wallet.name)
-            setAutoConnected(true)
-            return true
-          }
-        } catch {
-          continue
-        }
+      if (!walletAddress) {
+        const { address } = await kit.getAddress()
+        setWalletAddress(address)
       }
     } catch (error) {
       console.warn("Auto-connect failed:", error)
+      setHasAutoConnect(false)
     }
-    return false
   }, [])
 
   useEffect(() => {
-    if (!isLoading && profile?.wallet_address && !autoConnected && !walletAddress) {
-      autoConnect(profile.wallet_address)
-    }
-  }, [isLoading, profile?.wallet_address, autoConnected, walletAddress, autoConnect])
+    if (hasAutoConnect) autoConnect()
+  }, [])
 
   const connectWallet = useCallback(async () => {
     const kit = getKit()
@@ -65,8 +50,8 @@ export function WalletProvider({ children }: { children: ReactNode }) {
         const { address } = await kit.getAddress()
 
         setWalletAddress(address)
-        setWalletName(option.name)
-        setAutoConnected(true)
+        setWalletName(option.id)
+        setHasAutoConnect(true)
       },
     })
   }, [])
@@ -74,7 +59,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
   const disconnectWallet = useCallback(() => {
     setWalletAddress(null)
     setWalletName(null)
-    setAutoConnected(false)
+    setHasAutoConnect(false)
   }, [])
 
   const signTransaction = useCallback(async (xdr: string, address?: string): Promise<string> => {

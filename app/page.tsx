@@ -4,8 +4,11 @@ import Link from "next/link"
 import { useEffect } from "react"
 import { redirect } from "next/navigation"
 import { GitFork, Wallet, Shield, Zap, ArrowRight, Globe, ChevronRight } from "lucide-react"
+import { IS_SIGNUP_ENABLED } from "@/lib/constants/flags"
 import { useUserStore } from "@/lib/store/user-store"
 import { Button } from "@/components/ui/button"
+import { ThemeToggle } from "@/components/theme-toggle"
+import { AppLogo } from "@/components/shared/app-logo"
 import { toast } from "sonner"
 
 const features = [
@@ -73,12 +76,7 @@ export default function HomePage() {
     <div className="flex min-h-screen flex-col bg-background">
       {/* Header */}
       <header className="flex items-center justify-between border-b border-border px-6 py-4">
-        <div className="flex items-center gap-3">
-          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary">
-            <GitFork className="h-5 w-5 text-primary-foreground" />
-          </div>
-          <span className="text-lg font-semibold tracking-tight text-foreground">Tippa</span>
-        </div>
+        <AppLogo />
         <nav className="hidden items-center gap-6 md:flex">
           <a href="#features" className="text-sm text-muted-foreground transition-colors hover:text-foreground">
             Features
@@ -95,7 +93,8 @@ export default function HomePage() {
             Stellar Network
           </a>
         </nav>
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2">
+          <ThemeToggle />
           {isAuthenticated ? (
             <Link href="/dashboard">
               <Button size="sm">Dashboard</Button>
@@ -107,9 +106,11 @@ export default function HomePage() {
                   Login
                 </Button>
               </Link>
-              <Link href="/auth/sign-up">
-                <Button size="sm">Sign Up</Button>
-              </Link>
+              {IS_SIGNUP_ENABLED && (
+                <Link href="/auth/sign-up">
+                  <Button size="sm">Sign Up</Button>
+                </Link>
+              )}
             </>
           )}
         </div>
