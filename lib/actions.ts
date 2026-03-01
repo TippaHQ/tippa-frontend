@@ -454,3 +454,43 @@ export async function getWaitlistCount(): Promise<number> {
   const { count } = await supabase.from("waitlist").select("*", { count: "exact", head: true }).eq("status", "pending")
   return count ?? 0
 }
+
+// ────────────────────────────────────────────────────────────
+// Donations
+// ────────────────────────────────────────────────────────────
+
+export interface Donation {
+  id: string
+  donor_wallet_address: string
+  donor_username: string | null
+  recipient_username: string
+  recipient_profile_id: string | null
+  amount: number
+  asset: string
+  stellar_tx_hash: string | null
+  created_at: string
+}
+
+export async function getDonationById(donationId: string): Promise<Donation | null> {
+  const supabase = await createClient()
+  const { data } = await supabase.from("donations").select("*").eq("id", donationId).single()
+  return data
+}
+
+export async function getUserDonations(): Promise<{ data: Donation[]; count: number }> {
+  const user = await getCurrentUser()
+  if (!user) return { data: [], count: 0 }
+
+  const supabase = await createClient()
+
+  const { data: profile } = await supabase.from("profiles").select("wallet_address").eq("id", user.id).single()
+  if (!profile) return { data: [], count: 0 }
+
+  const { data, count } = await supabase
+    .from("donations")
+    .select("*", { count: "exact" })
+    .eq("donor_wallet_address", profile.wallet_address)
+    .order("created_at", { ascending: false })
+
+  return { data: data ?? [], count: count ?? 0 }
+}

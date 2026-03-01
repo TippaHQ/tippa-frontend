@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { useState, useEffect } from "react"
-import { GitFork, Loader2, CheckCircle2, ExternalLink, Wallet, ArrowDown, User, Github, Twitter, Globe } from "lucide-react"
+import { GitFork, Loader2, CheckCircle2, ExternalLink, Wallet, ArrowDown, User, Github, Twitter, Globe, Copy, Check } from "lucide-react"
 
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -35,6 +35,8 @@ export function DonateForm({ profile, dependencies }: DonateFormProps) {
   const [donorName, setDonorName] = useState(currentUserProfile?.display_name || "")
   const [error, setError] = useState<string | null>(null)
   const [txHash, setTxHash] = useState<string | null>(null)
+  const [donationId, setDonationId] = useState<string | null>(null)
+  const [copied, setCopied] = useState(false)
 
   const selectedAsset = TESTNET_ASSETS.find((a) => a.id === assetId)!
   const displayName = profile.display_name || profile.username || "Anonymous"
@@ -97,6 +99,7 @@ export function DonateForm({ profile, dependencies }: DonateFormProps) {
       }
 
       setTxHash(submitData.txHash)
+      setDonationId(submitData.donationId || null)
       setStep("success")
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong.")
@@ -109,7 +112,16 @@ export function DonateForm({ profile, dependencies }: DonateFormProps) {
     setAmount("")
     setDonorName("")
     setTxHash(null)
+    setDonationId(null)
     setError(null)
+  }
+
+  async function copyDonationLink() {
+    if (!donationId) return
+    const link = `${window.location.origin}/donation/${donationId}`
+    await navigator.clipboard.writeText(link)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
   }
 
   useEffect(() => {
@@ -382,6 +394,23 @@ export function DonateForm({ profile, dependencies }: DonateFormProps) {
                         View on StellarExpert
                         <ExternalLink className="h-3 w-3" />
                       </a>
+                    )}
+                    {donationId && (
+                      <div className="mt-4 flex flex-col items-center gap-2 rounded-lg border border-border bg-secondary/30 px-4 py-3">
+                        <p className="text-xs text-muted-foreground">Share your impact</p>
+                        <div className="flex items-center gap-2">
+                          <a href={`/donation/${donationId}`} className="text-xs font-medium text-primary hover:underline">
+                            /donation/{donationId.slice(0, 8)}...
+                          </a>
+                          <button
+                            onClick={copyDonationLink}
+                            className="text-muted-foreground transition-colors hover:text-foreground"
+                            title="Copy link"
+                          >
+                            {copied ? <Check className="h-3.5 w-3.5 text-green-500" /> : <Copy className="h-3.5 w-3.5" />}
+                          </button>
+                        </div>
+                      </div>
                     )}
                     <Button
                       variant="outline"

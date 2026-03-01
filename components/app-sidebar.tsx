@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { LayoutDashboard, GitFork, ArrowLeftRight, User, ExternalLink, Settings, HelpCircle, Wallet } from "lucide-react"
+import { LayoutDashboard, GitFork, ArrowLeftRight, User, ExternalLink, Settings, HelpCircle, Wallet, Receipt } from "lucide-react"
 import { useUserStore } from "@/lib/store/user-store"
 import {
   Sidebar,
@@ -25,6 +25,7 @@ const mainNav = [
   { label: "Funds", href: "/dashboard/funds", icon: Wallet },
   { label: "Cascades", href: "/dashboard/cascades", icon: GitFork },
   { label: "Transactions", href: "/dashboard/transactions", icon: ArrowLeftRight },
+  { label: "Donations", href: "/dashboard/donations", icon: Receipt },
   { label: "Profile", href: "/dashboard/profile", icon: User },
 ]
 

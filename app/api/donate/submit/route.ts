@@ -39,12 +39,13 @@ export async function POST(request: Request) {
 
     if (getResponse.status === "SUCCESS") {
       const adminClient = createAdminClient()
+      let donationId: string | null = null
 
       // Record the donate transaction
       if (username && donorAddress && amount && assetId) {
         try {
           // Look up recipient's wallet address
-          const { data: recipientProfile } = await adminClient.from("profiles").select("wallet_address").eq("username", username).single()
+          const { data: recipientProfile } = await adminClient.from("profiles").select("wallet_address, id").eq("username", username).single()
 
           // Look up donor's username (nullable - they may not have a tippa account)
           const { data: donorProfile } = await adminClient.from("profiles").select("username").eq("wallet_address", donorAddress).single()
@@ -60,6 +61,27 @@ export async function POST(request: Request) {
             status: "completed",
             stellar_tx_hash: sendResponse.hash,
           })
+
+          // Create donation record
+          const { data: donationData, error: donationError } = await adminClient
+            .from("donations")
+            .insert({
+              donor_wallet_address: donorAddress,
+              donor_username: donorProfile?.username ?? null,
+              recipient_username: username,
+              recipient_profile_id: recipientProfile?.id ?? null,
+              amount: parseFloat(amount),
+              asset: assetId,
+              stellar_tx_hash: sendResponse.hash,
+            })
+            .select("id")
+            .single()
+
+          if (donationError) {
+            console.error("Failed to create donation:", donationError)
+          } else {
+            donationId = donationData.id
+          }
         } catch (txRecordErr) {
           console.error("Failed to record donate transaction:", txRecordErr)
         }
@@ -88,7 +110,7 @@ export async function POST(request: Request) {
         }
       }
 
-      return NextResponse.json({ success: true, txHash: sendResponse.hash })
+      return NextResponse.json({ success: true, txHash: sendResponse.hash, donationId })
     }
 
     return NextResponse.json({ error: "Transaction failed on-chain." }, { status: 400 })
