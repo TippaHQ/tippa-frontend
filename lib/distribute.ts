@@ -23,144 +23,145 @@ export async function processDistributionQueue(): Promise<ProcessResults> {
   const server = new Server(rpcUrl)
   const keypair = Keypair.fromSecret(process.env.TIPPA_DISTRIBUTOR_SECRET_KEY!)
 
-  // Pick up pending items
-  const { data: items, error: fetchError } = await adminClient
-    .from("distribution_queue")
-    .select("*")
-    .eq("status", "pending")
-    .order("created_at", { ascending: true })
-    .limit(10)
-
-  if (fetchError) {
-    console.error("Failed to fetch distribution queue:", fetchError)
-    throw new Error("Failed to fetch queue.")
-  }
-
-  if (!items || items.length === 0) {
-    return { processed: 0, succeeded: 0, failed: 0, enqueued: 0, skipped: 0 }
-  }
-
   const results: ProcessResults = { processed: 0, succeeded: 0, failed: 0, enqueued: 0, skipped: 0 }
 
-  for (const item of items) {
-    results.processed++
+  // Keep processing until no more pending items remain.
+  // Downstream items enqueued during a batch are picked up in the next iteration.
+  while (true) {
+    const { data: items, error: fetchError } = await adminClient
+      .from("distribution_queue")
+      .select("*")
+      .eq("status", "pending")
+      .order("created_at", { ascending: true })
+      .limit(10)
 
-    // Mark as processing
-    await adminClient.from("distribution_queue").update({ status: "processing" }).eq("id", item.id)
+    if (fetchError) {
+      console.error("Failed to fetch distribution queue:", fetchError)
+      throw new Error("Failed to fetch queue.")
+    }
 
-    try {
-      const client = new Client({
-        ...networks.testnet,
-        rpcUrl,
-        publicKey: keypair.publicKey(),
-      })
+    if (!items || items.length === 0) break
 
-      // Look up user's configured min hop threshold
-      const floorStroops = BigInt(Math.round(MINIMUM_HOP_THRESHOLD * 10 ** ASSET_DECIMALS))
-      let minDistribution = floorStroops
-      const { data: profile } = await adminClient.from("profiles").select("id").eq("username", item.username).single()
-      if (profile) {
-        const { data: rules } = await adminClient.from("cascade_rules").select("min_hop_enabled, min_hop_amount").eq("user_id", profile.id).single()
-        if (rules?.min_hop_enabled && rules.min_hop_amount != null) {
-          const userStroops = BigInt(Math.round(Math.max(rules.min_hop_amount, MINIMUM_HOP_THRESHOLD) * 10 ** ASSET_DECIMALS))
-          minDistribution = userStroops > floorStroops ? userStroops : floorStroops
-        }
-      }
+    for (const item of items) {
+      results.processed++
 
-      // Read pool amount BEFORE distributing (for transaction recording)
-      let poolAmount: bigint = BigInt(0)
+      // Mark as processing
+      await adminClient.from("distribution_queue").update({ status: "processing" }).eq("id", item.id)
+
       try {
-        const poolResult = await client.get_pool({
+        const client = new Client({
+          ...networks.testnet,
+          rpcUrl,
+          publicKey: keypair.publicKey(),
+        })
+
+        // Look up user's configured min hop threshold
+        const floorStroops = BigInt(Math.round(MINIMUM_HOP_THRESHOLD * 10 ** ASSET_DECIMALS))
+        let minDistribution = floorStroops
+        const { data: profile } = await adminClient.from("profiles").select("id").eq("username", item.username).single()
+        if (profile) {
+          const { data: rules } = await adminClient.from("cascade_rules").select("min_hop_enabled, min_hop_amount").eq("user_id", profile.id).single()
+          if (rules?.min_hop_enabled && rules.min_hop_amount != null) {
+            const userStroops = BigInt(Math.round(Math.max(rules.min_hop_amount, MINIMUM_HOP_THRESHOLD) * 10 ** ASSET_DECIMALS))
+            minDistribution = userStroops > floorStroops ? userStroops : floorStroops
+          }
+        }
+
+        // Read pool amount BEFORE distributing (for transaction recording)
+        let poolAmount: bigint = BigInt(0)
+        try {
+          const poolResult = await client.get_pool({
+            username: item.username,
+            asset: item.asset_contract_id,
+          })
+          poolAmount = poolResult.result
+        } catch {
+          // Pool read failed — will still attempt distribute (contract handles NothingToDistribute)
+        }
+
+        // Build distribute tx
+        const assembled = await client.distribute({
           username: item.username,
           asset: item.asset_contract_id,
+          min_distribution: minDistribution,
         })
-        poolAmount = poolResult.result
-      } catch {
-        // Pool read failed — will still attempt distribute (contract handles NothingToDistribute)
-      }
 
-      // Build distribute tx
-      const assembled = await client.distribute({
-        username: item.username,
-        asset: item.asset_contract_id,
-        min_distribution: minDistribution,
-      })
+        // Sign server-side
+        const xdr = assembled.toXDR()
+        const tx = TransactionBuilder.fromXDR(xdr, Networks.TESTNET)
+        tx.sign(keypair)
 
-      // Sign server-side
-      const xdr = assembled.toXDR()
-      const tx = TransactionBuilder.fromXDR(xdr, Networks.TESTNET)
-      tx.sign(keypair)
+        // Submit
+        const sendResponse = await server.sendTransaction(tx)
 
-      // Submit
-      const sendResponse = await server.sendTransaction(tx)
+        if (sendResponse.status === "ERROR") {
+          throw new Error("Transaction submission failed")
+        }
 
-      if (sendResponse.status === "ERROR") {
-        throw new Error("Transaction submission failed")
-      }
+        // Poll for result
+        let getResponse = await server.getTransaction(sendResponse.hash)
+        while (getResponse.status === "NOT_FOUND") {
+          await new Promise((resolve) => setTimeout(resolve, 1000))
+          getResponse = await server.getTransaction(sendResponse.hash)
+        }
 
-      // Poll for result
-      let getResponse = await server.getTransaction(sendResponse.hash)
-      while (getResponse.status === "NOT_FOUND") {
-        await new Promise((resolve) => setTimeout(resolve, 1000))
-        getResponse = await server.getTransaction(sendResponse.hash)
-      }
+        if (getResponse.status !== "SUCCESS") {
+          throw new Error("Transaction failed on-chain")
+        }
 
-      if (getResponse.status !== "SUCCESS") {
-        throw new Error("Transaction failed on-chain")
-      }
-
-      // Mark completed
-      await adminClient
-        .from("distribution_queue")
-        .update({
-          status: "completed",
-          tx_hash: sendResponse.hash,
-          processed_at: new Date().toISOString(),
-        })
-        .eq("id", item.id)
-
-      results.succeeded++
-
-      // Record distribute transactions per recipient
-      if (poolAmount > BigInt(0)) {
-        await recordDistributeTransactions(adminClient, item.username, item.asset_contract_id, poolAmount, sendResponse.hash)
-      }
-
-      // Enqueue downstream recipients if depth allows
-      if (item.depth < MAX_DEPTH) {
-        await enqueueDownstream(adminClient, item.username, item.asset_contract_id, item.depth, item.source_tx, results)
-      }
-    } catch (err) {
-      const errMsg = String(err)
-
-      // NothingToDistribute or RulesNotSet — not errors, just nothing to do
-      if (errMsg.includes("#7") || errMsg.includes("#11")) {
+        // Mark completed
         await adminClient
           .from("distribution_queue")
           .update({
             status: "completed",
-            error: errMsg.includes("#7") ? "NothingToDistribute" : "RulesNotSet",
+            tx_hash: sendResponse.hash,
             processed_at: new Date().toISOString(),
           })
           .eq("id", item.id)
 
-        results.skipped++
-        continue
+        results.succeeded++
+
+        // Record distribute transactions per recipient
+        if (poolAmount > BigInt(0)) {
+          await recordDistributeTransactions(adminClient, item.username, item.asset_contract_id, poolAmount, sendResponse.hash)
+        }
+
+        // Enqueue downstream recipients if depth allows
+        if (item.depth < MAX_DEPTH) {
+          await enqueueDownstream(adminClient, item.username, item.asset_contract_id, item.depth, item.source_tx, results)
+        }
+      } catch (err) {
+        const errMsg = String(err)
+
+        // NothingToDistribute or RulesNotSet — not errors, just nothing to do
+        if (errMsg.includes("#7") || errMsg.includes("#11")) {
+          await adminClient
+            .from("distribution_queue")
+            .update({
+              status: "completed",
+              error: errMsg.includes("#7") ? "NothingToDistribute" : "RulesNotSet",
+              processed_at: new Date().toISOString(),
+            })
+            .eq("id", item.id)
+
+          results.skipped++
+          continue
+        }
+
+        // Real error — retry or fail permanently
+        const newAttempts = (item.attempts || 0) + 1
+        await adminClient
+          .from("distribution_queue")
+          .update({
+            status: newAttempts >= MAX_ATTEMPTS ? "failed" : "pending",
+            attempts: newAttempts,
+            error: errMsg.slice(0, 500),
+          })
+          .eq("id", item.id)
+
+        results.failed++
+        console.error(`Distribution failed for ${item.username}:`, err)
       }
-
-      // Real error — retry or fail permanently
-      const newAttempts = (item.attempts || 0) + 1
-      await adminClient
-        .from("distribution_queue")
-        .update({
-          status: newAttempts >= MAX_ATTEMPTS ? "failed" : "pending",
-          attempts: newAttempts,
-          error: errMsg.slice(0, 500),
-        })
-        .eq("id", item.id)
-
-      results.failed++
-      console.error(`Distribution failed for ${item.username}:`, err)
     }
   }
 

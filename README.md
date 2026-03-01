@@ -157,7 +157,7 @@ providers/
 
 ## License
 
-Private.
+Apache 2.0
 
 
 ## Buy us a coffee!
