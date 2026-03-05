@@ -428,27 +428,6 @@ export async function joinWaitlist(email: string, name: string, role?: string): 
   return { status: "SUCCESS", error: null }
 }
 
-export async function getWaitlistPosition(email: string): Promise<WaitlistPosition | null> {
-  const supabase = await createClient()
-
-  const { data: entry } = await supabase.from("waitlist").select("created_at").eq("email", email.toLowerCase()).single()
-
-  if (!entry) return null
-
-  const { count } = await supabase
-    .from("waitlist")
-    .select("*", { count: "exact", head: true })
-    .lt("created_at", entry.created_at)
-    .eq("status", "pending")
-
-  const { count: total } = await supabase.from("waitlist").select("*", { count: "exact", head: true }).eq("status", "pending")
-
-  return {
-    position: (count ?? 0) + 1,
-    total: total ?? 0,
-  }
-}
-
 export async function getWaitlistCount(): Promise<number> {
   const supabase = await createClient()
   const { count } = await supabase.from("waitlist").select("*", { count: "exact", head: true }).eq("status", "pending")

@@ -3,8 +3,8 @@
 import Link from "next/link"
 import { toast } from "sonner"
 import { useState } from "react"
-import { Loader2, CheckCircle2, Users, Hash } from "lucide-react"
-import { joinWaitlist, getWaitlistPosition } from "@/lib/actions"
+import { Loader2, CheckCircle2 } from "lucide-react"
+import { joinWaitlist } from "@/lib/actions"
 
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -26,7 +26,6 @@ export default function WaitlistPage() {
   const [role, setRole] = useState("")
   const [loading, setLoading] = useState(false)
   const [joined, setJoined] = useState(false)
-  const [position, setPosition] = useState<{ position: number; total: number } | null>(null)
   const [error, setError] = useState("")
 
   async function handleSubmit(e: React.FormEvent) {
@@ -35,7 +34,6 @@ export default function WaitlistPage() {
     setLoading(true)
 
     const { status, error } = await joinWaitlist(email, name, role || undefined)
-
     if (status === "ERROR" && error) {
       setError(error)
       setLoading(false)
@@ -48,14 +46,12 @@ export default function WaitlistPage() {
       return
     }
 
-    const pos = await getWaitlistPosition(email)
-    setPosition(pos)
     setJoined(true)
     setLoading(false)
     toast.success("You're on the list!", { position: "top-center" })
   }
 
-  if (joined && position) {
+  if (joined) {
     return (
       <div className="w-full max-w-sm text-center -mt-16">
         <div className="flex items-center justify-center mb-6 mx-auto h-16 w-16 rounded-full bg-primary/10">
@@ -67,24 +63,6 @@ export default function WaitlistPage() {
         <p className="mt-3 text-sm text-muted-foreground">
           We'll notify you at <strong className="text-foreground">{email}</strong> when spots open up.
         </p>
-
-        <div className="mt-8 flex items-center justify-center gap-6">
-          <div className="flex flex-col items-center">
-            <div className="flex items-center gap-2 text-2xl font-bold text-primary">
-              <Hash className="h-5 w-5" />
-              {position.position}
-            </div>
-            <span className="text-xs text-muted-foreground">Your position</span>
-          </div>
-          <div className="h-10 w-px bg-border" />
-          <div className="flex flex-col items-center">
-            <div className="flex items-center gap-2 text-2xl font-bold text-foreground">
-              <Users className="h-5 w-5" />
-              {position.total}
-            </div>
-            <span className="text-xs text-muted-foreground">Already on the list</span>
-          </div>
-        </div>
 
         <div className="mt-10 rounded-xl border border-border bg-card p-5">
           <p className="text-sm text-muted-foreground">
