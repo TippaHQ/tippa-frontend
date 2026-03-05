@@ -3,7 +3,7 @@
 import Link from "next/link"
 import { toast } from "sonner"
 import { useState } from "react"
-import { Loader2, CheckCircle2 } from "lucide-react"
+import { Loader2, CheckCircle2, Twitter, Linkedin } from "lucide-react"
 import { joinWaitlist } from "@/lib/actions"
 
 import { Input } from "@/components/ui/input"
@@ -65,13 +65,15 @@ export default function WaitlistPage() {
         </p>
 
         <div className="mt-10 rounded-xl border border-border bg-card p-5">
-          <p className="text-sm text-muted-foreground">
-            In the meantime, follow us on{" "}
+          <p className="text-sm text-muted-foreground">In the meantime, follow us on our social media channels for updates.</p>
+          <div className="flex items-center justify-center gap-4 mt-4">
             <a href="https://x.com/trytippa" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
-              X
-            </a>{" "}
-            for updates.
-          </p>
+              <Twitter className="h-5 w-5" />
+            </a>
+            <a href="https://www.linkedin.com/company/try-tippa/" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+              <Linkedin className="h-5 w-5" />
+            </a>
+          </div>
         </div>
 
         <Link href="/" className="mt-8 inline-block">
